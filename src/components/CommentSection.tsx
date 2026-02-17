@@ -19,6 +19,7 @@ interface Comment {
 export default function CommentSection({ postId }: { postId: string }) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState("");
+    const [isAnonymous, setIsAnonymous] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -58,8 +59,9 @@ export default function CommentSection({ postId }: { postId: string }) {
         try {
             await addDoc(collection(db, "posts", postId, "comments"), {
                 text: newComment,
-                authorName: user.displayName || "匿名ユーザー",
+                authorName: isAnonymous ? "匿名ユーザー" : (user.displayName || "名無し"),
                 authorId: user.uid,
+                isAnonymous,
                 createdAt: serverTimestamp(),
                 isAi: false
             });
@@ -91,6 +93,16 @@ export default function CommentSection({ postId }: { postId: string }) {
                         placeholder="あなたの考えを共有してください..."
                         disabled={loading}
                     />
+
+                    <label className={styles.checkboxGroup}>
+                        <input
+                            type="checkbox"
+                            checked={isAnonymous}
+                            onChange={(e) => setIsAnonymous(e.target.checked)}
+                        />
+                        匿名でコメントする
+                    </label>
+
                     <button type="submit" className={styles.submitBtn} disabled={loading || !newComment.trim()}>
                         {loading ? "送信中..." : "コメントする"}
                     </button>

@@ -46,6 +46,21 @@
     transition: opacity 0.2s;
 }
 
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ccc;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.checkboxGroup input {
+    cursor: pointer;
+    accent-color: #6a11cb;
+}
+
 .submitBtn:hover {
     opacity: 0.9;
 }
