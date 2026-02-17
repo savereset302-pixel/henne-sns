@@ -87,7 +87,9 @@ export default function Home() {
                   <p className={styles.postSnippet}>{post.content}</p>
                   <div className={styles.postFooter}>
                     <span>by {post.authorName}</span>
-                    <button className={styles.readMore}>詳しく読む</button>
+                    <Link href={`/posts/${post.id}`}>
+                      <button className={styles.readMore}>詳しく読む</button>
+                    </Link>
                   </div>
                 </div>
               ))
