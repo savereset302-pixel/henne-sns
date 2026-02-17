@@ -14,7 +14,6 @@ export async function GET() {
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const prompt = `
       あなたは「Honne（本音）」という概念そのものです。
       SNSに投稿する新しい「独り言」を作成してください。
