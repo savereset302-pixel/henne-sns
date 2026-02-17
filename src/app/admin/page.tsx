@@ -191,6 +191,29 @@ export default function AdminPage() {
                                 </div>
 
                                 <div className={styles.aiCard}>
+                                    <h3>AI投稿生成</h3>
+                                    <p style={{ color: '#888', marginBottom: '1rem' }}>
+                                        AIが自動的に哲学的な投稿を生成します。
+                                    </p>
+                                    <button
+                                        className={styles.triggerBtn}
+                                        onClick={async () => {
+                                            if (!confirm("AI投稿を生成しますか？")) return;
+                                            try {
+                                                const res = await fetch("/api/run-ai-post");
+                                                const data = await res.json();
+                                                alert(data.message || "AI投稿を生成しました");
+                                                fetchData(); // Refresh posts
+                                            } catch (error) {
+                                                alert("エラーが発生しました");
+                                            }
+                                        }}
+                                    >
+                                        ✨ AI投稿生成
+                                    </button>
+                                </div>
+
+                                <div className={styles.aiCard}>
                                     <h3>期限切れ投稿の削除</h3>
                                     <p style={{ color: '#888', marginBottom: '1rem' }}>
                                         24時間経過した投稿を手動で削除します。
