@@ -1,0 +1,15 @@
+name: Trigger AI Comment
+
+on:
+  schedule:
+    # Run every hour at minute 0
+    - cron: '0 * * * *'
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  trigger-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call AI Comment API
+        run: curl -X GET https://henne-sns.vercel.app/api/run-ai-comment

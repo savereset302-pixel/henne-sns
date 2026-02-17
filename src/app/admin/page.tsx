@@ -57,6 +57,23 @@ export default function AdminDashboard() {
         }
     };
 
+    const triggerAI = async (endpoint: string) => {
+        if (!confirm("AIを手動実行しますか？")) return;
+        try {
+            const res = await fetch(endpoint);
+            const data = await res.json();
+            if (data.success) {
+                alert("実行しました: " + (data.message || "成功"));
+                if (endpoint.includes("post")) fetchPosts();
+            } else {
+                alert("エラー: " + data.error);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("通信エラーが発生しました。");
+        }
+    };
+
     if (loading) return <div className={styles.loading}>読み込み中...</div>;
 
     if (!user || !user.isAdmin) {
@@ -80,6 +97,24 @@ export default function AdminDashboard() {
             </header>
 
             <div style={{ marginBottom: '2rem' }}>
+                <h2 className={styles.sectionTitle}>システム操作 (AI手動実行)</h2>
+                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                    <button
+                        onClick={() => triggerAI("/api/run-ai-comment")}
+                        className="btn-primary"
+                        style={{ background: '#6a11cb' }}
+                    >
+                        AIコメントを実行
+                    </button>
+                    <button
+                        onClick={() => triggerAI("/api/run-ai-post")}
+                        className="btn-primary"
+                        style={{ background: '#2575fc' }}
+                    >
+                        AI投稿を作成
+                    </button>
+                </div>
+
                 <h2 className={styles.sectionTitle}>投稿管理 (最新50件)</h2>
                 <button onClick={fetchPosts} className="btn-secondary" style={{ marginBottom: '1rem' }}>更新</button>
             </div>
