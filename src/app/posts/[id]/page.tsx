@@ -19,6 +19,7 @@ interface Post {
     createdAt: any;
     commentCount?: number;
     likeCount?: number;
+    commentPolicy?: string;
 }
 
 export default function PostPage() {
@@ -74,7 +75,7 @@ export default function PostPage() {
                         </div>
                     </div>
 
-                    <CommentSection postId={post.id} />
+                    <CommentSection postId={post.id} commentPolicy={post.commentPolicy} />
                 </div>
 
                 <Link href="/" className={styles.backLink}>

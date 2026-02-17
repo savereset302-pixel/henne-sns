@@ -11,6 +11,7 @@ export default function NewPostPage() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("哲学");
+    const [commentPolicy, setCommentPolicy] = useState("all");
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
@@ -32,6 +33,7 @@ export default function NewPostPage() {
                 authorId: auth.currentUser.uid,
                 authorName: isAnonymous ? "匿名" : (auth.currentUser.displayName || "名無し"),
                 isAnonymous,
+                commentPolicy,
                 createdAt: serverTimestamp(),
             });
             router.push("/");
@@ -71,6 +73,14 @@ export default function NewPostPage() {
                                 <option value="社会">社会</option>
                                 <option value="人生">人生</option>
                                 <option value="技術">技術</option>
+                            </select>
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label>コメント設定</label>
+                            <select value={commentPolicy} onChange={(e) => setCommentPolicy(e.target.value)}>
+                                <option value="all">誰でもコメント可</option>
+                                <option value="ai_only">AIのみ許可 (人間は不可)</option>
+                                <option value="none">誰からも受け付けない (独り言)</option>
                             </select>
                         </div>
                         <div className={styles.inputGroup}>

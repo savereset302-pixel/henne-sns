@@ -22,7 +22,13 @@ export async function GET() {
             return NextResponse.json({ message: "No posts found" }, { status: 404 });
         }
 
-        const posts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; title: string, content: string }));
+        const posts = querySnapshot.docs
+            .map(doc => ({ id: doc.id, ...doc.data() } as { id: string; title: string, content: string, commentPolicy?: string }))
+            .filter(post => post.commentPolicy !== 'none');
+
+        if (posts.length === 0) {
+            return NextResponse.json({ message: "No eligible posts found for AI comments" }, { status: 404 });
+        }
 
         // 2. Select a random post
         const randomPost = posts[Math.floor(Math.random() * posts.length)];

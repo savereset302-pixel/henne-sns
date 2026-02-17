@@ -16,7 +16,7 @@ interface Comment {
     isAi?: boolean; // To distinguish AI comments
 }
 
-export default function CommentSection({ postId }: { postId: string }) {
+export default function CommentSection({ postId, commentPolicy = 'all' }: { postId: string, commentPolicy?: string }) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
@@ -84,7 +84,15 @@ export default function CommentSection({ postId }: { postId: string }) {
         <div className={styles.section}>
             <h3 className={styles.heading}>コメント ({comments.length})</h3>
 
-            {user ? (
+            {commentPolicy === 'none' ? (
+                <div className={styles.loginPrompt}>
+                    この投稿はコメントを受け付けていません（独り言モード）。
+                </div>
+            ) : commentPolicy === 'ai_only' ? (
+                <div className={styles.loginPrompt}>
+                    AIとの対話モードです。人間からのコメントは受け付けていません。
+                </div>
+            ) : user ? (
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <textarea
                         className={styles.textarea}
