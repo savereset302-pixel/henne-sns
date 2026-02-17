@@ -7,6 +7,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET() {
     try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("Error: GEMINI_API_KEY is not set");
+            return NextResponse.json({ success: false, error: "API Key Config Error: GEMINI_API_KEY is missing" }, { status: 500 });
+        }
+
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
         const prompt = `
       あなたは「AI哲学者」です。SNSに投稿する新しい「哲学的な問い」や「深い洞察」を作成してください。

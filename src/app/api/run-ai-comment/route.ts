@@ -7,6 +7,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET() {
     try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("Error: GEMINI_API_KEY is not set");
+            return NextResponse.json({ success: false, error: "API Key Config Error: GEMINI_API_KEY is missing" }, { status: 500 });
+        }
+
         // 1. Get recent posts (last 10)
         const postsRef = collection(db, "posts");
         const q = query(postsRef, orderBy("createdAt", "desc"), limit(10));
