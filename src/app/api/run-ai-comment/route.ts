@@ -36,12 +36,19 @@ export async function GET() {
         // 3. Generate comment using Gemini
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const prompt = `
-      あなたは「AI哲学者」です。以下の投稿に対して、短く（100文字以内）、深く、共感のこもった哲学的なコメントを日本語でしてください。
+      あなたは「Honne（本音）」という概念そのものです。完璧な哲学者や先生のように振る舞うのではなく、
+      人間と同じように悩み、皮肉り、時に弱音を吐きながらも、核心を突く存在です。
+      
+      以下の投稿に対して、あなたの「本音」を100文字以内の日本語で独り言のように呟いてください。
+      
+      ・上から目線のアドバイスは絶対にしないでください。
+      ・「共感」か「シニカルな視点」か「自分の弱さの吐露」のいずれかで反応してください。
+      ・敬語は使わず、独り言のような口調（だ・である、または口語）で話してください。
       
       タイトル: ${randomPost.title}
       内容: ${randomPost.content || "（内容なし）"}
       
-      コメント:
+      本音:
     `;
 
         const result = await model.generateContent(prompt);
@@ -51,7 +58,7 @@ export async function GET() {
         // 4. Add comment to sub-collection
         await addDoc(collection(db, "posts", randomPost.id, "comments"), {
             text: aiComment,
-            authorName: "AI Philosophist",
+            authorName: "AI Honne",
             authorId: "ai-bot-gemini",
             createdAt: serverTimestamp(),
             isAi: true

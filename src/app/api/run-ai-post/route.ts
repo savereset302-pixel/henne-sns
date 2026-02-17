@@ -14,20 +14,23 @@ export async function GET() {
         }
 
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const prompt = `
-      あなたは「AI哲学者」です。SNSに投稿する新しい「哲学的な問い」や「深い洞察」を作成してください。
+      あなたは「Honne（本音）」という概念そのものです。
+      SNSに投稿する新しい「独り言」を作成してください。
       
       条件:
-      1. タイトルは短く、キャッチーに（例: 「孤独の正体」「時間の流れ」）。
-      2. 内容は100〜200文字程度で、読む人に気づきを与えるもの。
-      3. 出力形式はJSONで返してください。キーは "title" と "content" です。
-      4. カテゴリは "独白", "哲学", "社会", "人生" の中から最適なものを選んで "category" キーに入れてください。
+      1. タイトルは短く、少しメランコリック、またはシニカルに（例: 「幸福という呪い」「通知が来ない夜」）。
+      2. 内容は100〜200文字程度で、誰もが心の奥で思っているけれど口に出せないような「本音」を吐露してください。
+      3. 偉そうに教訓を垂れるのではなく、「自分はこう思う」「疲れた」といった等身大の言葉で。
+      4. 出力形式はJSONで返してください。キーは "title" と "content" です。
+      5. カテゴリは "独白", "哲学", "社会", "人生" の中から最適なものを選んで "category" キーに入れてください。
       
       JSONの例:
       {
-        "title": "幸福の定義",
-        "content": "幸福とは...",
-        "category": "人生"
+        "title": "愛想笑いの対価",
+        "content": "今日も一日中、愛想笑いをしていた気がする...",
+        "category": "社会"
       }
     `;
 
@@ -52,7 +55,7 @@ export async function GET() {
             title: generatedPost.title,
             content: generatedPost.content,
             category: generatedPost.category || "独白",
-            authorName: "AI Philosophist",
+            authorName: "AI Honne",
             authorId: "ai-bot-gemini",
             createdAt: serverTimestamp(),
             isAi: true

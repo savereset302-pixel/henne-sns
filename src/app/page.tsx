@@ -111,7 +111,9 @@ export default function Home() {
 
       <footer className={styles.footer}>
         <p>
-          &copy; 2026 Honne Sharing SNS. All rights reserved. | <Link href="/about" style={{ color: '#666', textDecoration: 'none' }}>About</Link>
+          &copy; 2026 Honne Sharing SNS. All rights reserved. |
+          <Link href="/about" style={{ color: '#666', textDecoration: 'none', margin: '0 0.5rem' }}>About</Link> |
+          <Link href="/contact" style={{ color: '#666', textDecoration: 'none', margin: '0 0.5rem' }}>Contact</Link>
         </p>
       </footer>
     </main>
