@@ -30,6 +30,18 @@ export default function AuthForm() {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 // Reload user to get latest emailVerified status
                 await userCredential.user.reload();
+
+                // If user is not verified, send verification email (one-time auto-send)
+                if (!userCredential.user.emailVerified) {
+                    try {
+                        await sendEmailVerification(userCredential.user);
+                        setSuccessMessage("確認メールを送信しました。メールをご確認ください。");
+                    } catch (emailError) {
+                        // Silently fail if email sending fails (e.g., too many requests)
+                        console.error("Failed to send verification email:", emailError);
+                    }
+                }
+
                 router.push("/");
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
