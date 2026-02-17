@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp, updateDoc, doc, increment } from "firebase/firestore";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
@@ -49,6 +49,11 @@ export async function GET() {
             authorId: "ai-bot-gemini",
             createdAt: serverTimestamp(),
             isAi: true
+        });
+
+        // 5. Increment comment count
+        await updateDoc(doc(db, "posts", randomPost.id), {
+            commentCount: increment(1)
         });
 
         return NextResponse.json({

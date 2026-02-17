@@ -14,6 +14,7 @@ interface Post {
   category: string;
   authorName: string;
   createdAt: any;
+  commentCount?: number;
 }
 
 export default function Home() {
@@ -86,7 +87,12 @@ export default function Home() {
                   <h3 className={styles.postTitle}>{post.title}</h3>
                   <p className={styles.postSnippet}>{post.content}</p>
                   <div className={styles.postFooter}>
-                    <span>by {post.authorName}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <span>by {post.authorName}</span>
+                      <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
+                        💬 {post.commentCount || 0}
+                      </span>
+                    </div>
                     <Link href={`/posts/${post.id}`}>
                       <button className={styles.readMore}>詳しく読む</button>
                     </Link>

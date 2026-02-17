@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { db, auth } from "@/lib/firebase";
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, increment } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import styles from "./CommentSection.module.css";
 import Link from "next/link";
@@ -63,6 +63,12 @@ export default function CommentSection({ postId }: { postId: string }) {
                 createdAt: serverTimestamp(),
                 isAi: false
             });
+
+            // Increment comment count
+            await updateDoc(doc(db, "posts", postId), {
+                commentCount: increment(1)
+            });
+
             setNewComment("");
         } catch (error) {
             console.error("Error adding comment:", error);

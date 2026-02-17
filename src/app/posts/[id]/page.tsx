@@ -16,6 +16,7 @@ interface Post {
     category: string;
     authorName: string;
     createdAt: any;
+    commentCount?: number;
 }
 
 export default function PostPage() {
@@ -65,6 +66,7 @@ export default function PostPage() {
                     <div className={styles.meta}>
                         <span>by {post.authorName}</span>
                         <span>{post.createdAt?.toDate?.().toLocaleDateString() || "Unknown Date"}</span>
+                        <span>💬 {post.commentCount || 0}</span>
                     </div>
 
                     <CommentSection postId={post.id} />
