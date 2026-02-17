@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
+import LikeButton from "@/components/LikeButton";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
 
@@ -15,6 +16,7 @@ interface Post {
   authorName: string;
   createdAt: any;
   commentCount?: number;
+  likeCount?: number;
 }
 
 export default function Home() {
@@ -92,6 +94,7 @@ export default function Home() {
                       <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
                         💬 {post.commentCount || 0}
                       </span>
+                      <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
                     </div>
                     <Link href={`/posts/${post.id}`}>
                       <button className={styles.readMore}>詳しく読む</button>

@@ -7,7 +7,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import styles from "./post.module.css";
 import UserNav from "@/components/UserNav";
-import CommentSection from "@/components/CommentSection";
+import LikeButton from "@/components/LikeButton";
 
 interface Post {
     id: string;
@@ -17,6 +17,7 @@ interface Post {
     authorName: string;
     createdAt: any;
     commentCount?: number;
+    likeCount?: number;
 }
 
 export default function PostPage() {
@@ -67,6 +68,9 @@ export default function PostPage() {
                         <span>by {post.authorName}</span>
                         <span>{post.createdAt?.toDate?.().toLocaleDateString() || "Unknown Date"}</span>
                         <span>💬 {post.commentCount || 0}</span>
+                        <div style={{ marginLeft: '1rem' }}>
+                            <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+                        </div>
                     </div>
 
                     <CommentSection postId={post.id} />

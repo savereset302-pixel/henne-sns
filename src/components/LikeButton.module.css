@@ -1,0 +1,28 @@
+.button {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 0.3rem 0.8rem;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.9rem;
+}
+
+.button:hover {
+    background: rgba(255, 100, 100, 0.1);
+    border-color: rgba(255, 100, 100, 0.4);
+}
+
+.active {
+    background: rgba(255, 50, 50, 0.2);
+    border-color: #ff5555;
+    color: #ff5555;
+}
+
+.icon {
+    font-size: 1rem;
+}
