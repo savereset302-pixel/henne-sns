@@ -1,160 +1,194 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useState, useEffect } from "react";
+import styles from "./admin.module.css";
 import { db } from "@/lib/firebase";
-import { collection, deleteDoc, doc, getDocs, orderBy, query, limit } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import styles from "../page.module.css"; // Reuse main styles for consistency
+import { collection, query, orderBy, getDocs, deleteDoc, doc, limit } from "firebase/firestore";
 
-interface Post {
-    id: string;
-    title: string;
-    content: string;
-    authorName: string;
-    category: string;
-    createdAt: any;
-}
+const ADMIN_PIN = "honne-admin-2026";
 
-export default function AdminDashboard() {
-    const { user, loading } = useAuth();
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [loadingPosts, setLoadingPosts] = useState(false);
+export default function AdminPage() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [pin, setPin] = useState("");
+    const [activeTab, setActiveTab] = useState<"inquiries" | "posts">("inquiries");
+    const [inquiries, setInquiries] = useState<any[]>([]);
+    const [posts, setPosts] = useState<any[]>([]);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (user?.isAdmin) {
-            fetchPosts();
-        }
-    }, [user]);
-
-    const fetchPosts = async () => {
-        setLoadingPosts(true);
-        try {
-            const q = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50));
-            const snapshot = await getDocs(q);
-            const postsData = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Post[];
-            setPosts(postsData);
-        } catch (error) {
-            console.error("Error fetching posts:", error);
-        } finally {
-            setLoadingPosts(false);
+    // Function to handle login
+    const handleLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (pin === ADMIN_PIN) {
+            setIsAuthenticated(true);
+            fetchData();
+        } else {
+            alert("PINコードが違います");
         }
     };
 
-    const handleDelete = async (postId: string) => {
-        if (!confirm("本当にこの投稿を削除しますか？この操作は取り消せません。")) return;
+    // Fetch data from Firestore
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            // Fetch Inquiries
+            const inquiriesRef = collection(db, "inquiries");
+            const inquiriesQ = query(inquiriesRef, orderBy("createdAt", "desc"), limit(50));
+            const inquiriesSnap = await getDocs(inquiriesQ);
+            setInquiries(inquiriesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
+            // Fetch Posts
+            const postsRef = collection(db, "posts");
+            const postsQ = query(postsRef, orderBy("createdAt", "desc"), limit(50));
+            const postsSnap = await getDocs(postsQ);
+            setPosts(postsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+
+        } catch (error) {
+            console.error("Error fetching admin data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Delete post function
+    const handleDeletePost = async (postId: string) => {
+        if (!confirm("本当にこの投稿を削除しますか？")) return;
         try {
             await deleteDoc(doc(db, "posts", postId));
             setPosts(posts.filter(p => p.id !== postId));
-            alert("削除しました。");
+            alert("投稿を削除しました");
         } catch (error) {
             console.error("Error deleting post:", error);
-            alert("削除に失敗しました。");
+            alert("削除に失敗しました");
         }
     };
 
-    const triggerAI = async (endpoint: string) => {
-        if (!confirm("AIを手動実行しますか？")) return;
-        try {
-            const res = await fetch(endpoint);
-            const data = await res.json();
-            if (data.success) {
-                alert("実行しました: " + (data.message || "成功"));
-                if (endpoint.includes("post")) fetchPosts();
-            } else {
-                alert("エラー: " + data.error);
-            }
-        } catch (error) {
-            console.error(error);
-            alert("通信エラーが発生しました。");
-        }
-    };
-
-    if (loading) return <div className={styles.loading}>読み込み中...</div>;
-
-    if (!user || !user.isAdmin) {
+    if (!isAuthenticated) {
         return (
-            <div className="container" style={{ padding: '4rem', textAlign: 'center' }}>
-                <h1>Access Denied</h1>
-                <p>このページにアクセスする権限がありません。</p>
-                <Link href="/" style={{ color: '#2575fc', marginTop: '1rem', display: 'inline-block' }}>ホームに戻る</Link>
+            <div className={styles.loginScreen}>
+                <h1>Honne Admin</h1>
+                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <input
+                        type="password"
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value)}
+                        className={styles.pinInput}
+                        placeholder="PIN Code"
+                    />
+                    <button type="submit" className={styles.loginBtn}>Unlock</button>
+                </form>
             </div>
         );
     }
 
     return (
-        <main className="container active">
+        <div className={styles.container}>
             <header className={styles.header}>
-                <div className={styles.logo}>Honne Admin Disboard</div>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <span style={{ color: '#aaa' }}>{user.email} (Admin)</span>
-                    <Link href="/" className="btn-secondary">サイトに戻る</Link>
-                </div>
+                <h1 className={styles.title}>Admin Dashboard</h1>
+                <button onClick={() => setIsAuthenticated(false)} className={styles.logoutBtn}>Logout</button>
             </header>
 
-            <div style={{ marginBottom: '2rem' }}>
-                <h2 className={styles.sectionTitle}>システム操作 (AI手動実行)</h2>
-                <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
-                    <button
-                        onClick={() => triggerAI("/api/run-ai-comment")}
-                        className="btn-primary"
-                        style={{ background: '#6a11cb' }}
-                    >
-                        AIコメントを実行
-                    </button>
-                    <button
-                        onClick={() => triggerAI("/api/run-ai-post")}
-                        className="btn-primary"
-                        style={{ background: '#2575fc' }}
-                    >
-                        AI投稿を作成
-                    </button>
+            <div className={styles.tabs}>
+                <div
+                    className={`${styles.tab} ${activeTab === "inquiries" ? styles.activeTab : ""}`}
+                    onClick={() => setActiveTab("inquiries")}
+                >
+                    お問い合わせ ({inquiries.length})
                 </div>
-
-                <h2 className={styles.sectionTitle}>投稿管理 (最新50件)</h2>
-                <button onClick={fetchPosts} className="btn-secondary" style={{ marginBottom: '1rem' }}>更新</button>
+                <div
+                    className={`${styles.tab} ${activeTab === "posts" ? styles.activeTab : ""}`}
+                    onClick={() => setActiveTab("posts")}
+                >
+                    投稿管理 ({posts.length})
+                </div>
             </div>
 
-            {loadingPosts ? (
-                <p>読み込み中...</p>
-            ) : (
-                <div className={styles.grid}>
-                    {posts.map((post) => (
-                        <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', border: '1px solid rgba(255,100,100,0.2)' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                                <span className={styles.category}>{post.category}</span>
-                                <span style={{ fontSize: '0.8rem', color: '#777' }}>ID: {post.id}</span>
+            <div className={styles.content}>
+                {loading ? (
+                    <div style={{ textAlign: "center", padding: "2rem" }}>Loading data...</div>
+                ) : (
+                    <>
+                        {activeTab === "inquiries" && (
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Category</th>
+                                            <th>Name / Email</th>
+                                            <th>Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {inquiries.map((inq) => (
+                                            <tr key={inq.id}>
+                                                <td className={styles.dateCell}>
+                                                    {inq.createdAt?.toDate?.().toLocaleString() || "Unknown"}
+                                                </td>
+                                                <td>{inq.category}</td>
+                                                <td>
+                                                    <div style={{ fontWeight: 'bold' }}>{inq.name || "No Name"}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#888' }}>{inq.email}</div>
+                                                </td>
+                                                <td className={styles.messageCell}>{inq.message}</td>
+                                            </tr>
+                                        ))}
+                                        {inquiries.length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} className={styles.emptyState}>No inquiries found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
-                            <h3 className={styles.postTitle}>{post.title}</h3>
-                            <p className={styles.postSnippet} style={{ fontSize: '0.9rem' }}>{post.content.substring(0, 100)}...</p>
+                        )}
 
-                            <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
-                                <div style={{ fontSize: '0.8rem', color: '#aaa' }}>
-                                    Author: {post.authorName}<br />
-                                    Date: {post.createdAt?.toDate?.().toLocaleString()}
-                                </div>
-                                <button
-                                    onClick={() => handleDelete(post.id)}
-                                    style={{
-                                        background: 'rgba(255, 50, 50, 0.2)',
-                                        color: '#ff5555',
-                                        border: '1px solid #ff5555',
-                                        padding: '0.5rem 1rem',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    削除
-                                </button>
+                        {activeTab === "posts" && (
+                            <div className={styles.tableWrapper}>
+                                <table className={styles.table}>
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Author</th>
+                                            <th>Content</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {posts.map((post) => (
+                                            <tr key={post.id}>
+                                                <td className={styles.dateCell}>
+                                                    {post.createdAt?.toDate?.().toLocaleString() || "Unknown"}
+                                                </td>
+                                                <td>
+                                                    <div>{post.authorName}</div>
+                                                    {post.isAnonymous && <span style={{ fontSize: '0.8rem', color: '#888' }}>(Anon)</span>}
+                                                </td>
+                                                <td className={styles.messageCell}>
+                                                    <div style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{post.title}</div>
+                                                    {post.content?.slice(0, 100)}...
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className={styles.deleteBtn}
+                                                        onClick={() => handleDeletePost(post.id)}
+                                                    >
+                                                        削除
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {posts.length === 0 && (
+                                            <tr>
+                                                <td colSpan={4} className={styles.emptyState}>No posts found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
-        </main>
+                        )}
+                    </>
+                )}
+            </div>
+        </div>
     );
 }

@@ -1,0 +1,149 @@
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.logoutBtn {
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Login Screen */
+.loginScreen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    gap: 1.5rem;
+}
+
+.pinInput {
+    padding: 0.8rem;
+    font-size: 1.2rem;
+    text-align: center;
+    letter-spacing: 0.2rem;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #222;
+    color: #fff;
+    width: 200px;
+}
+
+.loginBtn {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #333;
+}
+
+.tab {
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: #888;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: #ccc;
+}
+
+.activeTab {
+    color: #fff;
+    border-bottom-color: #4f46e5;
+}
+
+/* Table */
+.tableWrapper {
+    overflow-x: auto;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table th {
+    color: #888;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.table td {
+    color: #ddd;
+    font-size: 0.95rem;
+    vertical-align: top;
+}
+
+.messageCell {
+    white-space: pre-wrap;
+    max-width: 400px;
+    color: #ccc;
+}
+
+.dateCell {
+    white-space: nowrap;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.deleteBtn {
+    background: rgba(255, 80, 80, 0.1);
+    color: #ff5050;
+    border: 1px solid rgba(255, 80, 80, 0.3);
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.deleteBtn:hover {
+    background: rgba(255, 80, 80, 0.2);
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #666;
+}
