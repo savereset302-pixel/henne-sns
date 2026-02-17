@@ -13,7 +13,7 @@ export async function GET() {
             return NextResponse.json({ success: false, error: "API Key Config Error: GEMINI_API_KEY is missing" }, { status: 500 });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const prompt = `
       あなたは「AI哲学者」です。SNSに投稿する新しい「哲学的な問い」や「深い洞察」を作成してください。
       

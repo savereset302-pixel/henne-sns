@@ -28,7 +28,7 @@ export async function GET() {
         const randomPost = posts[Math.floor(Math.random() * posts.length)];
 
         // 3. Generate comment using Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
         const prompt = `
       あなたは「AI哲学者」です。以下の投稿に対して、短く（100文字以内）、深く、共感のこもった哲学的なコメントを日本語でしてください。
       
