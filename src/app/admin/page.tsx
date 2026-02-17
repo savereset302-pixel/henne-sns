@@ -10,7 +10,7 @@ const ADMIN_PIN = "honne-admin-2026";
 export default function AdminPage() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [pin, setPin] = useState("");
-    const [activeTab, setActiveTab] = useState<"inquiries" | "posts">("inquiries");
+    const [activeTab, setActiveTab] = useState<"inquiries" | "posts" | "ai">("inquiries");
     const [inquiries, setInquiries] = useState<any[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -100,6 +100,12 @@ export default function AdminPage() {
                 >
                     投稿管理 ({posts.length})
                 </div>
+                <div
+                    className={`${styles.tab} ${activeTab === "ai" ? styles.activeTab : ""}`}
+                    onClick={() => setActiveTab("ai")}
+                >
+                    AI機能
+                </div>
             </div>
 
             <div className={styles.content}>
@@ -184,6 +190,56 @@ export default function AdminPage() {
                                         )}
                                     </tbody>
                                 </table>
+                            </div>
+                        )}
+
+                        {activeTab === "ai" && (
+                            <div className={styles.aiPanel}>
+                                <h2 style={{ marginBottom: '1.5rem' }}>AI機能の手動実行</h2>
+
+                                <div className={styles.aiCard}>
+                                    <h3>AIコメント生成</h3>
+                                    <p style={{ color: '#888', marginBottom: '1rem' }}>
+                                        最新の投稿に対してAI哲学者がコメントを生成します。
+                                    </p>
+                                    <button
+                                        className={styles.triggerBtn}
+                                        onClick={async () => {
+                                            if (!confirm("AIコメントを実行しますか？")) return;
+                                            try {
+                                                const res = await fetch("/api/run-ai-comment");
+                                                const data = await res.json();
+                                                alert(data.message || "AIコメントを実行しました");
+                                            } catch (error) {
+                                                alert("エラーが発生しました");
+                                            }
+                                        }}
+                                    >
+                                        🤖 AIコメント実行
+                                    </button>
+                                </div>
+
+                                <div className={styles.aiCard}>
+                                    <h3>期限切れ投稿の削除</h3>
+                                    <p style={{ color: '#888', marginBottom: '1rem' }}>
+                                        24時間経過した投稿を手動で削除します。
+                                    </p>
+                                    <button
+                                        className={styles.triggerBtn}
+                                        onClick={async () => {
+                                            if (!confirm("期限切れ投稿を削除しますか？")) return;
+                                            try {
+                                                const res = await fetch("/api/cron-cleanup");
+                                                const data = await res.json();
+                                                alert(`${data.deletedCount}件の投稿を削除しました`);
+                                            } catch (error) {
+                                                alert("エラーが発生しました");
+                                            }
+                                        }}
+                                    >
+                                        🗑️ 期限切れ投稿削除
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </>
