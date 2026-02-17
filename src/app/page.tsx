@@ -110,7 +110,9 @@ export default function Home() {
       </section>
 
       <footer className={styles.footer}>
-        <p>&copy; 2026 Honne Sharing SNS. All rights reserved.</p>
+        <p>
+          &copy; 2026 Honne Sharing SNS. All rights reserved. | <Link href="/about" style={{ color: '#666', textDecoration: 'none' }}>About</Link>
+        </p>
       </footer>
     </main>
   );

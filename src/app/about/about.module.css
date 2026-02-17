@@ -1,0 +1,87 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    text-decoration: none;
+    background: linear-gradient(to right, #4f46e5, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.content {
+    max-width: 800px;
+    margin: 4rem auto;
+    text-align: center;
+}
+
+.hero {
+    margin-bottom: 4rem;
+    animation: float 6s ease-in-out infinite;
+}
+
+.title {
+    font-size: 2.5rem;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    background: linear-gradient(to bottom right, #fff, #aaa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.message {
+    font-size: 1.1rem;
+    line-height: 2.2;
+    color: #d1d5db;
+    margin-bottom: 4rem;
+}
+
+.message p {
+    margin-bottom: 2.5rem;
+}
+
+.action {
+    margin-top: 2rem;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 4rem;
+    color: #666;
+    font-size: 0.8rem;
+    padding-bottom: 2rem;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+
+    100% {
+        transform: translateY(0px);
+    }
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .message {
+        font-size: 1rem;
+        padding: 0 1rem;
+        text-align: left;
+    }
+}
