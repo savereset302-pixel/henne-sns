@@ -47,6 +47,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
+      <head>
+        <meta name="google-site-verification" content="z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c" />
+      </head>
       <body className={`${outfit.variable}`}>
         <JsonLd />
         {children}
