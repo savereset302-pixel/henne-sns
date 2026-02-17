@@ -11,6 +11,7 @@ export default function NewPostPage() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("哲学");
+    const [isAnonymous, setIsAnonymous] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
@@ -29,7 +30,8 @@ export default function NewPostPage() {
                 content,
                 category,
                 authorId: auth.currentUser.uid,
-                authorName: auth.currentUser.displayName || "匿名",
+                authorName: isAnonymous ? "匿名" : (auth.currentUser.displayName || "名無し"),
+                isAnonymous,
                 createdAt: serverTimestamp(),
             });
             router.push("/");
@@ -81,6 +83,16 @@ export default function NewPostPage() {
                                 rows={10}
                             />
                         </div>
+
+                        <label className={styles.checkboxGroup}>
+                            <input
+                                type="checkbox"
+                                checked={isAnonymous}
+                                onChange={(e) => setIsAnonymous(e.target.checked)}
+                            />
+                            匿名で投稿する
+                        </label>
+
                         <div className={styles.actions}>
                             <Link href="/" className={styles.cancel}>キャンセル</Link>
                             <button type="submit" className="btn-primary" disabled={isLoading}>

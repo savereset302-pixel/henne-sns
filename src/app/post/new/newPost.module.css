@@ -69,6 +69,23 @@
     border-color: var(--accent-color);
 }
 
+.checkboxGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    width: fit-content;
+}
+
+.checkboxGroup input {
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+}
+
 .actions {
     display: flex;
     justify-content: flex-end;
