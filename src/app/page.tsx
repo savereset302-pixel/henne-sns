@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
 import LikeButton from "@/components/LikeButton";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
 
@@ -63,6 +64,8 @@ export default function Home() {
           世間の目を気にせず、あなたの内なる哲学を共有し、深め合うSNS。
         </p>
       </section>
+
+      <EmailVerificationBanner />
 
       <section className={styles.feed}>
         <div className={styles.feedHeader}>

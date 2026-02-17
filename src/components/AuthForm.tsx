@@ -6,7 +6,8 @@ import { auth } from "@/lib/firebase";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
-    updateProfile
+    updateProfile,
+    sendEmailVerification
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
 
@@ -16,20 +17,31 @@ export default function AuthForm() {
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
     const [error, setError] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
     const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
+        setSuccessMessage("");
 
         try {
             if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                // Reload user to get latest emailVerified status
+                await userCredential.user.reload();
+                router.push("/");
             } else {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
+
+                // Send verification email
+                await sendEmailVerification(userCredential.user);
+                setSuccessMessage("登録完了！確認メールを送信しました。メールをご確認ください。");
+
+                // Redirect after 3 seconds
+                setTimeout(() => router.push("/"), 3000);
             }
-            router.push("/");
         } catch (err: any) {
             setError(err.message);
         }
@@ -72,6 +84,7 @@ export default function AuthForm() {
                     />
                 </div>
                 {error && <p className={styles.error}>{error}</p>}
+                {successMessage && <p className={styles.success}>{successMessage}</p>}
                 <button type="submit" className="btn-primary">
                     {isLogin ? "ログイン" : "登録して本音を語る"}
                 </button>
