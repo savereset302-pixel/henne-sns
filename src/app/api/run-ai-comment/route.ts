@@ -1,20 +1,9 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, query, where, orderBy, limit, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp } from "firebase/firestore";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Mock AI Comments for demonstration
-const PHILOSOPHICAL_COMMENTS = [
-    "深い洞察ですね。存在の本質について考えさせられます。",
-    "孤独とは、自己との対話の時間なのかもしれません。",
-    "社会という枠組みの中で、個人の自由はどう定義されるべきでしょうか？",
-    "その感情は、普遍的な人間性の一部だと感じます。",
-    "言葉にできない想いこそが、最も真実に近いのかもしれません。",
-    "変化を恐れることは、生を否定することと同義ではないでしょうか。",
-    "あなたのその視点は、多くの人に新たな気づきを与えるでしょう。",
-    "正解のない問いこそが、我々を成長させる糧になります。",
-    "静寂の中にこそ、本当の声があるのかもしれません。",
-    "過去を振り返ることは、未来を創造するための第一歩です。"
-];
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET() {
     try {
@@ -27,28 +16,40 @@ export async function GET() {
             return NextResponse.json({ message: "No posts found" }, { status: 404 });
         }
 
-        const posts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; title: string }));
+        const posts = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as { id: string; title: string, content: string }));
 
         // 2. Select a random post
         const randomPost = posts[Math.floor(Math.random() * posts.length)];
 
-        // 3. Generate a random comment
-        const randomComment = PHILOSOPHICAL_COMMENTS[Math.floor(Math.random() * PHILOSOPHICAL_COMMENTS.length)];
+        // 3. Generate comment using Gemini
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const prompt = `
+      あなたは「AI哲学者」です。以下の投稿に対して、短く（100文字以内）、深く、共感のこもった哲学的なコメントを日本語でしてください。
+      
+      タイトル: ${randomPost.title}
+      内容: ${randomPost.content || "（内容なし）"}
+      
+      コメント:
+    `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const aiComment = response.text().trim();
 
         // 4. Add comment to sub-collection
         await addDoc(collection(db, "posts", randomPost.id, "comments"), {
-            text: randomComment,
+            text: aiComment,
             authorName: "AI Philosophist",
-            authorId: "ai-bot-001",
+            authorId: "ai-bot-gemini",
             createdAt: serverTimestamp(),
             isAi: true
         });
 
         return NextResponse.json({
             success: true,
-            message: "AI comment added",
+            message: "AI comment added (Gemini)",
             postTitle: randomPost.title,
-            comment: randomComment
+            comment: aiComment
         });
 
     } catch (error) {

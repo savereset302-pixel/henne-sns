@@ -1,55 +1,61 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// Mock AI Posts
-const PHILOSOPHICAL_TITLES = [
-    "今日の問い: 幸福とは何か",
-    "流れる時間と変わらない想い",
-    "「普通」という幻想について",
-    "夜明け前の静けさに思うこと",
-    "言葉が持つ本当の力",
-    "人間関係における適度な距離感",
-    "失敗の中に隠された種",
-    "自由と責任の境界線",
-    "なぜ私たちは夢を見るのか",
-    "孤独を愛するための方法"
-];
-
-const PHILOSOPHICAL_CONTENTS = [
-    "幸福は目的地ではなく、旅の途中に咲く花のようなものかもしれません。追い求めすぎると見失い、ふと立ち止まった時に気づくものです。",
-    "時間は川のように流れ去りますが、心に残る記憶は岩のように留まります。変わらないものを大切にする勇気を持ちたいですね。",
-    "社会が定義する「普通」に縛られていませんか？あなたの個性こそが、この世界を彩る唯一無二の色なのです。",
-    "最も暗い時間は、夜明けの直前だと言います。今の苦しみは、新しい始まりへの準備期間なのかもしれません。",
-    "言葉は時に刃となり、時に薬となります。今日あなたが発する言葉が、誰かの心を温めるものでありますように。",
-    "近づきすぎると傷つけ合い、離れすぎると凍えてしまう。ハリネズミのジレンマのように、私たちは最適な距離を探し続けています。",
-    "失敗は終わりではなく、学びの始まりです。転んだ数だけ、立ち上がる強さが身につくはずです。",
-    "自由には必ず責任が伴います。しかし、その重みを受け入れた時、私たちは本当の意味で自由になれるのではないでしょうか。",
-    "夢は現実からの逃避ではなく、現実を創造するための設計図です。あなたの描く未来を、恐れずに信じてください。",
-    "孤独は寂しさではありません。自分自身と深く対話し、内なる声に耳を傾けるための贅沢な時間です。"
-];
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET() {
     try {
-        // Select random title and matching content (simplified for now)
-        const index = Math.floor(Math.random() * PHILOSOPHICAL_TITLES.length);
-        const title = PHILOSOPHICAL_TITLES[index];
-        const content = PHILOSOPHICAL_CONTENTS[index]; // Ideally these should match, for now simple 1:1 mapping
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const prompt = `
+      あなたは「AI哲学者」です。SNSに投稿する新しい「哲学的な問い」や「深い洞察」を作成してください。
+      
+      条件:
+      1. タイトルは短く、キャッチーに（例: 「孤独の正体」「時間の流れ」）。
+      2. 内容は100〜200文字程度で、読む人に気づきを与えるもの。
+      3. 出力形式はJSONで返してください。キーは "title" と "content" です。
+      4. カテゴリは "独白", "哲学", "社会", "人生" の中から最適なものを選んで "category" キーに入れてください。
+      
+      JSONの例:
+      {
+        "title": "幸福の定義",
+        "content": "幸福とは...",
+        "category": "人生"
+      }
+    `;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text().replace(/```json|```/g, "").trim();
+
+        let generatedPost;
+        try {
+            generatedPost = JSON.parse(text);
+        } catch (e) {
+            console.error("JSON Parse Error:", text);
+            // Fallback if JSON parsing fails
+            generatedPost = {
+                title: "無題の思考",
+                content: text,
+                category: "独白"
+            };
+        }
 
         await addDoc(collection(db, "posts"), {
-            title: title,
-            content: content,
-            category: "独白", // Default category for AI
+            title: generatedPost.title,
+            content: generatedPost.content,
+            category: generatedPost.category || "独白",
             authorName: "AI Philosophist",
-            authorId: "ai-bot-001",
+            authorId: "ai-bot-gemini",
             createdAt: serverTimestamp(),
             isAi: true
         });
 
         return NextResponse.json({
             success: true,
-            message: "AI post created",
-            title: title
+            message: "AI post created (Gemini)",
+            title: generatedPost.title
         });
 
     } catch (error) {
