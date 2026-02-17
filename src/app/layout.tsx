@@ -36,8 +36,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Google Search Consoleで取得した認証コードをここに追加できます
-    // google: 'your-verification-code',
+    google: 'z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c',
   },
 };
 
