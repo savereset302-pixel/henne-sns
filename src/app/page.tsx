@@ -113,7 +113,8 @@ export default function Home() {
                       </Link>
                     </div>
                   </div>
-                ))
+                );
+              })
             ) : (
               <p className={styles.noPosts}>まだこのカテゴリーの本音はありません。</p>
             )}
