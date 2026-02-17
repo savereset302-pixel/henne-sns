@@ -5,26 +5,11 @@ import styles from "./admin.module.css";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, limit } from "firebase/firestore";
 
-const ADMIN_PIN = "honne-admin-2026";
-
 export default function AdminPage() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [pin, setPin] = useState("");
     const [activeTab, setActiveTab] = useState<"inquiries" | "posts" | "ai">("inquiries");
     const [inquiries, setInquiries] = useState<any[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-
-    // Function to handle login
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (pin === ADMIN_PIN) {
-            setIsAuthenticated(true);
-            fetchData();
-        } else {
-            alert("PINコードが違います");
-        }
-    };
 
     // Fetch data from Firestore
     const fetchData = async () => {
@@ -49,6 +34,11 @@ export default function AdminPage() {
         }
     };
 
+    // Fetch data on component mount
+    useEffect(() => {
+        fetchData();
+    }, []);
+
     // Delete post function
     const handleDeletePost = async (postId: string) => {
         if (!confirm("本当にこの投稿を削除しますか？")) return;
@@ -62,29 +52,10 @@ export default function AdminPage() {
         }
     };
 
-    if (!isAuthenticated) {
-        return (
-            <div className={styles.loginScreen}>
-                <h1>Honne Admin</h1>
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <input
-                        type="password"
-                        value={pin}
-                        onChange={(e) => setPin(e.target.value)}
-                        className={styles.pinInput}
-                        placeholder="PIN Code"
-                    />
-                    <button type="submit" className={styles.loginBtn}>Unlock</button>
-                </form>
-            </div>
-        );
-    }
-
     return (
         <div className={styles.container}>
             <header className={styles.header}>
                 <h1 className={styles.title}>Admin Dashboard</h1>
-                <button onClick={() => setIsAuthenticated(false)} className={styles.logoutBtn}>Logout</button>
             </header>
 
             <div className={styles.tabs}>
