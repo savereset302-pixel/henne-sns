@@ -4,6 +4,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/lib/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
+import styles from "../page.module.css";
+import UserNav from "@/components/UserNav";
+import Link from "next/link";
 
 const ADMIN_EMAIL = "ykts.yukitosi.5698@gmail.com";
 
@@ -30,34 +33,48 @@ export default function AdminInitPage() {
         }
     };
 
-    if (loading) return <div>読み込み中...</div>;
-
-    if (!user) return <div>ログインしてください。</div>;
+    if (loading) return <div className={styles.loading}>読み込み中...</div>;
 
     return (
-        <div className="container" style={{ padding: '4rem', textAlign: 'center' }}>
-            <h1>Admin Initialization</h1>
-            <p>現在のログインユーザー: {user.email}</p>
-            <p>管理者権限: {user.isAdmin ? "あり (TRUE)" : "なし (FALSE)"}</p>
+        <main className="container fade-in">
+            <header className={styles.header}>
+                <Link href="/" className={styles.logo}>Honne Admin Init</Link>
+                <UserNav />
+            </header>
 
-            {!user.isAdmin && user.email === ADMIN_EMAIL && (
-                <button
-                    onClick={makeAdmin}
-                    style={{
-                        marginTop: '2rem',
-                        padding: '1rem 2rem',
-                        background: 'red',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer'
-                    }}
-                >
-                    私を管理者にする
-                </button>
-            )}
+            <div className="container" style={{ padding: '4rem', textAlign: 'center' }}>
+                <h1>Admin Initialization</h1>
 
-            {status && <p style={{ marginTop: '2rem', color: 'yellow' }}>{status}</p>}
-        </div>
+                {user ? (
+                    <>
+                        <p>現在のログインユーザー: {user.email}</p>
+                        <p>管理者権限: {user.isAdmin ? "あり (TRUE)" : "なし (FALSE)"}</p>
+
+                        {!user.isAdmin && user.email === ADMIN_EMAIL && (
+                            <button
+                                onClick={makeAdmin}
+                                style={{
+                                    marginTop: '2rem',
+                                    padding: '1rem 2rem',
+                                    background: 'red',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                私を管理者にする
+                            </button>
+                        )}
+                        {status && <p style={{ marginTop: '2rem', color: 'yellow' }}>{status}</p>}
+                    </>
+                ) : (
+                    <div style={{ marginTop: '2rem' }}>
+                        <p>管理者設定を行うにはログインが必要です。</p>
+                        <p>右上のボタンからログインしてください。</p>
+                    </div>
+                )}
+            </div>
+        </main>
     );
 }
