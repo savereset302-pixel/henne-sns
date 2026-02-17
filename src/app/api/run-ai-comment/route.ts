@@ -58,8 +58,8 @@ export async function GET() {
             comment: aiComment
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error running AI comment job:", error);
-        return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+        return NextResponse.json({ success: false, error: error.message || String(error) }, { status: 500 });
     }
 }
