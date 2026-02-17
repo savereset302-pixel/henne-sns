@@ -13,6 +13,9 @@ export default function NewPostPage() {
     const [category, setCategory] = useState("哲学");
     const [commentPolicy, setCommentPolicy] = useState("all");
     const [isAnonymous, setIsAnonymous] = useState(false);
+    const [isEphemeral, setIsEphemeral] = useState(false);
+    const [sentimentMode, setSentimentMode] = useState("none"); // none, manual, ai
+    const [sentiment, setSentiment] = useState("none");
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
@@ -26,6 +29,21 @@ export default function NewPostPage() {
 
         setIsLoading(true);
         try {
+            let finalSentiment = sentiment;
+
+            if (sentimentMode === "ai") {
+                const res = await fetch("/api/analyze-sentiment", {
+                    method: "POST",
+                    body: JSON.stringify({ content })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    finalSentiment = data.sentiment;
+                }
+            } else if (sentimentMode === "none") {
+                finalSentiment = "none";
+            }
+
             await addDoc(collection(db, "posts"), {
                 title,
                 content,
@@ -34,6 +52,8 @@ export default function NewPostPage() {
                 authorName: isAnonymous ? "匿名" : (auth.currentUser.displayName || "名無し"),
                 isAnonymous,
                 commentPolicy,
+                sentiment: finalSentiment,
+                expiresAt: isEphemeral ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null,
                 createdAt: serverTimestamp(),
             });
             router.push("/");
@@ -94,14 +114,51 @@ export default function NewPostPage() {
                             />
                         </div>
 
-                        <label className={styles.checkboxGroup}>
-                            <input
-                                type="checkbox"
-                                checked={isAnonymous}
-                                onChange={(e) => setIsAnonymous(e.target.checked)}
-                            />
-                            匿名で投稿する
-                        </label>
+                        <div className={styles.inputGroup}>
+                            <label>感情カラー</label>
+                            <div className={styles.sentimentSelection}>
+                                <select value={sentimentMode} onChange={(e) => setSentimentMode(e.target.value)}>
+                                    <option value="none">設定しない</option>
+                                    <option value="manual">自分で選ぶ</option>
+                                    <option value="ai">AIに診断してもらう</option>
+                                </select>
+
+                                {sentimentMode === "manual" && (
+                                    <div className={styles.colorOptions}>
+                                        <button type="button" onClick={() => setSentiment("sadness")} className={`${styles.colorBtn} ${sentiment === "sadness" ? styles.activeColor : ""} ${styles.sadColor}`}>悲しみ/憂鬱</button>
+                                        <button type="button" onClick={() => setSentiment("anger")} className={`${styles.colorBtn} ${sentiment === "anger" ? styles.activeColor : ""} ${styles.angerColor}`}>怒り/不満</button>
+                                        <button type="button" onClick={() => setSentiment("fatigue")} className={`${styles.colorBtn} ${sentiment === "fatigue" ? styles.activeColor : ""} ${styles.fatigueColor}`}>虚無/疲れ</button>
+                                        <button type="button" onClick={() => setSentiment("joy")} className={`${styles.colorBtn} ${sentiment === "joy" ? styles.activeColor : ""} ${styles.joyColor}`}>喜び/希望</button>
+                                    </div>
+                                )}
+
+                                {sentimentMode === "ai" && (
+                                    <div className={styles.aiDiagnostic}>
+                                        投稿時にAIが文章から感情を読み取ります。
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className={styles.checkboxContainer}>
+                            <label className={styles.checkboxGroup}>
+                                <input
+                                    type="checkbox"
+                                    checked={isAnonymous}
+                                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                                />
+                                匿名で投稿する
+                            </label>
+
+                            <label className={styles.checkboxGroup}>
+                                <input
+                                    type="checkbox"
+                                    checked={isEphemeral}
+                                    onChange={(e) => setIsEphemeral(e.target.checked)}
+                                />
+                                <span style={{ color: '#ffbd59' }}>⏳ 24時間で消去する (水に流す)</span>
+                            </label>
+                        </div>
 
                         <div className={styles.actions}>
                             <Link href="/" className={styles.cancel}>キャンセル</Link>

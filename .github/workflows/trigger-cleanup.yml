@@ -1,0 +1,14 @@
+name: Trigger Cleanup
+
+on:
+  schedule:
+    # Run every hour at minute 5
+    - cron: '5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cleanup API
+        run: curl -X GET https://henne-sns.vercel.app/api/cron-cleanup

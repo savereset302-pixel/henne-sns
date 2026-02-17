@@ -17,6 +17,8 @@ interface Post {
   createdAt: any;
   commentCount?: number;
   likeCount?: number;
+  expiresAt?: any;
+  sentiment?: string;
 }
 
 export default function Home() {
@@ -83,25 +85,35 @@ export default function Home() {
         ) : (
           <div className={styles.grid}>
             {posts.length > 0 ? (
-              posts.map((post) => (
-                <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s' }}>
-                  <span className={styles.category}>{post.category}</span>
-                  <h3 className={styles.postTitle}>{post.title}</h3>
-                  <p className={styles.postSnippet}>{post.content}</p>
-                  <div className={styles.postFooter}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <span>by {post.authorName}</span>
-                      <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
-                        💬 {post.commentCount || 0}
-                      </span>
-                      <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+              posts.map((post) => {
+                const sentimentStyle = post.sentiment === "sadness" ? { background: "rgba(26, 35, 126, 0.25)", border: "1px solid rgba(26, 35, 126, 0.3)" } :
+                  post.sentiment === "anger" ? { background: "rgba(74, 20, 20, 0.25)", border: "1px solid rgba(74, 20, 20, 0.3)" } :
+                    post.sentiment === "fatigue" ? { background: "rgba(51, 51, 51, 0.3)", border: "1px solid rgba(100, 100, 100, 0.2)" } :
+                      post.sentiment === "joy" ? { background: "rgba(100, 90, 40, 0.2)", border: "1px solid rgba(184, 164, 74, 0.2)" } :
+                        {};
+
+                return (
+                  <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s', ...sentimentStyle }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span className={styles.category}>{post.category}</span>
+                      {post.expiresAt && <span style={{ fontSize: '0.8rem', color: '#ffbd59' }}>⏳ 24h</span>}
                     </div>
-                    <Link href={`/posts/${post.id}`}>
-                      <button className={styles.readMore}>詳しく読む</button>
-                    </Link>
+                    <h3 className={styles.postTitle}>{post.title}</h3>
+                    <p className={styles.postSnippet}>{post.content}</p>
+                    <div className={styles.postFooter}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <span>by {post.authorName}</span>
+                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
+                          💬 {post.commentCount || 0}
+                        </span>
+                        <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+                      </div>
+                      <Link href={`/posts/${post.id}`}>
+                        <button className={styles.readMore}>詳しく読む</button>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))
+                ))
             ) : (
               <p className={styles.noPosts}>まだこのカテゴリーの本音はありません。</p>
             )}

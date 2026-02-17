@@ -79,6 +79,13 @@
     width: fit-content;
 }
 
+.checkboxContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
 .checkboxGroup input {
     width: 1.2rem;
     height: 1.2rem;
@@ -108,4 +115,56 @@
     .formWrapper {
         padding: 1.5rem;
     }
+}
+
+.sentimentSelection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.colorOptions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.colorBtn {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.activeColor {
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.sadColor {
+    background: rgba(26, 35, 126, 0.4);
+}
+
+.angerColor {
+    background: rgba(74, 20, 20, 0.4);
+}
+
+.fatigueColor {
+    background: rgba(51, 51, 51, 0.4);
+}
+
+.joyColor {
+    background: rgba(100, 90, 40, 0.4);
+}
+
+.aiDiagnostic {
+    font-size: 0.9rem;
+    color: #ffbd59;
+    font-style: italic;
+    padding-left: 0.5rem;
+    border-left: 2px solid #ffbd59;
 }
