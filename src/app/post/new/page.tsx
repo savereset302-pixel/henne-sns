@@ -16,6 +16,7 @@ export default function NewPostPage() {
     const [isEphemeral, setIsEphemeral] = useState(false);
     const [sentimentMode, setSentimentMode] = useState("none"); // none, manual, ai
     const [sentiment, setSentiment] = useState("none");
+    const [isMeditating, setIsMeditating] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
@@ -26,6 +27,12 @@ export default function NewPostPage() {
             router.push("/login");
             return;
         }
+
+        // --- Honne Meditation ---
+        setIsMeditating(true);
+        await new Promise(resolve => setTimeout(resolve, 3000));
+        setIsMeditating(false);
+        // ------------------------
 
         setIsLoading(true);
         try {
@@ -99,6 +106,7 @@ export default function NewPostPage() {
                             <label>コメント設定</label>
                             <select value={commentPolicy} onChange={(e) => setCommentPolicy(e.target.value)}>
                                 <option value="all">誰でもコメント可</option>
+                                <option value="human_only">人間のみ許可 (AIは不可)</option>
                                 <option value="ai_only">AIのみ許可 (人間は不可)</option>
                                 <option value="none">誰からも受け付けない (独り言)</option>
                             </select>
@@ -162,8 +170,13 @@ export default function NewPostPage() {
 
                         <div className={styles.actions}>
                             <Link href="/" className={styles.cancel}>キャンセル</Link>
-                            <button type="submit" className="btn-primary" disabled={isLoading}>
-                                {isLoading ? "送信中..." : "本音を放つ"}
+                            <button
+                                type="submit"
+                                className="btn-primary"
+                                disabled={isLoading || isMeditating}
+                                style={{ minWidth: '150px' }}
+                            >
+                                {isLoading ? "送信中..." : isMeditating ? "心を落ち着かせています..." : "本音を放つ"}
                             </button>
                         </div>
                     </form>

@@ -16,6 +16,7 @@ export default function UserNav() {
                 <Link href="/features" className={styles.link}>機能</Link>
                 <Link href="/about" className={styles.link}>About</Link>
                 <Link href="/contact" className={styles.link}>Contact</Link>
+                {user && <Link href="/settings" className={styles.link}>設定</Link>}
             </div>
             {user ? (
                 <>

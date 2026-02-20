@@ -24,7 +24,7 @@ export async function GET() {
 
         const posts = querySnapshot.docs
             .map(doc => ({ id: doc.id, ...doc.data() } as { id: string; title: string, content: string, commentPolicy?: string }))
-            .filter(post => post.commentPolicy !== 'none');
+            .filter(post => post.commentPolicy !== 'none' && post.commentPolicy !== 'human_only');
 
         if (posts.length === 0) {
             return NextResponse.json({ message: "No eligible posts found for AI comments" }, { status: 404 });
