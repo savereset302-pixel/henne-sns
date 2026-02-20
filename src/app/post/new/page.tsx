@@ -100,6 +100,9 @@ export default function NewPostPage() {
                                 <option value="社会">社会</option>
                                 <option value="人生">人生</option>
                                 <option value="技術">技術</option>
+                                <option value="小説">小説</option>
+                                <option value="時事">時事</option>
+                                <option value="その他">その他</option>
                             </select>
                         </div>
                         <div className={styles.inputGroup}>

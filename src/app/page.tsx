@@ -27,7 +27,7 @@ export default function Home() {
   const [filter, setFilter] = useState("すべて");
   const [loading, setLoading] = useState(true);
 
-  const categories = ["すべて", "哲学", "独白", "社会", "人生", "技術"];
+  const categories = ["すべて", "哲学", "独白", "社会", "人生", "技術", "小説", "時事", "その他"];
 
   useEffect(() => {
     let q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
@@ -130,6 +130,7 @@ export default function Home() {
           <Link href="/terms">利用規約</Link>
           <Link href="/privacy">プライバシーポリシー</Link>
           <Link href="/security">セキュリティ</Link>
+          <Link href="/updates">アップデート情報</Link>
           <Link href="/contact">お問い合わせ</Link>
         </div>
         <p>&copy; 2026 Honne Sharing SNS.</p>
