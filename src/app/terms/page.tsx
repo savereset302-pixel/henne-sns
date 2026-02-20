@@ -1,5 +1,5 @@
 import Link from "next/link";
-import styles from "./legal.module.css";
+import styles from "../privacy/legal.module.css";
 
 export default function TermsPage() {
     return (
