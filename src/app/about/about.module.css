@@ -9,10 +9,7 @@
     font-size: 1.8rem;
     font-weight: 800;
     text-decoration: none;
-    background: linear-gradient(to right, #4f46e5, #ec4899);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--logo-color);
 }
 
 .content {
@@ -31,16 +28,13 @@
     line-height: 1.4;
     font-weight: 700;
     letter-spacing: 0.05em;
-    background: linear-gradient(to bottom right, #fff, #aaa);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .message {
     font-size: 1.1rem;
     line-height: 2.2;
-    color: #d1d5db;
+    color: var(--text-secondary);
     margin-bottom: 4rem;
 }
 
@@ -105,13 +99,13 @@
 .securityItem h3 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .securityItem p {
     font-size: 0.9rem;
     line-height: 1.6;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 .securityLink {

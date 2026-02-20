@@ -2,7 +2,7 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 2rem 1rem;
-    color: #e0e0e0;
+    color: var(--text-primary);
 }
 
 .header {
@@ -11,19 +11,19 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .logo {
     font-family: var(--font-outfit);
     font-weight: 700;
     font-size: 1.5rem;
-    color: #fff;
+    color: var(--logo-color);
     text-decoration: none;
 }
 
 .backLink {
-    color: #a0a0a0;
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: 0.9rem;
     transition: color 0.2s;
@@ -33,17 +33,17 @@
 }
 
 .backLink:hover {
-    color: #fff;
+    color: var(--accent-color);
 }
 
 .postContent {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-bg);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 2.5rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .category {
@@ -63,13 +63,13 @@
     font-weight: 700;
     margin-bottom: 1.5rem;
     line-height: 1.3;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .text {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #d0d0d0;
+    color: var(--text-primary);
     white-space: pre-wrap;
     margin-bottom: 2rem;
 }
@@ -78,9 +78,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: #777;
+    color: var(--text-secondary);
     font-size: 0.9rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-color);
     padding-top: 1rem;
 }
 

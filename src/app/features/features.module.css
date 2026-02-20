@@ -10,10 +10,6 @@
     font-weight: 800;
     color: var(--logo-color);
     text-decoration: none;
-    background: linear-gradient(to right, #4f46e5, #ec4899);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
 }
 
 .content {
@@ -29,15 +25,12 @@
 .hero h1 {
     font-size: 3rem;
     margin-bottom: 1.5rem;
-    background: linear-gradient(to bottom, #fff, #888);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .hero p {
     font-size: 1.2rem;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 .featureGrid {
@@ -51,9 +44,9 @@
     align-items: center;
     gap: 4rem;
     padding: 3rem;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--panel-bg);
     border-radius: 24px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .featureItem:nth-child(even) {
@@ -78,13 +71,13 @@
 .featureText h2 {
     font-size: 2rem;
     margin-bottom: 1.5rem;
-    color: #fff;
+    color: var(--text-primary);
 }
 
 .featureText p {
     font-size: 1.1rem;
     line-height: 1.8;
-    color: #aaa;
+    color: var(--text-secondary);
 }
 
 .featureText ul {
@@ -98,7 +91,7 @@
     display: flex;
     align-items: center;
     gap: 0.8rem;
-    color: #ddd;
+    color: var(--text-primary);
 }
 
 .featureText li::before {

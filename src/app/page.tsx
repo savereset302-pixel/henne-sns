@@ -111,7 +111,6 @@ export default function Home() {
                           💬 {post.commentCount || 0}
                         </span>
                         <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
-                        <BookmarkButton postId={post.id} />
                       </div>
                       <Link href={`/posts/${post.id}`}>
                         <button className={styles.readMore}>詳しく読む</button>

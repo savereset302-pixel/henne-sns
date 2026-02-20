@@ -8,6 +8,7 @@ import { doc, getDoc } from "firebase/firestore";
 import styles from "./post.module.css";
 import UserNav from "@/components/UserNav";
 import LikeButton from "@/components/LikeButton";
+import BookmarkButton from "@/components/BookmarkButton";
 import CommentSection from "@/components/CommentSection";
 
 interface Post {
@@ -83,8 +84,9 @@ export default function PostPage() {
                                 <span>by {post.authorName}</span>
                                 <span>{post.createdAt?.toDate?.().toLocaleDateString() || "Unknown Date"}</span>
                                 <span>💬 {post.commentCount || 0}</span>
-                                <div style={{ marginLeft: '1rem' }}>
+                                <div style={{ marginLeft: '1rem', display: 'flex', gap: '1rem' }}>
                                     <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+                                    <BookmarkButton postId={post.id} />
                                 </div>
                             </div>
 

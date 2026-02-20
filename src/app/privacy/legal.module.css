@@ -15,19 +15,17 @@
 .content {
     max-width: 800px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--panel-bg);
     padding: 3rem;
     border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
 }
 
 .content h1 {
     font-size: 2.2rem;
     margin-bottom: 2rem;
     text-align: center;
-    background: linear-gradient(to right, #fff, #888);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .content h2 {

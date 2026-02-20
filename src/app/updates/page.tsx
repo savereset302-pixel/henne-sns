@@ -63,10 +63,10 @@ export default function UpdatesPage() {
                             <div style={{ color: 'var(--accent-color)', fontSize: '0.9rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
                                 {update.date}
                             </div>
-                            <h2 style={{ fontSize: '1.4rem', marginBottom: '1rem', color: '#fff' }}>
+                            <h2 style={{ fontSize: '1.4rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
                                 {update.title}
                             </h2>
-                            <ul style={{ color: '#aaa', lineHeight: '1.8' }}>
+                            <ul style={{ color: 'var(--text-secondary)', lineHeight: '1.8' }}>
                                 {update.items.map((item, i) => (
                                     <li key={i}>{item}</li>
                                 ))}
