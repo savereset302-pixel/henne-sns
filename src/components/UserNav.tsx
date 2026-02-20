@@ -16,7 +16,13 @@ export default function UserNav() {
                 <Link href="/features" className={styles.link}>機能</Link>
                 <Link href="/about" className={styles.link}>About</Link>
                 <Link href="/contact" className={styles.link}>Contact</Link>
-                {user && <Link href="/settings" className={styles.link}>設定</Link>}
+                {user && (
+                    <>
+                        <Link href="/settings" className={styles.link}>設定</Link>
+                        <Link href="/bookmarks" className={styles.link} title="しおり">🔖</Link>
+                        <Link href="/drafts" className={styles.link} title="下書き">📝</Link>
+                    </>
+                )}
             </div>
             {user ? (
                 <>

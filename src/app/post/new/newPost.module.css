@@ -93,12 +93,27 @@
     accent-color: var(--accent-color);
 }
 
+.draftBtn {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.draftBtn:hover {
+    background: var(--panel-bg);
+    border-color: var(--text-secondary);
+}
+
 .actions {
     display: flex;
-    justify-content: flex-end;
+    gap: 1rem;
     align-items: center;
-    gap: 2rem;
-    margin-top: 1rem;
+    justify-content: flex-end;
+    margin-top: 3rem;
 }
 
 .cancel {

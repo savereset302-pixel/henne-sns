@@ -5,9 +5,10 @@
     padding: 1.5rem 0;
 }
 
-.logo {
+.header .logo {
     font-size: 1.8rem;
     font-weight: 800;
+    color: var(--logo-color);
     text-decoration: none;
     background: linear-gradient(to right, #4f46e5, #ec4899);
     -webkit-background-clip: text;

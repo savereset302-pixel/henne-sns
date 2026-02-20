@@ -5,6 +5,7 @@ import styles from "./page.module.css";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
 import LikeButton from "@/components/LikeButton";
+import BookmarkButton from "@/components/BookmarkButton";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
@@ -110,6 +111,7 @@ export default function Home() {
                           💬 {post.commentCount || 0}
                         </span>
                         <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+                        <BookmarkButton postId={post.id} />
                       </div>
                       <Link href={`/posts/${post.id}`}>
                         <button className={styles.readMore}>詳しく読む</button>

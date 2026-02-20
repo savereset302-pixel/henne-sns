@@ -8,15 +8,20 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import styles from "./settings.module.css";
 
+import { useTheme } from "@/components/ThemeProvider";
+
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
+    const { theme: currentTheme, setTheme } = useTheme();
     const [displayName, setDisplayName] = useState("");
+    const [theme, setThemeOption] = useState("dark");
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
     useEffect(() => {
         if (user) {
             setDisplayName(user.displayName || "");
+            setThemeOption(user.theme || "dark");
         }
     }, [user]);
 
@@ -33,9 +38,12 @@ export default function SettingsPage() {
 
             // 2. Update Firestore user document
             const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { displayName });
+            await updateDoc(userRef, { displayName, theme });
 
-            setMessage({ type: "success", text: "名前を更新しました。" });
+            // 3. Update local theme context
+            setTheme(theme);
+
+            setMessage({ type: "success", text: "設定を更新しました。" });
         } catch (error) {
             console.error("Error updating profile:", error);
             setMessage({ type: "error", text: "更新に失敗しました。もう一度お試しください。" });
@@ -73,6 +81,21 @@ export default function SettingsPage() {
                                 placeholder="名無し"
                                 maxLength={20}
                             />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="theme">背景テーマ</label>
+                            <select
+                                id="theme"
+                                value={theme}
+                                onChange={(e) => setThemeOption(e.target.value)}
+                                className={styles.select}
+                            >
+                                <option value="dark">デフォルト (ダーク)</option>
+                                <option value="light">ホワイト (白背景 / 黒文字)</option>
+                                <option value="parchment">生成色 (生成背景 / 黒文字)</option>
+                                <option value="dusk">夕暮れ (深い青 / 青白文字)</option>
+                            </select>
                         </div>
 
                         <button type="submit" className={`btn-primary ${styles.saveBtn}`} disabled={isSaving}>

@@ -6,6 +6,7 @@ import { onAuthStateChanged, User } from "firebase/auth";
 
 export type AuthUser = User & {
     isAdmin?: boolean;
+    theme?: string;
 };
 
 export function useAuth() {
@@ -23,10 +24,12 @@ export function useAuth() {
                 const userSnap = await getDoc(userRef);
 
                 let isAdmin = false;
+                let theme = "dark";
 
                 if (userSnap.exists()) {
                     const data = userSnap.data();
                     isAdmin = data.isAdmin || false;
+                    theme = data.theme || "dark";
                 } else {
                     // Create user document if it doesn't exist
                     await setDoc(userRef, {
@@ -34,11 +37,12 @@ export function useAuth() {
                         displayName: firebaseUser.displayName,
                         photoURL: firebaseUser.photoURL,
                         createdAt: new Date(),
-                        isAdmin: false
+                        isAdmin: false,
+                        theme: "dark"
                     });
                 }
 
-                setUser({ ...firebaseUser, isAdmin });
+                setUser({ ...firebaseUser, isAdmin, theme });
             } else {
                 setUser(null);
             }

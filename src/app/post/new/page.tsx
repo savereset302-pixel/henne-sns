@@ -16,29 +16,23 @@ export default function NewPostPage() {
     const [isEphemeral, setIsEphemeral] = useState(false);
     const [sentimentMode, setSentimentMode] = useState("none"); // none, manual, ai
     const [sentiment, setSentiment] = useState("none");
-    const [isMeditating, setIsMeditating] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e: React.FormEvent, isDraft = false) => {
+        if (e) e.preventDefault();
+
         if (!auth.currentUser) {
             alert("ログインが必要です");
             router.push("/login");
             return;
         }
 
-        // --- Honne Meditation ---
-        setIsMeditating(true);
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        setIsMeditating(false);
-        // ------------------------
-
         setIsLoading(true);
         try {
             let finalSentiment = sentiment;
 
-            if (sentimentMode === "ai") {
+            if (!isDraft && sentimentMode === "ai") {
                 const res = await fetch("/api/analyze-sentiment", {
                     method: "POST",
                     body: JSON.stringify({ content })
@@ -51,7 +45,8 @@ export default function NewPostPage() {
                 finalSentiment = "none";
             }
 
-            await addDoc(collection(db, "posts"), {
+            const collectionName = isDraft ? "drafts" : "posts";
+            const data: any = {
                 title,
                 content,
                 category,
@@ -60,13 +55,26 @@ export default function NewPostPage() {
                 isAnonymous,
                 commentPolicy,
                 sentiment: finalSentiment,
-                expiresAt: isEphemeral ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null,
                 createdAt: serverTimestamp(),
-            });
-            router.push("/");
+            };
+
+            if (!isDraft) {
+                data.expiresAt = isEphemeral ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
+            } else {
+                data.isDraft = true;
+            }
+
+            await addDoc(collection(db, collectionName), data);
+
+            if (isDraft) {
+                alert("下書きを保存しました");
+                router.push("/drafts");
+            } else {
+                router.push("/");
+            }
         } catch (error) {
             console.error("Error adding document: ", error);
-            alert("投稿に失敗しました");
+            alert(isDraft ? "下書き保存に失敗しました" : "投稿に失敗しました");
         } finally {
             setIsLoading(false);
         }
@@ -81,7 +89,7 @@ export default function NewPostPage() {
             <section className={styles.content}>
                 <div className={`glass-panel ${styles.formWrapper}`}>
                     <h1 className={styles.pageTitle}>本音を綴る</h1>
-                    <form onSubmit={handleSubmit} className={styles.form}>
+                    <form onSubmit={(e) => handleSubmit(e, false)} className={styles.form}>
                         <div className={styles.inputGroup}>
                             <label>タイトル</label>
                             <input
@@ -174,12 +182,20 @@ export default function NewPostPage() {
                         <div className={styles.actions}>
                             <Link href="/" className={styles.cancel}>キャンセル</Link>
                             <button
+                                type="button"
+                                onClick={(e) => handleSubmit(null as any, true)}
+                                className={styles.draftBtn}
+                                disabled={isLoading}
+                            >
+                                下書き保存
+                            </button>
+                            <button
                                 type="submit"
                                 className="btn-primary"
-                                disabled={isLoading || isMeditating}
-                                style={{ minWidth: '150px' }}
+                                disabled={isLoading}
+                                style={{ minWidth: '220px' }}
                             >
-                                {isLoading ? "送信中..." : isMeditating ? "心を落ち着かせています..." : "本音を放つ"}
+                                {isLoading ? "心を落ち着かせています..." : "本音を放つ"}
                             </button>
                         </div>
                     </form>

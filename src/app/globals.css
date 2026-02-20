@@ -7,6 +7,40 @@
   --accent-color: #4f46e5;
   --accent-glow: 0 0 20px rgba(79, 70, 229, 0.4);
   --font-main: 'Outfit', sans-serif;
+  --logo-color: var(--accent-color);
+}
+
+[data-theme='light'] {
+  --bg-color: #ffffff;
+  --panel-bg: rgba(0, 0, 0, 0.05);
+  --border-color: rgba(0, 0, 0, 0.1);
+  --text-primary: #111111;
+  --text-secondary: #666666;
+  --accent-color: #3b82f6;
+  --accent-glow: 0 0 10px rgba(59, 130, 246, 0.2);
+  --logo-color: #111111;
+}
+
+[data-theme='parchment'] {
+  --bg-color: #f5f2e8;
+  --panel-bg: rgba(0, 0, 0, 0.03);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --text-primary: #2d2d2d;
+  --text-secondary: #5a5a5a;
+  --accent-color: #8b7355;
+  --accent-glow: 0 0 10px rgba(139, 115, 85, 0.1);
+  --logo-color: #2d2d2d;
+}
+
+[data-theme='dusk'] {
+  --bg-color: #1a1b26;
+  --panel-bg: rgba(255, 255, 255, 0.04);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #a9b1d6;
+  --text-secondary: #787c99;
+  --accent-color: #7aa2f7;
+  --accent-glow: 0 0 15px rgba(122, 162, 247, 0.3);
+  --logo-color: #7aa2f7;
 }
 
 * {
@@ -34,15 +68,24 @@ body {
 }
 
 /* Typography */
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-in {

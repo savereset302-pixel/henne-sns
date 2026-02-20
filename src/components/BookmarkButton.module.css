@@ -1,0 +1,33 @@
+.button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 0.85rem;
+}
+
+.button:hover {
+    background: var(--panel-bg);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.active {
+    background: var(--panel-bg);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+.icon {
+    font-size: 1rem;
+}
+
+.label {
+    font-weight: 500;
+}
