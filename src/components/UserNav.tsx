@@ -12,6 +12,11 @@ export default function UserNav() {
 
     return (
         <nav className={styles.nav}>
+            <div className={styles.links}>
+                <Link href="/features" className={styles.link}>機能</Link>
+                <Link href="/about" className={styles.link}>About</Link>
+                <Link href="/contact" className={styles.link}>Contact</Link>
+            </div>
             {user ? (
                 <>
                     <span className={styles.userName}>{user.displayName || "匿名ユーザー"}さん</span>

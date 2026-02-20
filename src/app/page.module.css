@@ -149,10 +149,32 @@
 
 .footer {
   margin-top: 6rem;
-  padding: 2rem 0;
+  padding: 4rem 0;
   text-align: center;
   border-top: 1px solid var(--border-color);
+}
+
+.footerLinks {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.footerLinks a {
   color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footerLinks a:hover {
+  color: var(--accent-color);
+}
+
+.footer p {
+  color: #666;
+  font-size: 0.8rem;
 }
 
 @media (max-width: 768px) {

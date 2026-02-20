@@ -182,3 +182,25 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
+
+.loadingScreen,
+.deniedScreen {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.deniedScreen h1 {
+    font-size: 2.5rem;
+    color: #ff5050;
+    margin-bottom: 1rem;
+}
+
+.deniedScreen p {
+    color: #888;
+    margin-bottom: 2rem;
+}

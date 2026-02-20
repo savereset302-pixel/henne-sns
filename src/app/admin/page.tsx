@@ -1,11 +1,16 @@
 "use client";
-
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import styles from "./admin.module.css";
-import { db } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, limit } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+
+const ADMIN_EMAILS = ["savereset302@gmail.com"]; // 追加される管理者のメールアドレス
 
 export default function AdminPage() {
+    const [user, setUser] = useState<any>(null);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
     const [activeTab, setActiveTab] = useState<"inquiries" | "posts" | "ai">("inquiries");
     const [inquiries, setInquiries] = useState<any[]>([]);
     const [posts, setPosts] = useState<any[]>([]);
@@ -34,9 +39,16 @@ export default function AdminPage() {
         }
     };
 
-    // Fetch data on component mount
+    // Auth state listener
     useEffect(() => {
-        fetchData();
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            setIsCheckingAuth(false);
+            if (currentUser && ADMIN_EMAILS.includes(currentUser.email || "")) {
+                fetchData();
+            }
+        });
+        return () => unsubscribe();
     }, []);
 
     // Delete post function
@@ -44,13 +56,27 @@ export default function AdminPage() {
         if (!confirm("本当にこの投稿を削除しますか？")) return;
         try {
             await deleteDoc(doc(db, "posts", postId));
-            setPosts(posts.filter(p => p.id !== postId));
+            setPosts(posts.filter((p: any) => p.id !== postId));
             alert("投稿を削除しました");
         } catch (error) {
             console.error("Error deleting post:", error);
             alert("削除に失敗しました");
         }
     };
+
+    if (isCheckingAuth) {
+        return <div className={styles.loadingScreen}>認証確認中...</div>;
+    }
+
+    if (!user || !ADMIN_EMAILS.includes(user.email || "")) {
+        return (
+            <div className={styles.deniedScreen}>
+                <h1>Access Denied</h1>
+                <p>管理者権限が必要です。正しいアカウントでログインしてください。</p>
+                <Link href="/login" className="btn-primary" style={{ marginTop: '1rem', display: 'inline-block' }}>ログイン画面へ</Link>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.container}>

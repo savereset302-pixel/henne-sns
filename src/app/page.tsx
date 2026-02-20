@@ -126,11 +126,13 @@ export default function Home() {
       </section>
 
       <footer className={styles.footer}>
-        <p>
-          &copy; 2026 Honne Sharing SNS. All rights reserved. |
-          <Link href="/about" style={{ color: '#666', textDecoration: 'none', margin: '0 0.5rem' }}>About</Link> |
-          <Link href="/contact" style={{ color: '#666', textDecoration: 'none', margin: '0 0.5rem' }}>Contact</Link>
-        </p>
+        <div className={styles.footerLinks}>
+          <Link href="/terms">利用規約</Link>
+          <Link href="/privacy">プライバシーポリシー</Link>
+          <Link href="/security">セキュリティ</Link>
+          <Link href="/contact">お問い合わせ</Link>
+        </div>
+        <p>&copy; 2026 Honne Sharing SNS.</p>
       </footer>
     </main>
   );
