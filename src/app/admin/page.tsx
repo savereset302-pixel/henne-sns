@@ -6,7 +6,7 @@ import { auth, db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, limit } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
-const ADMIN_EMAILS = ["savereset302@gmail.com"]; // 追加される管理者のメールアドレス
+const ADMIN_EMAILS = ["ykts.yukitosi.5698@gmail.com"]; // 追加される管理者のメールアドレス
 
 export default function AdminPage() {
     const [user, setUser] = useState<any>(null);
