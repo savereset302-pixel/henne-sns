@@ -7,6 +7,16 @@ import UserNav from "@/components/UserNav";
 export default function UpdatesPage() {
     const updates = [
         {
+            date: "2026-02-22",
+            title: "繋がりと表現の拡張（コミュニティ & 画像投稿）",
+            items: [
+                "コミュニティ機能（グループチャット）を実装。共通の想いで繋がる場所に",
+                "画像投稿機能を追加。言葉と色彩で本音を表現可能に",
+                "ナビゲーションメニューの整理とUXの改善",
+                "各ページのテーマ適用範囲の拡大"
+            ]
+        },
+        {
             date: "2026-02-21",
             title: "自分好みの Honne. へ（テーマ・しおり・下書き）",
             items: [

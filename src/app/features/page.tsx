@@ -18,65 +18,66 @@ export default function FeaturesPage() {
 
                 <div className={styles.featureGrid}>
                     <div className={styles.featureItem}>
-                        <div className={styles.featureImage}>⏳</div>
+                        <div className={styles.featureImage}>👥</div>
                         <div className={styles.featureText}>
-                            <h2>水に流す、24時間消滅</h2>
-                            <p>
-                                すべての投稿は、デフォルトで「24時間で消滅」を選択できます。
-                                後に残らないからこそ、今の瞬間の本当の気持ちを綴ることができます。
-                            </p>
+                            <h2>コミュニティ (グループチャット)</h2>
+                            <p>共通の興味や想いを持つ人々が集える、リアルタイムな交流空間です。</p>
                             <ul>
-                                <li>サーバーからも物理的に削除</li>
-                                <li>「今ここ」の感情に集中</li>
-                                <li>痕跡を残さない安心感</li>
+                                <li>誰でも自由にチャットルームを作成可能</li>
+                                <li>Firestore による瞬時のメッセージ同期</li>
+                                <li>同じ悩みや喜びを分かち合う場所</li>
                             </ul>
                         </div>
                     </div>
 
                     <div className={styles.featureItem}>
-                        <div className={styles.featureImage}>🤖</div>
+                        <div className={styles.featureImage}>🖼️</div>
                         <div className={styles.featureText}>
-                            <h2>AI哲学者の寄り添い</h2>
-                            <p>
-                                あなたの投稿に対して、AI哲学者が客観的かつ温かい視点でコメントを返します。
-                                単なる共感を越えて、あなたの本音を新しい視点で照らします。
-                            </p>
+                            <h2>画像投稿機能</h2>
+                            <p>言葉だけでは伝えきれない色彩や空気感を、1枚の画像に込めて共有できます。</p>
                             <ul>
-                                <li>最新のAIによる深い洞察</li>
-                                <li>哲学的な対話体験</li>
-                                <li>誰にも言えない悩みへの返答</li>
+                                <li>投稿に画像を1枚添付可能</li>
+                                <li>Firebase Storage によるセキュアな保管</li>
+                                <li>視覚的な本音の表現</li>
                             </ul>
                         </div>
                     </div>
 
                     <div className={styles.featureItem}>
-                        <div className={styles.featureImage}>🌈</div>
+                        <div className={styles.featureImage}>🎨</div>
                         <div className={styles.featureText}>
-                            <h2>感情に同期するUI</h2>
-                            <p>
-                                投稿時に選んだ感情に合わせて、投稿カードの色合いや雰囲気が変化します。
-                                言葉だけでなく、視覚的にもあなたの心の色を表現します。
-                            </p>
+                            <h2>テーマシステム</h2>
+                            <p>あなたの心の状態や好みに合わせて、背景色やテキストの配色を自由に変更できます。</p>
                             <ul>
-                                <li>喜怒哀楽を色で可視化</li>
-                                <li>直感的なユーザー体験</li>
-                                <li>言葉以上に伝わるフィーリング</li>
+                                <li>4種類のテーマ（ダーク、ホワイト、生成色、夕暮れ）</li>
+                                <li>サイト全体の雰囲気が一瞬で切り替わります</li>
+                                <li>全ページで一貫したテーマ適用</li>
                             </ul>
                         </div>
                     </div>
 
                     <div className={styles.featureItem}>
-                        <div className={styles.featureImage}>🔒</div>
+                        <div className={styles.featureImage}>🔖</div>
                         <div className={styles.featureText}>
-                            <h2>匿名と安全性の両立</h2>
-                            <p>
-                                匿名での投稿機能を全ページで提供。
-                                一方で、システムレベルでは強固な認証技術を使用し、荒らしや不正利用から場を守ります。
-                            </p>
+                            <h2>しおり & 下書き</h2>
+                            <p>大切な言葉を手元に残し、自分の想いをじっくり温めるための機能です。</p>
                             <ul>
-                                <li>完全に切り離された匿名性</li>
-                                <li>Google品質の認証基盤</li>
-                                <li>安心できるクローズドな空気感</li>
+                                <li>気に入った本音を「しおり」で保存</li>
+                                <li>未完成な想いを「下書き」として一時保存</li>
+                                <li>詳細ページからワンタップでしおり登録</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>🧞</div>
+                        <div className={styles.featureText}>
+                            <h2>AI哲学者</h2>
+                            <p>あなたの本音に寄り添うAIの分析と、心地よい距離感のための制限機能。</p>
+                            <ul>
+                                <li>AIによる感情カラーの自動診断</li>
+                                <li>文脈を汲み取った血の通ったAIコメント</li>
+                                <li>「人間のみ許可」設定で静かな場所を守る</li>
                             </ul>
                         </div>
                     </div>

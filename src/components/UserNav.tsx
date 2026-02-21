@@ -18,9 +18,10 @@ export default function UserNav() {
                 <Link href="/contact" className={styles.link}>Contact</Link>
                 {user && (
                     <>
-                        <Link href="/settings" className={styles.link}>設定</Link>
-                        <Link href="/bookmarks" className={styles.link} title="しおり">🔖</Link>
-                        <Link href="/drafts" className={styles.link} title="下書き">📝</Link>
+                        <Link href="/bookmarks" className={styles.link}>🔖 しおり</Link>
+                        <Link href="/drafts" className={styles.link}>📝 下書き</Link>
+                        <Link href="/communities" className={styles.link}>👥 コミュニティ</Link>
+                        <Link href="/settings" className={styles.link}>⚙️ 設定</Link>
                     </>
                 )}
             </div>

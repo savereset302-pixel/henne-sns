@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import styles from "./newPost.module.css";
-import { db, auth } from "@/lib/firebase";
+import { db, auth, storage } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -16,8 +17,18 @@ export default function NewPostPage() {
     const [isEphemeral, setIsEphemeral] = useState(false);
     const [sentimentMode, setSentimentMode] = useState("none"); // none, manual, ai
     const [sentiment, setSentiment] = useState("none");
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const router = useRouter();
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setImageFile(file);
+            setImagePreview(URL.createObjectURL(file));
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent, isDraft = false) => {
         if (e) e.preventDefault();
@@ -30,6 +41,13 @@ export default function NewPostPage() {
 
         setIsLoading(true);
         try {
+            let imageUrl = null;
+            if (imageFile) {
+                const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${imageFile.name}`);
+                const snapshot = await uploadBytes(storageRef, imageFile);
+                imageUrl = await getDownloadURL(snapshot.ref);
+            }
+
             let finalSentiment = sentiment;
 
             if (!isDraft && sentimentMode === "ai") {
@@ -55,6 +73,7 @@ export default function NewPostPage() {
                 isAnonymous,
                 commentPolicy,
                 sentiment: finalSentiment,
+                imageUrl,
                 createdAt: serverTimestamp(),
             };
 
@@ -177,6 +196,22 @@ export default function NewPostPage() {
                                 />
                                 <span style={{ color: '#ffbd59' }}>⏳ 24時間で消去する (水に流す)</span>
                             </label>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label>画像 (任意)</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className={styles.fileInput}
+                            />
+                            {imagePreview && (
+                                <div className={styles.imagePreview}>
+                                    <img src={imagePreview} alt="Preview" />
+                                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); }} className={styles.removeImg}>✕</button>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.actions}>

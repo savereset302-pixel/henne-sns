@@ -1,0 +1,86 @@
+.header {
+    padding: 2rem 0;
+}
+
+.logo {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--logo-color);
+    text-decoration: none;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 0;
+}
+
+.formWrapper {
+    width: 100%;
+    max-width: 600px;
+    padding: 3rem;
+}
+
+.formWrapper h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 3rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.inputGroup label {
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.inputGroup input,
+.inputGroup textarea {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.inputGroup input:focus,
+.inputGroup textarea:focus {
+    border-color: var(--accent-color);
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.cancel {
+    color: var(--text-secondary);
+    text-decoration: none;
+}
+
+@media (max-width: 768px) {
+    .formWrapper {
+        padding: 2rem;
+    }
+}

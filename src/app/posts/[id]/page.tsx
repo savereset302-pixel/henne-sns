@@ -23,6 +23,7 @@ interface Post {
     commentPolicy?: string;
     expiresAt?: any;
     sentiment?: string;
+    imageUrl?: string | null;
 }
 
 export default function PostPage() {
@@ -78,6 +79,11 @@ export default function PostPage() {
                                 {post.expiresAt && <span style={{ fontSize: '0.9rem', color: '#ffbd59' }}>⏳ この投稿は24時間で消滅します</span>}
                             </div>
                             <h1 className={styles.title}>{post.title}</h1>
+                            {post.imageUrl && (
+                                <div className={styles.postImage}>
+                                    <img src={post.imageUrl} alt={post.title} />
+                                </div>
+                            )}
                             <div className={styles.text}>{post.content}</div>
 
                             <div className={styles.meta}>
