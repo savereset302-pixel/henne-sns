@@ -31,15 +31,22 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className={styles.featureItem}>
-                        <div className={styles.featureImage}>🖼️</div>
-                        <div className={styles.featureText}>
-                            <h2>画像投稿機能</h2>
-                            <p>言葉だけでは伝えきれない色彩や空気感を、1枚の画像に込めて共有できます。</p>
-                            <ul>
-                                <li>投稿に画像を1枚添付可能</li>
-                                <li>Firebase Storage によるセキュアな保管</li>
-                                <li>視覚的な本音の表現</li>
-                            </ul>
+                        <div className={`glass-panel ${styles.featureCard}`}>
+                            <div className={styles.icon}>🖼️</div>
+                            <div>
+                                <h3>画像投稿 (最適化済み)</h3>
+                                <p>あなたの想いに彩りを添える画像を投稿できます。デバイス側で自動的に軽量化処理を行うため、通信量を抑えつつスムーズにアップロード可能です。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={`glass-panel ${styles.featureCard}`}>
+                            <div className={styles.icon}>🌐</div>
+                            <div>
+                                <h3>多言語・AI翻訳機能</h3>
+                                <p>日本語だけでなく、英語、スペイン語、中国語に対応。設定を切り替えると、他のユーザーの投稿もAIがあなたの言語へ自動的に翻訳します。世界中の「本音」に触れてみましょう。</p>
+                            </div>
                         </div>
                     </div>
 

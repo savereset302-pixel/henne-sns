@@ -83,6 +83,15 @@ export default function UpdatesPage() {
                             </ul>
                         </div>
                     ))}
+                    <div className={`glass-panel ${styles.updateCard}`}>
+                        <div className={styles.date}>2026.02.21</div>
+                        <h3 className={styles.versionTitle}>画像投稿の改善 & 多言語・AI翻訳対応</h3>
+                        <ul className={styles.changeList}>
+                            <li><strong>画像投稿の高速化</strong>: クライアント側での画像圧縮を導入し、大容量の写真もスムーズに投稿できるようになりました。</li>
+                            <li><strong>多言語対応 (i18n)</strong>: UIが英語・スペイン語・中国語に切り替え可能になりました。</li>
+                            <li><strong>本音のAI自動翻訳</strong>: 言語設定を切り替えると、投稿内容がAIによって自動的に翻訳表示されます。</li>
+                        </ul>
+                    </div>
                 </div>
             </section>
 

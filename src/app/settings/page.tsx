@@ -9,12 +9,16 @@ import Link from "next/link";
 import styles from "./settings.module.css";
 
 import { useTheme } from "@/components/ThemeProvider";
+import { useLanguage } from "@/context/LanguageContext";
+import { Language } from "@/lib/translations";
 
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
     const { theme: currentTheme, setTheme } = useTheme();
+    const { language: currentLang, setLanguage } = useLanguage();
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
+    const [language, setLanguageOption] = useState<Language>("ja");
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
@@ -22,6 +26,7 @@ export default function SettingsPage() {
         if (user) {
             setDisplayName(user.displayName || "");
             setThemeOption(user.theme || "dark");
+            setLanguageOption((user.language as Language) || "ja");
         }
     }, [user]);
 
@@ -40,10 +45,11 @@ export default function SettingsPage() {
 
             // 2. Update Firestore user document
             const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { displayName, theme });
+            await updateDoc(userRef, { displayName, theme, language });
 
-            // 3. Update local theme context
+            // 3. Update local contexts
             setTheme(theme);
+            setLanguage(language);
 
             setMessage({ type: "success", text: "設定を更新しました。" });
         } catch (error) {
@@ -97,6 +103,21 @@ export default function SettingsPage() {
                                 <option value="light">ホワイト (白背景 / 黒文字)</option>
                                 <option value="parchment">生成色 (生成背景 / 黒文字)</option>
                                 <option value="dusk">夕暮れ (深い青 / 青白文字)</option>
+                            </select>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="language">言語 / Language</label>
+                            <select
+                                id="language"
+                                value={language}
+                                onChange={(e) => setLanguageOption(e.target.value as Language)}
+                                className={styles.select}
+                            >
+                                <option value="ja">日本語 (Japanese)</option>
+                                <option value="en">English</option>
+                                <option value="es">Español (Spanish)</option>
+                                <option value="zh">中文 (Chinese)</option>
                             </select>
                         </div>
 

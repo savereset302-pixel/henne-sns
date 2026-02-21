@@ -5,10 +5,13 @@ import styles from "./newPost.module.css";
 import { db, auth, storage } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { compressImage } from "@/lib/imageUtils";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function NewPostPage() {
+    const { t } = useLanguage();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("哲学");
@@ -43,8 +46,9 @@ export default function NewPostPage() {
         try {
             let imageUrl = null;
             if (imageFile) {
-                const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_${imageFile.name}`);
-                const snapshot = await uploadBytes(storageRef, imageFile);
+                const compressedBlob = await compressImage(imageFile);
+                const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_image.jpg`);
+                const snapshot = await uploadBytes(storageRef, compressedBlob);
                 imageUrl = await getDownloadURL(snapshot.ref);
             }
 
@@ -102,15 +106,15 @@ export default function NewPostPage() {
     return (
         <main className="container">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
             </header>
 
             <section className={styles.content}>
                 <div className={`glass-panel ${styles.formWrapper}`}>
-                    <h1 className={styles.pageTitle}>本音を綴る</h1>
+                    <h1 className={styles.pageTitle}>{t("newPost")}</h1>
                     <form onSubmit={(e) => handleSubmit(e, false)} className={styles.form}>
                         <div className={styles.inputGroup}>
-                            <label>タイトル</label>
+                            <label>{t("title")}</label>
                             <input
                                 type="text"
                                 value={title}
@@ -120,7 +124,7 @@ export default function NewPostPage() {
                             />
                         </div>
                         <div className={styles.inputGroup}>
-                            <label>カテゴリー</label>
+                            <label>{t("category")}</label>
                             <select value={category} onChange={(e) => setCategory(e.target.value)}>
                                 <option value="哲学">哲学</option>
                                 <option value="独白">独白</option>
@@ -133,7 +137,7 @@ export default function NewPostPage() {
                             </select>
                         </div>
                         <div className={styles.inputGroup}>
-                            <label>コメント設定</label>
+                            <label>{t("commentPolicy")}</label>
                             <select value={commentPolicy} onChange={(e) => setCommentPolicy(e.target.value)}>
                                 <option value="all">誰でもコメント可</option>
                                 <option value="human_only">人間のみ許可 (AIは不可)</option>
@@ -142,7 +146,7 @@ export default function NewPostPage() {
                             </select>
                         </div>
                         <div className={styles.inputGroup}>
-                            <label>本文</label>
+                            <label>{t("content")}</label>
                             <textarea
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
@@ -185,7 +189,7 @@ export default function NewPostPage() {
                                     checked={isAnonymous}
                                     onChange={(e) => setIsAnonymous(e.target.checked)}
                                 />
-                                匿名で投稿する
+                                {t("anonymous")}
                             </label>
 
                             <label className={styles.checkboxGroup}>
@@ -194,12 +198,12 @@ export default function NewPostPage() {
                                     checked={isEphemeral}
                                     onChange={(e) => setIsEphemeral(e.target.checked)}
                                 />
-                                <span style={{ color: '#ffbd59' }}>⏳ 24時間で消去する (水に流す)</span>
+                                <span style={{ color: '#ffbd59' }}>⏳ {t("ephemeral")}</span>
                             </label>
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label>画像 (任意)</label>
+                            <label>{t("image")}</label>
                             <input
                                 type="file"
                                 accept="image/*"
@@ -215,14 +219,14 @@ export default function NewPostPage() {
                         </div>
 
                         <div className={styles.actions}>
-                            <Link href="/" className={styles.cancel}>キャンセル</Link>
+                            <Link href="/" className={styles.cancel}>{t("cancel")}</Link>
                             <button
                                 type="button"
                                 onClick={(e) => handleSubmit(null as any, true)}
                                 className={styles.draftBtn}
                                 disabled={isLoading}
                             >
-                                下書き保存
+                                {t("saveDraft")}
                             </button>
                             <button
                                 type="submit"
@@ -230,7 +234,7 @@ export default function NewPostPage() {
                                 disabled={isLoading}
                                 style={{ minWidth: '220px' }}
                             >
-                                {isLoading ? "心を落ち着かせています..." : "本音を放つ"}
+                                {isLoading ? t("loadingPost") : t("postHonne")}
                             </button>
                         </div>
                     </form>

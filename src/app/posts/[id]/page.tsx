@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import styles from "./post.module.css";
 import UserNav from "@/components/UserNav";
+import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import CommentSection from "@/components/CommentSection";
@@ -28,8 +30,12 @@ interface Post {
 
 export default function PostPage() {
     const { id } = useParams();
+    const router = useRouter();
     const [post, setPost] = useState<Post | null>(null);
+    const [translatedContent, setTranslatedContent] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const { language, t } = useLanguage();
 
     useEffect(() => {
         if (!id) return;
@@ -84,7 +90,23 @@ export default function PostPage() {
                                     <img src={post.imageUrl} alt={post.title} />
                                 </div>
                             )}
-                            <div className={styles.text}>{post.content}</div>
+
+                            <div className={styles.contentWrapper}>
+                                {translatedContent ? (
+                                    <>
+                                        <div className={styles.translatedBadge}>{t("translated")}</div>
+                                        <div className={styles.text}>{translatedContent}</div>
+                                        <div className={styles.originalDivider}>
+                                            <span>{t("original")}</span>
+                                        </div>
+                                        <div className={`${styles.text} ${styles.originalText}`}>{post.content}</div>
+                                    </>
+                                ) : (
+                                    <div className={styles.text}>
+                                        {isTranslating ? "Translating..." : post.content}
+                                    </div>
+                                )}
+                            </div>
 
                             <div className={styles.meta}>
                                 <span>by {post.authorName}</span>

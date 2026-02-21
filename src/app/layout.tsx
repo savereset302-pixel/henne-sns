@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { LanguageProvider } from "@/context/LanguageContext";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 
@@ -40,7 +42,7 @@ export const metadata: Metadata = {
   },
 };
 
-import { ThemeProvider } from "@/components/ThemeProvider";
+// ThemeProvider is already imported above
 
 export default function RootLayout({
   children,
@@ -54,8 +56,10 @@ export default function RootLayout({
       </head>
       <body className={`${outfit.variable}`}>
         <ThemeProvider>
-          <JsonLd />
-          {children}
+          <LanguageProvider>
+            <JsonLd />
+            {children}
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -95,6 +95,40 @@
     padding: 4rem;
 }
 
+.translatedBadge {
+    display: inline-block;
+    background: var(--accent-color);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.originalDivider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0 1rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.originalDivider::before,
+.originalDivider::after {
+    content: "";
+    flex-grow: 1;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.originalText {
+    font-style: italic;
+    opacity: 0.7;
+    font-size: 1rem;
+}
+
 .postImage {
     margin: 1.5rem 0;
     width: 100%;
