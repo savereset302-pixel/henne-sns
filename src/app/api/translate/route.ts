@@ -1,19 +1,19 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+// We keep the logic simple to ensure maximum compatibility with the SDK version
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-// Using gemini-1.5-flash with v1 API for stable production use
-const model = genAI.getGenerativeModel(
-    { model: "gemini-1.5-flash" },
-    { apiVersion: "v1" }
-);
+// Use gemini-1.5-flash-latest as it is the most robust identifier for v1/v1beta
+const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash-latest"
+});
 
 export async function POST(req: Request) {
     try {
         const { text, targetLang, texts } = await req.json();
 
         if (!process.env.GEMINI_API_KEY) {
-            console.error("Translation Error: GEMINI_API_KEY is not set in environment variables.");
+            console.error("Translation Error: GEMINI_API_KEY is not set.");
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
 
