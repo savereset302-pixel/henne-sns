@@ -60,6 +60,9 @@ export const translations = {
         privacyTitle: "プライバシーポリシー",
         termsTitle: "利用規約",
         securityTitle: "セキュリティへの取り組み",
+        privacyBody: "Honne.（以下「当サービス」）は、ユーザーの個人情報の保護を重要視しています。収集した情報は、サービスの提供、AIによる感情分析、および不正利用防止の目的で使用されます。Google Firebaseを使用し、パスワードは運営者も関与できない形で安全に管理されます。",
+        termsBody: "当サービスは匿名で本音を共有する場を提供します。他人への誹謗中傷、迷惑行為、犯罪を示唆する内容の投稿は禁止されており、管理者の判断で削除される場合があります。また、投稿内容はAIの学習や分析に使用されることに同意するものとします。",
+        securityBody: "Honne. は現代のウェブ標準に準拠したセキュリティ対策を講じています。Firebase Authenticationによる安全な認証、Firestoreのルールによるアクセス制御、Gemini APIへの匿名化されたデータ送信により、あなたのアイデンティティを保護します。",
         // Categories for contact
         con_cat_bug: "バグ・不具合報告",
         con_cat_req: "機能の要望",
@@ -225,6 +228,9 @@ export const translations = {
         privacyTitle: "Privacy Policy",
         termsTitle: "Terms of Service",
         securityTitle: "Security Efforts",
+        privacyBody: "Honne. (the 'Service') prioritizes the protection of user privacy. Collected information is used for providing services, AI sentiment analysis, and preventing misuse. We use Google Firebase to ensure passwords are encrypted and securely managed beyond the reach of operators.",
+        termsBody: "This service provides a space to share true feelings anonymously. Defamatory content, harassment, or content suggesting criminal acts are prohibited and may be deleted at the administrator's discretion. You agree that your content may be processed by AI for analysis.",
+        securityBody: "Honne. employs security measures compliant with modern web standards. We protect your identity through secure authentication via Firebase Auth, access control via Firestore rules, and anonymized data transmission to the Gemini API.",
         // Categories for contact
         con_cat_bug: "Bug Report",
         con_cat_req: "Feature Request",
@@ -387,6 +393,9 @@ export const translations = {
         privacyTitle: "Política de privacidad",
         termsTitle: "Términos de servicio",
         securityTitle: "Esfuerzos de seguridad",
+        privacyBody: "Honne. (el 'Servicio') prioriza la protección de la privacidad del usuario. La información recopilada se utiliza para proporcionar servicios, análisis de sentimientos por IA y prevenir el mal uso. Utilizamos Google Firebase para garantizar que las contraseñas estén cifradas y se gestionen de forma segura fuera del alcance de los operadores.",
+        termsBody: "Este servicio proporciona un espacio para compartir sentimientos verdaderos de forma anónima. El contenido difamatorio, el acoso o el contenido que sugiera actos criminales están prohibidos y pueden ser eliminados a discreción del administrador. Usted acepta que su contenido sea procesado por la IA para su análisis.",
+        securityBody: "Honne. emplea medidas de seguridad que cumplen con los estándares web modernos. Protegemos su identidad a través de la autenticación segura mediante Firebase Auth, el control de acceso mediante las reglas de Firestore y la transmisión de datos anonimizados a la API de Gemini.",
         // Categories for contact
         con_cat_bug: "Informe de error",
         con_cat_req: "Solicitud de función",
@@ -549,6 +558,9 @@ export const translations = {
         privacyTitle: "隐私政策",
         termsTitle: "使用条款",
         securityTitle: "安全保障措施",
+        privacyBody: "Honne.（以下简称“本服务”）高度重视用户隐私保护。我们收集的信息将用于提供服务、AI情感分析以及防止滥用。我们使用 Google Firebase 确保密码经过加密和安全管理，任何运营人员都无法触及。",
+        termsBody: "本服务提供匿名分享本音的空间。禁止发布诽谤内容、骚扰行为或涉及犯罪的内容，管理员有权根据判断进行删除。您同意您的内容将被AI进行处理和分析。",
+        securityBody: "Honne. 采用了符合现代网络标准的各类安全措施。我们通过 Firebase Auth 的安全认证、Firestore 规则的权限控制以及向 Gemini API 发送匿名化的数据来全面保护您的身份安全。",
         // Categories for contact
         con_cat_bug: "故障报告",
         con_cat_req: "功能建议",

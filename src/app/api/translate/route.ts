@@ -26,14 +26,25 @@ export async function POST(req: Request) {
             Items:
             ${JSON.stringify(texts)}
             
-            ONLY return the JSON array. Output absolute JSON.`;
+            Return ONLY the valid JSON array starting with [ and ending with ]. No Markdown code blocks.`;
 
             const result = await model.generateContent(prompt);
             const response = await result.response;
-            const translatedJSON = response.text().replace(/```json/g, "").replace(/```/g, "").trim();
-            const translatedItems = JSON.parse(translatedJSON);
+            let textResponse = response.text().trim();
 
-            return NextResponse.json({ success: true, translatedItems });
+            // Extract JSON if wrapped in markdown
+            const jsonMatch = textResponse.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                textResponse = jsonMatch[0];
+            }
+
+            try {
+                const translatedItems = JSON.parse(textResponse);
+                return NextResponse.json({ success: true, translatedItems });
+            } catch (e) {
+                console.error("JSON Parse error:", e, textResponse);
+                return NextResponse.json({ success: false, error: "Failed to parse translation" }, { status: 500 });
+            }
         }
 
         // Single text translation
