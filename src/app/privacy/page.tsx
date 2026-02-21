@@ -5,7 +5,7 @@ import styles from "./legal.module.css";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function PrivacyPage() {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     return (
         <main className="container fade-in">
