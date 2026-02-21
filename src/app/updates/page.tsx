@@ -1,18 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import styles from "../privacy/legal.module.css"; // Reuse legal styles for consistency
+import styles from "../privacy/legal.module.css";
 import UserNav from "@/components/UserNav";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function UpdatesPage() {
+    const { t } = useLanguage();
+
+    // Using keys for localized content where available, otherwise fallback
     const updates = [
         {
-            date: "2026-02-22",
-            title: "繋がりと表現の拡張（コミュニティ & 画像投稿）",
+            date: "2026-02-23",
+            title: t("update_v21_title") || "v2.1: 高速化とグローバル展開の完成",
             items: [
-                "コミュニティ機能（グループチャット）を実装。共通の想いで繋がる場所に",
-                "画像投稿機能を追加。言葉と色彩で本音を表現可能に",
-                "ナビゲーションメニューの整理とUXの改善",
+                t("update_v21_i1") || "画像圧縮エンジンの最適化。アップロード速度がさらに向上",
+                t("update_v21_i2") || "UI全体の完全多言語化（日/英/西/中）。",
+                t("update_v21_i3") || "法的ページの国際化",
+                t("update_v21_i4") || "システム安定性の向上"
+            ]
+        },
+        {
+            date: "2026-02-22",
+            title: t("update_v22_title") || "繋がりと表現の拡張（コミュニティ & 画像投稿）",
+            items: [
+                "コミュニティ機能（グループチャット）を実装",
+                "画像投稿機能を追加",
+                "ナビゲーションメニューの整理",
                 "各ページのテーマ適用範囲の拡大"
             ]
         },
@@ -20,21 +34,10 @@ export default function UpdatesPage() {
             date: "2026-02-21",
             title: "自分好みの Honne. へ（テーマ・しおり・下書き）",
             items: [
-                "背景テーマ選択機能の追加（ダーク、ホワイト、生成色、夕暮れ）",
-                "「しおり（保存）」機能を実装。心に響いた本音を手元に残せるように",
-                "「下書き保存」機能の導入。言葉になる前の想いを一時保存可能に",
-                "投稿時の演出を「送信中」から「心を落ち着かせています」へ洗練",
-                "名前変更機能の不具合修正と安定性の向上"
-            ]
-        },
-        {
-            date: "2026-02-20",
-            title: "機能拡張とUXの向上",
-            items: [
-                "名前変更機能の追加",
-                "コメント設定に「人間のみ許可 (AIは不可)」オプションを追加",
-                "新規カテゴリー「小説」「時事」「その他」の追加",
-                "アップデートログの開設"
+                "背景テーマ選択機能の追加",
+                "「しおり（保存）」機能を実装",
+                "「下書き保存」機能の導入",
+                "投稿演出の改善"
             ]
         },
         {
@@ -43,16 +46,7 @@ export default function UpdatesPage() {
             items: [
                 "水に流す機能（24時間消滅投稿）の実装",
                 "感情カラー機能（Emotional UI）の導入",
-                "AI哲学者による自動コメント機能の開始"
-            ]
-        },
-        {
-            date: "2026-02-15",
-            title: "Honne. プレリリース",
-            items: [
-                "匿名の本音投稿機能",
-                "カテゴリー別フィード",
-                "メール認証システム"
+                "AI哲学者による自動コメント開始"
             ]
         }
     ];
@@ -60,12 +54,12 @@ export default function UpdatesPage() {
     return (
         <main className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>Honne.</Link>
+                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>{t("siteName")}</Link>
                 <UserNav />
             </header>
 
             <section className={styles.content}>
-                <h1 style={{ textAlign: 'center', marginBottom: '3rem' }}>アップデートログ</h1>
+                <h1 style={{ textAlign: 'center', marginBottom: '3rem' }}>{t("updatesTitle")}</h1>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
                     {updates.map((update, index) => (
@@ -83,20 +77,11 @@ export default function UpdatesPage() {
                             </ul>
                         </div>
                     ))}
-                    <div className={`glass-panel ${styles.updateCard}`}>
-                        <div className={styles.date}>2026.02.21</div>
-                        <h3 className={styles.versionTitle}>画像投稿の改善 & 多言語・AI翻訳対応</h3>
-                        <ul className={styles.changeList}>
-                            <li><strong>画像投稿の高速化</strong>: クライアント側での画像圧縮を導入し、大容量の写真もスムーズに投稿できるようになりました。</li>
-                            <li><strong>多言語対応 (i18n)</strong>: UIが英語・スペイン語・中国語に切り替え可能になりました。</li>
-                            <li><strong>本音のAI自動翻訳</strong>: 言語設定を切り替えると、投稿内容がAIによって自動的に翻訳表示されます。</li>
-                        </ul>
-                    </div>
                 </div>
             </section>
 
             <div style={{ textAlign: 'center', marginTop: '4rem', paddingBottom: '4rem' }}>
-                <Link href="/" className={styles.backLink}>ホームに戻る</Link>
+                <Link href="/" className={styles.backLink}>{t("backToHome")}</Link>
             </div>
         </main>
     );

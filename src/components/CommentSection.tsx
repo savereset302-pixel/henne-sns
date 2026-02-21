@@ -6,6 +6,7 @@ import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, update
 import { onAuthStateChanged, User } from "firebase/auth";
 import styles from "./CommentSection.module.css";
 import Link from "next/link";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Comment {
     id: string;
@@ -17,6 +18,7 @@ interface Comment {
 }
 
 export default function CommentSection({ postId, commentPolicy = 'all' }: { postId: string, commentPolicy?: string }) {
+    const { t } = useLanguage();
     const [comments, setComments] = useState<Comment[]>([]);
     const [newComment, setNewComment] = useState("");
     const [isAnonymous, setIsAnonymous] = useState(false);
@@ -59,7 +61,7 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
         try {
             await addDoc(collection(db, "posts", postId, "comments"), {
                 text: newComment,
-                authorName: isAnonymous ? "匿名ユーザー" : (user.displayName || "名無し"),
+                authorName: isAnonymous ? t("anonUser") : (user.displayName || t("ph_display_name")),
                 authorId: user.uid,
                 isAnonymous,
                 createdAt: serverTimestamp(),
@@ -74,7 +76,7 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
             setNewComment("");
         } catch (error) {
             console.error("Error adding comment:", error);
-            alert("コメントの投稿に失敗しました。");
+            alert(t("errorOccurred"));
         } finally {
             setLoading(false);
         }
@@ -82,15 +84,15 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
 
     return (
         <div className={styles.section}>
-            <h3 className={styles.heading}>コメント ({comments.length})</h3>
+            <h3 className={styles.heading}>{t("commentsHeading")} ({comments.length})</h3>
 
             {commentPolicy === 'none' ? (
                 <div className={styles.loginPrompt}>
-                    この投稿はコメントを受け付けていません（独り言モード）。
+                    {t("policyNone")}
                 </div>
             ) : commentPolicy === 'ai_only' ? (
                 <div className={styles.loginPrompt}>
-                    AIとの対話モードです。人間からのコメントは受け付けていません。
+                    {t("policyAiOnly")}
                 </div>
             ) : user ? (
                 <form onSubmit={handleSubmit} className={styles.form}>
@@ -98,7 +100,7 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                         className={styles.textarea}
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="あなたの考えを共有してください..."
+                        placeholder={t("ph_comment")}
                         disabled={loading}
                     />
 
@@ -108,16 +110,26 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                             checked={isAnonymous}
                             onChange={(e) => setIsAnonymous(e.target.checked)}
                         />
-                        匿名でコメントする
+                        {t("anonComment")}
                     </label>
 
                     <button type="submit" className={styles.submitBtn} disabled={loading || !newComment.trim()}>
-                        {loading ? "送信中..." : "コメントする"}
+                        {loading ? t("contactSubmitting") : t("submitComment")}
                     </button>
                 </form>
             ) : (
                 <div className={styles.loginPrompt}>
-                    コメントするには <Link href="/login" className={styles.loginLink}>ログイン</Link> してください。
+                    {t("loginToComment").includes("ログイン") ? (
+                        <>コメントするには <Link href="/login" className={styles.loginLink}>ログイン</Link> してください。</>
+                    ) : t("loginToComment").includes("Login") ? (
+                        <>Please <Link href="/login" className={styles.loginLink}>Login</Link> to comment.</>
+                    ) : t("loginToComment").includes("Iniciar sesión") ? (
+                        <>Por favor, <Link href="/login" className={styles.loginLink}>Inicia sesión</Link> para comentar.</>
+                    ) : t("loginToComment").includes("登录") ? (
+                        <>请 <Link href="/login" className={styles.loginLink}>登录</Link> 以发表评论。</>
+                    ) : (
+                        <>{t("loginToComment")}</>
+                    )}
                 </div>
             )}
 
@@ -130,16 +142,18 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                                 {comment.authorName}
                             </span>
                             <span className={styles.date}>
-                                {comment.createdAt?.toDate?.().toLocaleString() || "たった今"}
+                                {comment.createdAt?.toDate?.().toLocaleString() || t("justNow")}
                             </span>
                         </div>
                         <div className={styles.body}>{comment.text}</div>
                     </div>
                 ))}
                 {comments.length === 0 && (
-                    <p style={{ color: "#777", textAlign: "center" }}>まだコメントはありません。</p>
+                    <p style={{ color: "#777", textAlign: "center" }}>{t("noComments")}</p>
                 )}
             </div>
         </div>
     );
 }
+
+// Fixed ternary logic for Login link in CommentSection

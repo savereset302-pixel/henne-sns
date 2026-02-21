@@ -7,8 +7,10 @@ import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import UserNav from "@/components/UserNav";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ContactPage() {
+    const { t } = useLanguage();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [category, setCategory] = useState("バグ報告");
@@ -53,14 +55,14 @@ export default function ContactPage() {
         return (
             <div className="container fade-in">
                 <header className={styles.header}>
-                    <Link href="/" className={styles.logo}>Honne.</Link>
+                    <Link href="/" className={styles.logo}>{t("siteName")}</Link>
                     <UserNav />
                 </header>
                 <div className={styles.successMessage}>
-                    <h2>送信完了</h2>
-                    <p>お問い合わせありがとうございます。<br />内容を確認し、必要に応じてご連絡いたします。</p>
+                    <h2>{t("contactSuccessTitle")}</h2>
+                    <p>{t("contactSuccessMsg")}</p>
                     <Link href="/">
-                        <button className="btn-primary">ホームに戻る</button>
+                        <button className="btn-primary">{t("backToHome")}</button>
                     </Link>
                 </div>
             </div>
@@ -70,61 +72,61 @@ export default function ContactPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
                 <UserNav />
             </header>
 
             <section className={styles.content}>
-                <h1 className={styles.title}>お問い合わせ</h1>
+                <h1 className={styles.title}>{t("contactTitle")}</h1>
                 <p className={styles.description}>
-                    機能の不具合、ご意見、通報などはこちらからお送りください。
+                    {t("contactDesc")}
                 </p>
 
                 <form onSubmit={handleSubmit} className={styles.form}>
                     <div className={styles.inputGroup}>
-                        <label>お名前</label>
+                        <label>{t("contactName")}</label>
                         <input
                             type="text"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
-                            placeholder="お名前（任意）"
+                            placeholder={t("contactName")}
                         />
                     </div>
 
                     <div className={styles.inputGroup}>
-                        <label>メールアドレス <span className={styles.required}>*</span></label>
+                        <label>{t("contactEmail")} <span className={styles.required}>*</span></label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="返信用のメールアドレス"
+                            placeholder={t("contactEmail")}
                             required
                         />
                     </div>
 
                     <div className={styles.inputGroup}>
-                        <label>種別</label>
+                        <label>{t("contactCategory")}</label>
                         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                            <option value="バグ報告">バグ・不具合報告</option>
-                            <option value="機能要望">機能の要望</option>
-                            <option value="違反通報">投稿・ユーザーの通報</option>
-                            <option value="その他">その他</option>
+                            <option value="バグ報告">{t("con_cat_bug")}</option>
+                            <option value="機能要望">{t("con_cat_req")}</option>
+                            <option value="違反通報">{t("con_cat_report")}</option>
+                            <option value="その他">{t("con_cat_other")}</option>
                         </select>
                     </div>
 
                     <div className={styles.inputGroup}>
-                        <label>メッセージ内容 <span className={styles.required}>*</span></label>
+                        <label>{t("contactMsg")} <span className={styles.required}>*</span></label>
                         <textarea
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             rows={8}
-                            placeholder="詳細をご記入ください"
+                            placeholder="..."
                             required
                         />
                     </div>
 
                     <button type="submit" className="btn-primary" disabled={loading}>
-                        {loading ? "送信中..." : "送信する"}
+                        {loading ? t("contactSubmitting") : t("contactSubmit")}
                     </button>
                 </form>
             </section>

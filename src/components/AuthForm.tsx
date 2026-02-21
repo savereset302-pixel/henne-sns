@@ -10,8 +10,10 @@ import {
     sendEmailVerification
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AuthForm() {
+    const { t } = useLanguage();
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -28,16 +30,13 @@ export default function AuthForm() {
         try {
             if (isLogin) {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                // Reload user to get latest emailVerified status
                 await userCredential.user.reload();
 
-                // If user is not verified, send verification email (one-time auto-send)
                 if (!userCredential.user.emailVerified) {
                     try {
                         await sendEmailVerification(userCredential.user);
-                        setSuccessMessage("確認メールを送信しました。メールをご確認ください。");
+                        setSuccessMessage(t("authSentVerification"));
                     } catch (emailError) {
-                        // Silently fail if email sending fails (e.g., too many requests)
                         console.error("Failed to send verification email:", emailError);
                     }
                 }
@@ -47,11 +46,9 @@ export default function AuthForm() {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(userCredential.user, { displayName: username });
 
-                // Send verification email
                 await sendEmailVerification(userCredential.user);
-                setSuccessMessage("登録完了！確認メールを送信しました。メールをご確認ください。");
+                setSuccessMessage(t("authSignupSuccess"));
 
-                // Redirect after 3 seconds
                 setTimeout(() => router.push("/"), 3000);
             }
         } catch (err: any) {
@@ -61,22 +58,22 @@ export default function AuthForm() {
 
     return (
         <div className={`glass-panel ${styles.container}`}>
-            <h2 className={styles.title}>{isLogin ? "ログイン" : "新規登録"}</h2>
+            <h2 className={styles.title}>{isLogin ? t("authLogin") : t("authSignup")}</h2>
             <form onSubmit={handleSubmit} className={styles.form}>
                 {!isLogin && (
                     <div className={styles.inputGroup}>
-                        <label>ユーザー名</label>
+                        <label>{t("authUsername")}</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder="あなたの哲学名"
+                            placeholder={t("authUsernamePH")}
                             required
                         />
                     </div>
                 )}
                 <div className={styles.inputGroup}>
-                    <label>メールアドレス</label>
+                    <label>{t("authEmail")}</label>
                     <input
                         type="email"
                         value={email}
@@ -86,7 +83,7 @@ export default function AuthForm() {
                     />
                 </div>
                 <div className={styles.inputGroup}>
-                    <label>パスワード</label>
+                    <label>{t("authPassword")}</label>
                     <input
                         type="password"
                         value={password}
@@ -98,13 +95,13 @@ export default function AuthForm() {
                 {error && <p className={styles.error}>{error}</p>}
                 {successMessage && <p className={styles.success}>{successMessage}</p>}
                 <button type="submit" className="btn-primary">
-                    {isLogin ? "ログイン" : "登録して本音を語る"}
+                    {isLogin ? t("authSubmitLogin") : t("authSubmitSignup")}
                 </button>
             </form>
             <p className={styles.switch}>
-                {isLogin ? "まだアカウントがありませんか？" : "既にアカウントをお持ちですか？"}
+                {isLogin ? t("authNoAccount") : t("authHasAccount")}
                 <span onClick={() => setIsLogin(!isLogin)}>
-                    {isLogin ? "新規登録はこちら" : "ログインはこちら"}
+                    {isLogin ? t("authGoSignup") : t("authGoLogin")}
                 </span>
             </p>
         </div>

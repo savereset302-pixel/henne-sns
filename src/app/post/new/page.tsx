@@ -119,7 +119,7 @@ export default function NewPostPage() {
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                placeholder="その哲学に名を付けるなら？"
+                                placeholder={t("ph_title")}
                                 required
                             />
                         </div>
@@ -150,7 +150,7 @@ export default function NewPostPage() {
                             <textarea
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
-                                placeholder="あなたの内なる声を、思うがままに。"
+                                placeholder={t("ph_content")}
                                 required
                                 rows={10}
                             />

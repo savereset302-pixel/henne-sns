@@ -1,7 +1,7 @@
 /**
  * Compress image using Canvas API
  */
-export async function compressImage(file: File, maxWidth = 1200, quality = 0.7): Promise<Blob> {
+export async function compressImage(file: File, maxWidth = 800, quality = 0.5): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);

@@ -6,7 +6,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function POST(req: Request) {
     try {
-        const { text, targetLang } = await req.json();
+        const { text, targetLang, texts } = await req.json();
 
         const langMap: Record<string, string> = {
             en: "English",
@@ -17,6 +17,26 @@ export async function POST(req: Request) {
 
         const targetLangName = langMap[targetLang] || "English";
 
+        if (texts && Array.isArray(texts)) {
+            // Bulk translation request
+            const prompt = `Translate the following list of Japanese items to ${targetLangName}. 
+            Return the result as a JSON array of objects with "id", "title" and "content" fields.
+            Keep the meaning and original atmosphere.
+            
+            Items:
+            ${JSON.stringify(texts)}
+            
+            ONLY return the JSON array. Output absolute JSON.`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            const translatedJSON = response.text().replace(/```json/g, "").replace(/```/g, "").trim();
+            const translatedItems = JSON.parse(translatedJSON);
+
+            return NextResponse.json({ success: true, translatedItems });
+        }
+
+        // Single text translation
         const prompt = `Translate the following Japanese text to ${targetLangName}. 
         Keep the meaning and original atmosphere.
         Text: ${text}

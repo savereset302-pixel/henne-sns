@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import styles from "./legal.module.css";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function PrivacyPage() {
+    const { t } = useLanguage();
+
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
             </header>
 
             <section className={styles.content}>
-                <h1>プライバシーポリシー</h1>
+                <h1>{t("privacyTitle")}</h1>
                 <p>Honne.（以下「当サービス」）は、ユーザーの個人情報の保護を重要視しています。</p>
 
                 <h2>1. 収集する情報</h2>

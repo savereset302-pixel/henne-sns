@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import styles from "../privacy/legal.module.css";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SecurityPage() {
+    const { t } = useLanguage();
+
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
             </header>
 
             <section className={styles.content}>
-                <h1>セキュリティへの取り組み</h1>
+                <h1>{t("securityTitle")}</h1>
                 <p>Honne.は、個人開発のプロジェクトでありながら、エンタープライズレベルの基盤技術を採用することで、ユーザーの安全を確保しています。</p>
 
                 <h2>1. アカウントの保護</h2>

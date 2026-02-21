@@ -15,7 +15,7 @@ import { Language } from "@/lib/translations";
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
     const { theme: currentTheme, setTheme } = useTheme();
-    const { language: currentLang, setLanguage } = useLanguage();
+    const { language: currentLang, setLanguage, t } = useLanguage();
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
     const [language, setLanguageOption] = useState<Language>("ja");
@@ -51,63 +51,63 @@ export default function SettingsPage() {
             setTheme(theme);
             setLanguage(language);
 
-            setMessage({ type: "success", text: "設定を更新しました。" });
+            setMessage({ type: "success", text: t("settingsSuccess") });
         } catch (error) {
             console.error("Error updating profile:", error);
-            setMessage({ type: "error", text: "更新に失敗しました。もう一度お試しください。" });
+            setMessage({ type: "error", text: t("settingsError") });
         } finally {
             setIsSaving(false);
         }
     };
 
-    if (authLoading) return <div className="container">読み込み中...</div>;
+    if (authLoading) return <div className="container">{t("loadingPosts")}</div>;
     if (!user) return (
-        <div className="container">
-            <p>設定を変更するにはログインが必要です。</p>
-            <Link href="/login" className="btn-primary">ログイン</Link>
+        <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>
+            <p>{t("loginRequired")}</p>
+            <Link href="/login" className="btn-primary" style={{ display: 'inline-block', marginTop: '1rem' }}>{t("login")}</Link>
         </div>
     );
 
     return (
         <main className="container fade-in">
             <header style={{ padding: '1.5rem 0' }}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>Honne.</Link>
+                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>{t("siteName")}</Link>
             </header>
 
             <div className={styles.content}>
-                <h1 className={styles.title}>設定</h1>
+                <h1 className={styles.title}>{t("settingsTitle")}</h1>
 
                 <div className={styles.settingsCard}>
                     <form onSubmit={handleSave}>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="displayName">表示名</label>
+                            <label htmlFor="displayName">{t("settingsDisplayName")}</label>
                             <input
                                 id="displayName"
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
-                                placeholder="名無し"
+                                placeholder={t("ph_display_name")}
                                 maxLength={20}
                             />
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label htmlFor="theme">背景テーマ</label>
+                            <label htmlFor="theme">{t("settingsTheme")}</label>
                             <select
                                 id="theme"
                                 value={theme}
                                 onChange={(e) => setThemeOption(e.target.value)}
                                 className={styles.select}
                             >
-                                <option value="dark">デフォルト (ダーク)</option>
-                                <option value="light">ホワイト (白背景 / 黒文字)</option>
-                                <option value="parchment">生成色 (生成背景 / 黒文字)</option>
-                                <option value="dusk">夕暮れ (深い青 / 青白文字)</option>
+                                <option value="dark">{t("theme_dark")}</option>
+                                <option value="light">{t("theme_light")}</option>
+                                <option value="parchment">{t("theme_parchment")}</option>
+                                <option value="dusk">{t("theme_dusk")}</option>
                             </select>
                         </div>
 
                         <div className={styles.inputGroup}>
-                            <label htmlFor="language">言語 / Language</label>
+                            <label htmlFor="language">{t("settingsLanguage")}</label>
                             <select
                                 id="language"
                                 value={language}
@@ -122,7 +122,7 @@ export default function SettingsPage() {
                         </div>
 
                         <button type="submit" className={`btn-primary ${styles.saveBtn}`} disabled={isSaving}>
-                            {isSaving ? "保存中..." : "保存する"}
+                            {isSaving ? t("settingsSaving") : t("settingsSave")}
                         </button>
 
                         {message && (
@@ -134,7 +134,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                    <Link href="/" style={{ color: '#888', textDecoration: 'none' }}>ホームに戻る</Link>
+                    <Link href="/" style={{ color: '#888', textDecoration: 'none' }}>{t("backToHome")}</Link>
                 </div>
             </div>
         </main>

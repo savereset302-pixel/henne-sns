@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { auth } from "@/lib/firebase";
 import { sendEmailVerification } from "firebase/auth";
 import styles from "./EmailVerificationBanner.module.css";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function EmailVerificationBanner() {
+    const { t } = useLanguage();
     const [user, setUser] = useState(auth.currentUser);
     const [isDismissed, setIsDismissed] = useState(false);
     const [isSending, setIsSending] = useState(false);
@@ -22,9 +24,9 @@ export default function EmailVerificationBanner() {
         setIsSending(true);
         try {
             await sendEmailVerification(user);
-            alert("確認メールを再送信しました！");
+            alert(t("sentVerification"));
         } catch (error) {
-            alert("エラーが発生しました。しばらくしてから再度お試しください。");
+            alert(t("errorOccurred"));
         } finally {
             setIsSending(false);
         }
@@ -40,8 +42,8 @@ export default function EmailVerificationBanner() {
             <div className={styles.content}>
                 <span className={styles.icon}>📧</span>
                 <div className={styles.text}>
-                    <strong>メールアドレスの確認をお願いします</strong>
-                    <p>登録したメールアドレス宛に確認メールを送信しました。メール内のリンクをクリックして確認を完了してください。</p>
+                    <strong>{t("verifyTitle")}</strong>
+                    <p>{t("verifyMsg")}</p>
                 </div>
                 <div className={styles.actions}>
                     <button
@@ -49,7 +51,7 @@ export default function EmailVerificationBanner() {
                         className={styles.resendBtn}
                         disabled={isSending}
                     >
-                        {isSending ? "送信中..." : "再送信"}
+                        {isSending ? t("contactSubmitting") : t("resend")}
                     </button>
                     <button
                         onClick={() => setIsDismissed(true)}

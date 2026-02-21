@@ -1,15 +1,20 @@
+"use client";
+
 import Link from "next/link";
 import styles from "../privacy/legal.module.css";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function TermsPage() {
+    const { t } = useLanguage();
+
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
             </header>
 
             <section className={styles.content}>
-                <h1>利用規約</h1>
+                <h1>{t("termsTitle")}</h1>
                 <p>この利用規約は、Honne.（以下「当サービス」）の利用条件を定めるものです。</p>
 
                 <h2>1. 禁止事項</h2>

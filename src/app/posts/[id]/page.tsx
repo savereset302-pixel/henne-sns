@@ -33,9 +33,22 @@ export default function PostPage() {
     const router = useRouter();
     const [post, setPost] = useState<Post | null>(null);
     const [translatedContent, setTranslatedContent] = useState<string | null>(null);
+    const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
     const { language, t } = useLanguage();
+
+    const categoryMap: any = {
+        "all": t("all"),
+        "哲学": t("cat_philosophy"),
+        "独白": t("cat_monologue"),
+        "社会": t("cat_society"),
+        "人生": t("cat_life"),
+        "技術": t("cat_tech"),
+        "小説": t("cat_novel"),
+        "時事": t("cat_news"),
+        "その他": t("cat_other")
+    };
 
     useEffect(() => {
         if (!id) return;
@@ -60,13 +73,43 @@ export default function PostPage() {
         fetchPost();
     }, [id]);
 
-    if (loading) return <div className={styles.loading}>読み込み中...</div>;
-    if (!post) return <div className={styles.notFound}>記事が見つかりませんでした。</div>;
+    useEffect(() => {
+        if (post && language !== "ja") {
+            const translateAll = async () => {
+                setIsTranslating(true);
+                try {
+                    const res = await fetch("/api/translate", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            texts: [{ id: post.id, title: post.title, content: post.content }],
+                            targetLang: language
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.translatedItems && data.translatedItems[0]) {
+                        setTranslatedContent(data.translatedItems[0].content);
+                        setTranslatedTitle(data.translatedItems[0].title);
+                    }
+                } catch (error) {
+                    console.error("Translation failed:", error);
+                } finally {
+                    setIsTranslating(false);
+                }
+            };
+            translateAll();
+        } else {
+            setTranslatedContent(null);
+            setTranslatedTitle(null);
+        }
+    }, [post, language]);
+
+    if (loading) return <div className={styles.loading}>{t("loadingPosts")}</div>;
+    if (!post) return <div className={styles.notFound}>{t("noPosts")}</div>;
 
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
                 <UserNav />
             </header>
 
@@ -81,10 +124,11 @@ export default function PostPage() {
                     return (
                         <div className={styles.postContent} style={sentimentStyle}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span className={styles.category}>{post.category}</span>
-                                {post.expiresAt && <span style={{ fontSize: '0.9rem', color: '#ffbd59' }}>⏳ この投稿は24時間で消滅します</span>}
+                                <span className={styles.category}>{categoryMap[post.category] || post.category}</span>
+                                {post.expiresAt && <span style={{ fontSize: '0.9rem', color: '#ffbd59' }}>{t("ephemeralAlert")}</span>}
                             </div>
-                            <h1 className={styles.title}>{post.title}</h1>
+                            {translatedTitle && <div className={styles.translatedBadge}>{t("translated")}</div>}
+                            <h1 className={styles.title}>{translatedTitle || post.title}</h1>
                             {post.imageUrl && (
                                 <div className={styles.postImage}>
                                     <img src={post.imageUrl} alt={post.title} />
@@ -94,7 +138,6 @@ export default function PostPage() {
                             <div className={styles.contentWrapper}>
                                 {translatedContent ? (
                                     <>
-                                        <div className={styles.translatedBadge}>{t("translated")}</div>
                                         <div className={styles.text}>{translatedContent}</div>
                                         <div className={styles.originalDivider}>
                                             <span>{t("original")}</span>
@@ -124,7 +167,7 @@ export default function PostPage() {
                 })()}
 
                 <Link href="/" className={styles.backLink}>
-                    ← ホームに戻る
+                    {t("backToHome")}
                 </Link>
             </div>
         </main>

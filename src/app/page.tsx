@@ -9,6 +9,7 @@ import BookmarkButton from "@/components/BookmarkButton";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Post {
   id: string;
@@ -24,16 +25,31 @@ interface Post {
 }
 
 export default function Home() {
+  const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [filter, setFilter] = useState("すべて");
+  const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string }>>({});
+  const [filter, setFilter] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [isTranslating, setIsTranslating] = useState(false);
 
-  const categories = ["すべて", "哲学", "独白", "社会", "人生", "技術", "小説", "時事", "その他"];
+  const categoryMap: any = {
+    "all": t("all"),
+    "哲学": t("cat_philosophy"),
+    "独白": t("cat_monologue"),
+    "社会": t("cat_society"),
+    "人生": t("cat_life"),
+    "技術": t("cat_tech"),
+    "小説": t("cat_novel"),
+    "時事": t("cat_news"),
+    "その他": t("cat_other")
+  };
+
+  const categories = ["all", "哲学", "独白", "社会", "人生", "技術", "小説", "時事", "その他"];
 
   useEffect(() => {
     let q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
-    if (filter !== "すべて") {
+    if (filter !== "all") {
       q = query(collection(db, "posts"), where("category", "==", filter), orderBy("createdAt", "desc"));
     }
 
@@ -49,20 +65,56 @@ export default function Home() {
     return () => unsubscribe();
   }, [filter]);
 
+  useEffect(() => {
+    if (posts.length > 0 && language !== "ja") {
+      const translateAll = async () => {
+        setIsTranslating(true);
+        try {
+          // Only translate if we haven't already translated these specific posts for this language
+          const toTranslate = posts.filter(p => !translatedPosts[p.id]);
+          if (toTranslate.length === 0) return;
+
+          const res = await fetch("/api/translate", {
+            method: "POST",
+            body: JSON.stringify({
+              texts: toTranslate.map(p => ({ id: p.id, title: p.title, content: p.content })),
+              targetLang: language
+            })
+          });
+          const data = await res.json();
+          if (data.success && data.translatedItems) {
+            const newTranslations = { ...translatedPosts };
+            data.translatedItems.forEach((item: any) => {
+              newTranslations[item.id] = { title: item.title, content: item.content };
+            });
+            setTranslatedPosts(newTranslations);
+          }
+        } catch (error) {
+          console.error("Batch translation failed:", error);
+        } finally {
+          setIsTranslating(false);
+        }
+      };
+      translateAll();
+    } else {
+      setTranslatedPosts({});
+    }
+  }, [posts, language]);
+
   return (
     <main className="container fade-in">
       <header className={styles.header}>
-        <div className={styles.logo}>Honne.</div>
+        <div className={styles.logo}>{t("siteName")}</div>
         <UserNav />
       </header>
 
       <section className={styles.hero}>
         <h1 className={styles.heroTitle}>
-          飾り言葉はいらない。<br />
-          <span>あなたの本音を、ここに。</span>
+          {t("heroTitle")}<br />
+          <span>{t("heroSubTitle")}</span>
         </h1>
         <p className={styles.heroSub}>
-          世間の目を気にせず、あなたの内なる哲学を共有し、深め合うSNS。
+          {t("heroDesc")}
         </p>
       </section>
 
@@ -70,7 +122,7 @@ export default function Home() {
 
       <section className={styles.feed}>
         <div className={styles.feedHeader}>
-          <h2 className={styles.sectionTitle}>最近の哲学</h2>
+          <h2 className={styles.sectionTitle}>{t("recentPhilosophy")}</h2>
           <div className={styles.filterBar}>
             {categories.map(cat => (
               <button
@@ -78,14 +130,14 @@ export default function Home() {
                 className={`${styles.filterBtn} ${filter === cat ? styles.activeFilter : ""}`}
                 onClick={() => setFilter(cat)}
               >
-                {cat}
+                {categoryMap[cat] || cat}
               </button>
             ))}
           </div>
         </div>
 
         {loading ? (
-          <div className={styles.loading}>本音を読み込み中...</div>
+          <div className={styles.loading}>{t("loadingPosts")}</div>
         ) : (
           <div className={styles.grid}>
             {posts.length > 0 ? (
@@ -96,14 +148,19 @@ export default function Home() {
                       post.sentiment === "joy" ? { background: "rgba(100, 90, 40, 0.2)", border: "1px solid rgba(184, 164, 74, 0.2)" } :
                         {};
 
+                const translated = translatedPosts[post.id];
+                const displayTitle = translated ? translated.title : post.title;
+                const displayContent = translated ? translated.content : post.content;
+
                 return (
                   <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s', ...sentimentStyle }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <span className={styles.category}>{post.category}</span>
+                      <span className={styles.category}>{categoryMap[post.category] || post.category}</span>
                       {post.expiresAt && <span style={{ fontSize: '0.8rem', color: '#ffbd59' }}>⏳ 24h</span>}
                     </div>
-                    <h3 className={styles.postTitle}>{post.title}</h3>
-                    <p className={styles.postSnippet}>{post.content}</p>
+                    {translated && <div className={styles.translatedBadge} style={{ fontSize: '0.7rem', marginBottom: '4px' }}>{t("translated")}</div>}
+                    <h3 className={styles.postTitle}>{displayTitle}</h3>
+                    <p className={styles.postSnippet}>{displayContent}</p>
                     <div className={styles.postFooter}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <span>by {post.authorName}</span>
@@ -113,14 +170,14 @@ export default function Home() {
                         <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
                       </div>
                       <Link href={`/posts/${post.id}`}>
-                        <button className={styles.readMore}>詳しく読む</button>
+                        <button className={styles.readMore}>{t("readMore")}</button>
                       </Link>
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className={styles.noPosts}>まだこのカテゴリーの本音はありません。</p>
+              <p className={styles.noPosts}>{t("noPosts")}</p>
             )}
           </div>
         )}
@@ -128,13 +185,13 @@ export default function Home() {
 
       <footer className={styles.footer}>
         <div className={styles.footerLinks}>
-          <Link href="/terms">利用規約</Link>
-          <Link href="/privacy">プライバシーポリシー</Link>
-          <Link href="/security">セキュリティ</Link>
-          <Link href="/updates">アップデート情報</Link>
-          <Link href="/contact">お問い合わせ</Link>
+          <Link href="/terms">{t("terms")}</Link>
+          <Link href="/privacy">{t("privacy")}</Link>
+          <Link href="/security">{t("security")}</Link>
+          <Link href="/updates">{t("updates")}</Link>
+          <Link href="/contact">{t("contact")}</Link>
         </div>
-        <p>&copy; 2026 Honne Sharing SNS.</p>
+        <p>{t("copyright")}</p>
       </footer>
     </main>
   );
