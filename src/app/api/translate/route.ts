@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -11,10 +10,6 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        // Using gemini-1.5-flash which is widely supported
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
         const langMap: Record<string, string> = {
             en: "English",
             ja: "Japanese",
@@ -24,12 +19,41 @@ export async function POST(req: Request) {
 
         const targetLangName = langMap[targetLang] || "English";
 
-        const safetySettings = [
-            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-        ];
+        // Helper function to call Gemini via REST API
+        const callGemini = async (promptText: string) => {
+            // Using v1 and gemini-1.5-flash as the most stable combination
+            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: promptText }] }],
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+                    ],
+                    generationConfig: {
+                        temperature: 0.2,
+                        topP: 0.8,
+                        topK: 40,
+                    }
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Gemini API Error:", response.status, errorData);
+                throw new Error(errorData?.error?.message || `Gemini API returned ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+        };
 
         if (texts && Array.isArray(texts)) {
             // Bulk translation request
@@ -42,16 +66,12 @@ export async function POST(req: Request) {
             
             Return ONLY the valid JSON array starting with [ and ending with ]. No Markdown code blocks. No other text.`;
 
-            const result = await model.generateContent({
-                contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                safetySettings
-            });
-            const response = await result.response;
-            const textResponse = response.text().trim();
+            const textResponse = await callGemini(prompt);
+            const trimmedResponse = textResponse.trim();
 
             // Extract JSON if wrapped in markdown
-            const jsonMatch = textResponse.match(/\[[\s\S]*\]/);
-            const cleanJSON = jsonMatch ? jsonMatch[0] : textResponse;
+            const jsonMatch = trimmedResponse.match(/\[[\s\S]*\]/);
+            const cleanJSON = jsonMatch ? jsonMatch[0] : trimmedResponse;
 
             try {
                 const translatedItems = JSON.parse(cleanJSON);
@@ -69,14 +89,8 @@ export async function POST(req: Request) {
         
         ONLY return the translated text.`;
 
-        const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            safetySettings
-        });
-        const response = await result.response;
-        const translatedText = response.text().trim();
-
-        return NextResponse.json({ success: true, translatedText });
+        const translatedText = await callGemini(prompt);
+        return NextResponse.json({ success: true, translatedText: translatedText.trim() });
     } catch (error: any) {
         console.error("Global Translation error:", error);
         return NextResponse.json({ success: false, error: error?.message || "Translation failed" }, { status: 500 });
