@@ -1,21 +1,19 @@
 import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
-// We keep the logic simple to ensure maximum compatibility with the SDK version
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-// Use gemini-1.5-flash-latest as it is the most robust identifier for v1/v1beta
-const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash-latest"
-});
-
 export async function POST(req: Request) {
     try {
         const { text, targetLang, texts } = await req.json();
 
-        if (!process.env.GEMINI_API_KEY) {
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
             console.error("Translation Error: GEMINI_API_KEY is not set.");
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        // Using gemini-1.5-flash which is widely supported
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const langMap: Record<string, string> = {
             en: "English",
@@ -25,6 +23,13 @@ export async function POST(req: Request) {
         };
 
         const targetLangName = langMap[targetLang] || "English";
+
+        const safetySettings = [
+            { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+            { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        ];
 
         if (texts && Array.isArray(texts)) {
             // Bulk translation request
@@ -39,12 +44,7 @@ export async function POST(req: Request) {
 
             const result = await model.generateContent({
                 contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                safetySettings: [
-                    { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                    { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                ]
+                safetySettings
             });
             const response = await result.response;
             const textResponse = response.text().trim();
@@ -71,12 +71,7 @@ export async function POST(req: Request) {
 
         const result = await model.generateContent({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            safetySettings: [
-                { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
-                { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
-                { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
-            ]
+            safetySettings
         });
         const response = await result.response;
         const translatedText = response.text().trim();
