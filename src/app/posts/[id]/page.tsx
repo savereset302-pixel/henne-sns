@@ -73,34 +73,33 @@ export default function PostPage() {
         fetchPost();
     }, [id]);
 
-    useEffect(() => {
-        if (post && language !== "ja") {
-            const translateAll = async () => {
-                setIsTranslating(true);
-                try {
-                    const res = await fetch("/api/translate", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            texts: [{ id: post.id, title: post.title, content: post.content }],
-                            targetLang: language
-                        })
-                    });
-                    const data = await res.json();
-                    if (data.success && data.translatedItems && data.translatedItems[0]) {
-                        setTranslatedContent(data.translatedItems[0].content);
-                        setTranslatedTitle(data.translatedItems[0].title);
-                    }
-                } catch (error) {
-                    console.error("Translation failed:", error);
-                } finally {
-                    setIsTranslating(false);
-                }
-            };
-            translateAll();
-        } else {
-            setTranslatedContent(null);
-            setTranslatedTitle(null);
+    const handleTranslate = async () => {
+        if (!post) return;
+        setIsTranslating(true);
+        try {
+            const res = await fetch("/api/translate", {
+                method: "POST",
+                body: JSON.stringify({
+                    texts: [{ id: post.id, title: post.title, content: post.content }],
+                    targetLang: language
+                })
+            });
+            const data = await res.json();
+            if (data.success && data.translatedItems && data.translatedItems[0]) {
+                setTranslatedContent(data.translatedItems[0].content);
+                setTranslatedTitle(data.translatedItems[0].title);
+            }
+        } catch (error) {
+            console.error("Translation failed:", error);
+        } finally {
+            setIsTranslating(false);
         }
+    };
+
+    useEffect(() => {
+        // Reset translations when navigating or changing language manually
+        setTranslatedContent(null);
+        setTranslatedTitle(null);
     }, [post, language]);
 
     if (loading) return <div className={styles.loading}>{t("loadingPosts")}</div>;
@@ -145,9 +144,21 @@ export default function PostPage() {
                                         <div className={`${styles.text} ${styles.originalText}`}>{post.content}</div>
                                     </>
                                 ) : (
-                                    <div className={styles.text}>
-                                        {isTranslating ? "Translating..." : post.content}
-                                    </div>
+                                    <>
+                                        <div className={styles.text}>{post.content}</div>
+                                        {language !== "ja" && (
+                                            <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
+                                                <button
+                                                    onClick={handleTranslate}
+                                                    className="btn-primary"
+                                                    disabled={isTranslating}
+                                                    style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', opacity: isTranslating ? 0.7 : 1 }}
+                                                >
+                                                    {isTranslating ? t("loadingPosts") : t("translatePost")}
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
 

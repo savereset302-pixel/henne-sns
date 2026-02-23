@@ -95,6 +95,9 @@ export const translations = {
         theme_light: "ホワイト (白背景)",
         theme_parchment: "生成色 (紙)",
         theme_dusk: "夕暮れ (藍色)",
+        theme_forest: "深林 (深緑)",
+        theme_sakura: "桜 (薄紅)",
+        theme_midnight: "真夜中 (紫黒)",
         // Auth / Login
         loginRequired: "設定を変更するにはログインが必要です。",
         // Placeholders
@@ -141,6 +144,7 @@ export const translations = {
         all: "すべて",
         loadingPosts: "本音を読み込み中...",
         readMore: "詳しく読む",
+        translatePost: "翻訳して読む",
         noPosts: "まだこのカテゴリーの本音はありません。",
         backToHome: "← ホームに戻る",
         ephemeralAlert: "⏳ この投稿は24時間で消去されます",
@@ -263,6 +267,9 @@ export const translations = {
         theme_light: "White (Bright)",
         theme_parchment: "Parchment (Warm)",
         theme_dusk: "Dusk (Deep Blue)",
+        theme_forest: "Forest (Deep Green)",
+        theme_sakura: "Sakura (Light Pink)",
+        theme_midnight: "Midnight (Deep Purple)",
         // Auth / Login
         loginRequired: "Login is required to change settings.",
         // Placeholders
@@ -309,6 +316,7 @@ export const translations = {
         all: "All",
         loadingPosts: "Loading true feelings...",
         readMore: "Read More",
+        translatePost: "Translate to Read",
         noPosts: "No true feelings in this category yet.",
         backToHome: "← Back to Home",
         ephemeralAlert: "⏳ This post will disappear in 24 hours",
@@ -428,6 +436,9 @@ export const translations = {
         theme_light: "Blanco (Brillante)",
         theme_parchment: "Pergamino (Cálido)",
         theme_dusk: "Ocaso (Azul profundo)",
+        theme_forest: "Bosque (Verde oscuro)",
+        theme_sakura: "Sakura (Rosa claro)",
+        theme_midnight: "Medianoche (Morado oscuro)",
         // Auth / Login
         loginRequired: "Es necesario iniciar sesión para cambiar los ajustes.",
         // Placeholders
@@ -474,6 +485,7 @@ export const translations = {
         all: "Todo",
         loadingPosts: "Cargando sentimientos reales...",
         readMore: "Leer más",
+        translatePost: "Traducir para leer",
         noPosts: "Aún no hay sentimientos reales en esta categoría.",
         backToHome: "← Volver al inicio",
         ephemeralAlert: "⏳ Esta publicación desaparecerá en 24 horas",
@@ -593,6 +605,9 @@ export const translations = {
         theme_light: "白色 (明亮)",
         theme_parchment: "纸张 (温暖)",
         theme_dusk: "黄昏 (深蓝)",
+        theme_forest: "森林 (深绿)",
+        theme_sakura: "樱花 (浅粉)",
+        theme_midnight: "午夜 (深紫)",
         // Auth / Login
         loginRequired: "更改设置需要先登录。",
         // Placeholders
@@ -639,6 +654,7 @@ export const translations = {
         all: "全部",
         loadingPosts: "正在加载本音...",
         readMore: "阅读详情",
+        translatePost: "点击翻译并阅读",
         noPosts: "该类目下暂无本音。",
         backToHome: "← 返回首页",
         ephemeralAlert: "⏳ 此内容将在24小时后消失",

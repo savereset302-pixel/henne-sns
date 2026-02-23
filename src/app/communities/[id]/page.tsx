@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
+import { useAuth } from "@/hooks/useAuth";
 import styles from "./chat.module.css";
 
 interface Message {
@@ -35,9 +36,11 @@ interface Community {
 export default function CommunityChatPage() {
     const { id } = useParams();
     const router = useRouter();
+    const { user } = useAuth();
     const [community, setCommunity] = useState<Community | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState("");
+    const [nickname, setNickname] = useState("");
     const [loading, setLoading] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +78,24 @@ export default function CommunityChatPage() {
     }, [id, router]);
 
     useEffect(() => {
+        if (!user || !id) return;
+
+        const fetchNickname = async () => {
+            const roomRef = doc(db, "users", user.uid, "joinedRooms", id as string);
+            const roomSnap = await getDoc(roomRef);
+
+            if (roomSnap.exists()) {
+                setNickname(roomSnap.data().nickname || user.displayName || "匿名");
+            } else {
+                // Not joined this room
+                router.push("/communities");
+            }
+        };
+
+        fetchNickname();
+    }, [user, id, router]);
+
+    useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
@@ -82,13 +103,13 @@ export default function CommunityChatPage() {
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !auth.currentUser || !id) return;
+        if (!newMessage.trim() || !user || !id) return;
 
         try {
             await addDoc(collection(db, "communities", id as string, "messages"), {
                 text: newMessage,
-                senderId: auth.currentUser.uid,
-                senderName: auth.currentUser.displayName || "匿名",
+                senderId: user.uid,
+                senderName: nickname,
                 createdAt: serverTimestamp()
             });
             setNewMessage("");
@@ -98,7 +119,7 @@ export default function CommunityChatPage() {
     };
 
     if (loading) return <div className="container">読み込み中...</div>;
-    if (!community) return null;
+    if (!community || !user) return null;
 
     return (
         <main className="container fade-in" style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -120,7 +141,7 @@ export default function CommunityChatPage() {
                     messages.map((msg) => (
                         <div
                             key={msg.id}
-                            className={`${styles.messageWrapper} ${msg.senderId === auth.currentUser?.uid ? styles.ownMessage : ""}`}
+                            className={`${styles.messageWrapper} ${msg.senderId === user.uid ? styles.ownMessage : ""}`}
                         >
                             <div className={styles.senderName}>{msg.senderName}</div>
                             <div className={`${styles.messageBubble} glass-panel`}>
@@ -136,7 +157,7 @@ export default function CommunityChatPage() {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder="メッセージを入力..."
+                    placeholder={`${nickname}としてメッセージを入力...`}
                     className={styles.input}
                     required
                 />

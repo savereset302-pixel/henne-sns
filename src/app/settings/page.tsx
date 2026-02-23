@@ -103,6 +103,9 @@ export default function SettingsPage() {
                                 <option value="light">{t("theme_light")}</option>
                                 <option value="parchment">{t("theme_parchment")}</option>
                                 <option value="dusk">{t("theme_dusk")}</option>
+                                <option value="forest">{t("theme_forest")}</option>
+                                <option value="sakura">{t("theme_sakura")}</option>
+                                <option value="midnight">{t("theme_midnight")}</option>
                             </select>
                         </div>
 
