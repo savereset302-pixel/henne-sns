@@ -21,8 +21,8 @@ export async function POST(req: Request) {
 
         // Helper function to call Gemini via REST API
         const callGemini = async (promptText: string) => {
-            // Using v1 and gemini-1.5-flash as the most stable combination
-            const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // Using v1beta for gemini-1.5-flash which is widely supported
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
             const response = await fetch(url, {
                 method: "POST",
@@ -82,15 +82,7 @@ export async function POST(req: Request) {
             }
         }
 
-        // Single text translation
-        const prompt = `Translate the following Japanese text to ${targetLangName}. 
-        Keep the meaning and original atmosphere.
-        Text: ${text}
-        
-        ONLY return the translated text.`;
-
-        const translatedText = await callGemini(prompt);
-        return NextResponse.json({ success: true, translatedText: translatedText.trim() });
+        return NextResponse.json({ success: false, error: "Invalid request format: expected 'texts' array." }, { status: 400 });
     } catch (error: any) {
         console.error("Global Translation error:", error);
         return NextResponse.json({ success: false, error: error?.message || "Translation failed" }, { status: 500 });
