@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req: Request) {
     try {
-        const { text, targetLang, texts } = await req.json();
+        const { texts, targetLang } = await req.json();
 
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
@@ -10,50 +11,16 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
 
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
         const langMap: Record<string, string> = {
             en: "English",
             ja: "Japanese",
             es: "Spanish",
             zh: "Chinese"
         };
-
         const targetLangName = langMap[targetLang] || "English";
-
-        // Helper function to call Gemini via REST API
-        const callGemini = async (promptText: string) => {
-            // Using v1beta for gemini-1.5-flash which is widely supported
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: promptText }] }],
-                    safetySettings: [
-                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
-                    ],
-                    generationConfig: {
-                        temperature: 0.2,
-                        topP: 0.8,
-                        topK: 40,
-                    }
-                }),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error("Gemini API Error:", response.status, errorData);
-                throw new Error(errorData?.error?.message || `Gemini API returned ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-        };
 
         if (texts && Array.isArray(texts)) {
             // Bulk translation request
@@ -66,7 +33,13 @@ export async function POST(req: Request) {
             
             Return ONLY the valid JSON array starting with [ and ending with ]. No Markdown code blocks. No other text.`;
 
-            const textResponse = await callGemini(prompt);
+            const result = await model.generateContent(prompt);
+            const textResponse = result.response.text();
+
+            if (!textResponse) {
+                throw new Error("Empty response from AI");
+            }
+
             const trimmedResponse = textResponse.trim();
 
             // Extract JSON if wrapped in markdown
