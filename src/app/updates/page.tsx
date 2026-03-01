@@ -11,6 +11,16 @@ export default function UpdatesPage() {
     // Using keys for localized content where available, otherwise fallback
     const updates = [
         {
+            date: "2026-03-01",
+            title: "v2.3: 感情の整理と彩りの追加",
+            items: [
+                "「感情フィルタ」をホーム画面に実装。今の気分に合った本音を絞り込めます",
+                "4つの新カラーテーマ（深海、夕暮れ、ラベンダー、禅）を追加",
+                "感情分析AIの安定性を大幅に向上（Gemini 2.5 Flashへの移行）",
+                "画像投稿時の通信エラー（CORS）の特定と改善策の導入"
+            ]
+        },
+        {
             date: "2026-02-23",
             title: t("update_v21_title") || "v2.1: 高速化とグローバル展開の完成",
             items: [

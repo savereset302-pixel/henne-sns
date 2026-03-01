@@ -46,10 +46,17 @@ export default function NewPostPage() {
         try {
             let imageUrl = null;
             if (imageFile) {
-                const compressedBlob = await compressImage(imageFile);
-                const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_image.jpg`);
-                const snapshot = await uploadBytes(storageRef, compressedBlob);
-                imageUrl = await getDownloadURL(snapshot.ref);
+                try {
+                    const compressedBlob = await compressImage(imageFile);
+                    const storageRef = ref(storage, `posts/${auth.currentUser.uid}/${Date.now()}_image.jpg`);
+                    const snapshot = await uploadBytes(storageRef, compressedBlob);
+                    imageUrl = await getDownloadURL(snapshot.ref);
+                } catch (storageErr) {
+                    console.error("Storage Error:", storageErr);
+                    alert("画像のアップロードに失敗しました。Firebase Storageが有効化されているか、料金プラン（Blazeへのアップグレード）を確認してください。画像なしであれば投稿可能です。");
+                    setIsLoading(false);
+                    return;
+                }
             }
 
             let finalSentiment = sentiment;

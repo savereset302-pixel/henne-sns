@@ -55,6 +55,26 @@
   padding-left: 1rem;
 }
 
+.filtersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.filterSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filterLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  opacity: 0.8;
+}
+
 .filterBar {
   display: flex;
   gap: 0.5rem;
@@ -66,23 +86,47 @@
   background: transparent;
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
-  padding: 0.4rem 1rem;
+  padding: 0.4rem 1.2rem;
   border-radius: 20px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 .filterBtn:hover {
   border-color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .activeFilter {
   background: var(--accent-color);
   border-color: var(--accent-color);
-  color: white;
+  color: white !important;
   box-shadow: var(--accent-glow);
+}
+
+/* Sentiment Specific Filter Colors */
+.sadnessFilter.activeFilter {
+  background: #3949ab;
+  border-color: #3949ab;
+}
+
+.angerFilter.activeFilter {
+  background: #b71c1c;
+  border-color: #b71c1c;
+}
+
+.fatigueFilter.activeFilter {
+  background: #424242;
+  border-color: #424242;
+}
+
+.joyFilter.activeFilter {
+  background: #fbc02d;
+  color: #000 !important;
+  border-color: #fbc02d;
 }
 
 .loading,

@@ -14,10 +14,11 @@ import { Language } from "@/lib/translations";
 
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
-    const { theme: currentTheme, setTheme } = useTheme();
+    const { theme: currentTheme, setTheme, font: currentFont, setFont } = useTheme();
     const { language: currentLang, setLanguage, t } = useLanguage();
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
+    const [font, setFontOption] = useState("default");
     const [language, setLanguageOption] = useState<Language>("ja");
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -26,6 +27,7 @@ export default function SettingsPage() {
         if (user) {
             setDisplayName(user.displayName || "");
             setThemeOption(user.theme || "dark");
+            setFontOption(user.font || "default");
             setLanguageOption((user.language as Language) || "ja");
         }
     }, [user]);
@@ -45,10 +47,11 @@ export default function SettingsPage() {
 
             // 2. Update Firestore user document
             const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { displayName, theme, language });
+            await updateDoc(userRef, { displayName, theme, font, language });
 
             // 3. Update local contexts
             setTheme(theme);
+            setFont(font);
             setLanguage(language);
 
             setMessage({ type: "success", text: t("settingsSuccess") });
@@ -106,6 +109,24 @@ export default function SettingsPage() {
                                 <option value="forest">{t("theme_forest")}</option>
                                 <option value="sakura">{t("theme_sakura")}</option>
                                 <option value="midnight">{t("theme_midnight")}</option>
+                                <option value="ocean">{t("theme_ocean")}</option>
+                                <option value="sunset">{t("theme_sunset")}</option>
+                                <option value="lavender">{t("theme_lavender")}</option>
+                                <option value="zen">{t("theme_zen")}</option>
+                            </select>
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="font">{t("settingsFont")}</label>
+                            <select
+                                id="font"
+                                value={font}
+                                onChange={(e) => setFontOption(e.target.value)}
+                                className={styles.select}
+                            >
+                                <option value="default">{t("font_default")}</option>
+                                <option value="soft">{t("font_soft")}</option>
+                                <option value="handwriting">{t("font_handwriting")}</option>
+                                <option value="rounded">{t("font_rounded")}</option>
                             </select>
                         </div>
 

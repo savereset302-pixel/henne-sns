@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-
 export async function POST(req: Request) {
     try {
         const { content } = await req.json();
@@ -11,7 +9,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Content is required" }, { status: 400 });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            console.error("Sentiment Error: GEMINI_API_KEY is not set.");
+            return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
+        }
+
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
         const prompt = `
       以下の文章の「感情」を分析し、指定された4つのカテゴリーの中から最も近いものを1つだけ選んで返してください。
       返信はカテゴリー名のみ（1単語）にしてください。解説は不要です。

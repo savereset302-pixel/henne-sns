@@ -29,6 +29,7 @@ export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string }>>({});
   const [filter, setFilter] = useState("all");
+  const [sentimentFilter, setSentimentFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
 
@@ -44,13 +45,26 @@ export default function Home() {
     "その他": t("cat_other")
   };
 
+  const sentimentMap: any = {
+    "all": t("sentiment_all"),
+    "sadness": t("sentiment_sadness"),
+    "anger": t("sentiment_anger"),
+    "fatigue": t("sentiment_fatigue"),
+    "joy": t("sentiment_joy")
+  };
+
   const categories = ["all", "哲学", "独白", "社会", "人生", "技術", "小説", "時事", "その他"];
+  const sentiments = ["all", "sadness", "anger", "fatigue", "joy"];
 
   useEffect(() => {
     let q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
 
-    if (filter !== "all") {
+    if (filter !== "all" && sentimentFilter !== "all") {
+      q = query(collection(db, "posts"), where("category", "==", filter), where("sentiment", "==", sentimentFilter), orderBy("createdAt", "desc"));
+    } else if (filter !== "all") {
       q = query(collection(db, "posts"), where("category", "==", filter), orderBy("createdAt", "desc"));
+    } else if (sentimentFilter !== "all") {
+      q = query(collection(db, "posts"), where("sentiment", "==", sentimentFilter), orderBy("createdAt", "desc"));
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -60,10 +74,13 @@ export default function Home() {
       } as Post));
       setPosts(postsData);
       setLoading(false);
+    }, (error) => {
+      console.error("Firestore error:", error);
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [filter]);
+  }, [filter, sentimentFilter]);
 
   useEffect(() => {
     if (posts.length > 0 && language !== "ja") {
@@ -122,17 +139,36 @@ export default function Home() {
 
       <section className={styles.feed}>
         <div className={styles.feedHeader}>
-          <h2 className={styles.sectionTitle}>{t("recentPhilosophy")}</h2>
-          <div className={styles.filterBar}>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                className={`${styles.filterBtn} ${filter === cat ? styles.activeFilter : ""}`}
-                onClick={() => setFilter(cat)}
-              >
-                {categoryMap[cat] || cat}
-              </button>
-            ))}
+          <div className={styles.filtersContainer}>
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterLabel}>{t("category")}:</h3>
+              <div className={styles.filterBar}>
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    className={`${styles.filterBtn} ${filter === cat ? styles.activeFilter : ""}`}
+                    onClick={() => setFilter(cat)}
+                  >
+                    {categoryMap[cat] || cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.filterSection}>
+              <h3 className={styles.filterLabel}>{t("sentiment") || "Sentiment"}:</h3>
+              <div className={styles.filterBar}>
+                {sentiments.map(s => (
+                  <button
+                    key={s}
+                    className={`${styles.filterBtn} ${sentimentFilter === s ? styles.activeFilter : ""} ${styles[s + 'Filter'] || ""}`}
+                    onClick={() => setSentimentFilter(s)}
+                  >
+                    {sentimentMap[s] || s}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 

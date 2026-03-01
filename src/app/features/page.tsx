@@ -51,6 +51,16 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className={styles.featureItem}>
+                        <div className={`glass-panel ${styles.featureCard}`}>
+                            <div className={styles.icon}>🎭</div>
+                            <div>
+                                <h3>{t("feat_emo_title")}</h3>
+                                <p>{t("feat_emo_desc")}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
                         <div className={styles.featureImage}>🎨</div>
                         <div className={styles.featureText}>
                             <h2>{t("feat_theme_title")}</h2>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Zen+Maru+Gothic:wght@400;700&family=Yomogi&family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+
 :root {
   --bg-color: #050505;
   --panel-bg: rgba(255, 255, 255, 0.05);
@@ -8,6 +10,25 @@
   --accent-glow: 0 0 20px rgba(79, 70, 229, 0.4);
   --font-main: 'Outfit', sans-serif;
   --logo-color: var(--accent-color);
+}
+
+[data-font='soft'] {
+  --font-main: 'Zen Maru Gothic', sans-serif;
+}
+
+[data-font='handwriting'] {
+  --font-main: 'Yomogi', cursive;
+}
+
+[data-font='rounded'] {
+  --font-main: 'M PLUS Rounded 1c', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-main);
 }
 
 [data-theme='light'] {
@@ -66,14 +87,48 @@
 }
 
 [data-theme='midnight'] {
-  --bg-color: #0b0914;
-  --panel-bg: rgba(255, 255, 255, 0.02);
-  --border-color: rgba(255, 255, 255, 0.05);
-  --text-primary: #e0e0fa;
-  --text-secondary: #74749f;
-  --accent-color: #9333ea;
-  --accent-glow: 0 0 20px rgba(147, 51, 234, 0.3);
-  --logo-color: #9333ea;
+  --bg-color: #0f0c29;
+  --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --panel-bg: rgba(20, 20, 40, 0.7);
+  --accent-color: #9d50bb;
+  --text-primary: #e0e0e0;
+  --text-secondary: #909090;
+}
+
+[data-theme='ocean'] {
+  --bg-color: #004e92;
+  --bg-gradient: linear-gradient(135deg, #000428 0%, #004e92 100%);
+  --panel-bg: rgba(0, 30, 60, 0.7);
+  --accent-color: #00d2ff;
+  --text-primary: #f0f8ff;
+  --text-secondary: #b0c4de;
+}
+
+[data-theme='sunset'] {
+  --bg-color: #ff512f;
+  --bg-gradient: linear-gradient(135deg, #ff512f 0%, #dd2476 100%);
+  --panel-bg: rgba(60, 10, 30, 0.6);
+  --accent-color: #ffd700;
+  --text-primary: #fff5ee;
+  --text-secondary: #ffa07a;
+}
+
+[data-theme='lavender'] {
+  --bg-color: #4b6cb7;
+  --bg-gradient: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+  --panel-bg: rgba(255, 255, 255, 0.8);
+  --accent-color: #6a5acd;
+  --text-primary: #2f4f4f;
+  --text-secondary: #708090;
+}
+
+[data-theme='zen'] {
+  --bg-color: #232526;
+  --bg-gradient: linear-gradient(135deg, #232526 0%, #414345 100%);
+  --panel-bg: rgba(30, 30, 30, 0.85);
+  --accent-color: #ffffff;
+  --text-primary: #cccccc;
+  --text-secondary: #888888;
 }
 
 * {
