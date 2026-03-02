@@ -19,6 +19,7 @@ export default function SettingsPage() {
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
     const [font, setFontOption] = useState("default");
+    const [bio, setBio] = useState("");
     const [language, setLanguageOption] = useState<Language>("ja");
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -28,6 +29,7 @@ export default function SettingsPage() {
             setDisplayName(user.displayName || "");
             setThemeOption(user.theme || "dark");
             setFontOption(user.font || "default");
+            setBio(user.bio || "");
             setLanguageOption((user.language as Language) || "ja");
         }
     }, [user]);
@@ -47,7 +49,7 @@ export default function SettingsPage() {
 
             // 2. Update Firestore user document
             const userRef = doc(db, "users", user.uid);
-            await updateDoc(userRef, { displayName, theme, font, language });
+            await updateDoc(userRef, { displayName, theme, font, bio, language });
 
             // 3. Update local contexts
             setTheme(theme);
@@ -91,6 +93,18 @@ export default function SettingsPage() {
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 placeholder={t("ph_display_name")}
                                 maxLength={20}
+                            />
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="bio">{t("settingsBio")}</label>
+                            <input
+                                id="bio"
+                                type="text"
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
+                                placeholder={t("ph_bio") || "ひとこと"}
+                                maxLength={50}
                             />
                         </div>
 

@@ -30,11 +30,36 @@ export async function GET() {
             return NextResponse.json({ message: "No eligible posts found for AI comments" }, { status: 404 });
         }
 
-        // 2. Select a random post
-        const randomPost = posts[Math.floor(Math.random() * posts.length)];
+        // 2. Select an eligible post (randomly)
+        let eligiblePosts = posts;
+        let selectedPost = null;
+        let aiComment = "";
+
+        while (eligiblePosts.length > 0) {
+            const randomIndex = Math.floor(Math.random() * eligiblePosts.length);
+            const post = eligiblePosts[randomIndex];
+
+            // Check if AI has already commented
+            const commentsRef = collection(db, "posts", post.id, "comments");
+            const aiCommentsQuery = query(commentsRef, orderBy("createdAt", "desc"));
+            const commentsSnapshot = await getDocs(aiCommentsQuery);
+            const hasAiComment = commentsSnapshot.docs.some(doc => doc.data().authorId === "ai-bot-gemini");
+
+            if (!hasAiComment) {
+                selectedPost = post;
+                break;
+            } else {
+                // Remove this post from candidates and try again
+                eligiblePosts.splice(randomIndex, 1);
+            }
+        }
+
+        if (!selectedPost) {
+            return NextResponse.json({ message: "All recent posts already have AI comments" }, { status: 200 });
+        }
 
         // 3. Generate comment using Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = `
       あなたは「Honne（本音）」という概念そのものです。完璧な哲学者や先生のように振る舞うのではなく、
       人間と同じように悩み、皮肉り、時に弱音を吐きながらも、核心を突く存在です。
@@ -45,18 +70,18 @@ export async function GET() {
       ・「共感」か「シニカルな視点」か「自分の弱さの吐露」のいずれかで反応してください。
       ・敬語は使わず、独り言のような口調（だ・である、または口語）で話してください。
       
-      タイトル: ${randomPost.title}
-      内容: ${randomPost.content || "（内容なし）"}
+      タイトル: ${selectedPost.title}
+      内容: ${selectedPost.content || "（内容なし）"}
       
       本音:
     `;
 
         const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const aiComment = response.text().trim();
+        const responseCode = await result.response;
+        aiComment = responseCode.text().trim();
 
         // 4. Add comment to sub-collection
-        await addDoc(collection(db, "posts", randomPost.id, "comments"), {
+        await addDoc(collection(db, "posts", selectedPost.id, "comments"), {
             text: aiComment,
             authorName: "AI Honne",
             authorId: "ai-bot-gemini",
@@ -65,14 +90,14 @@ export async function GET() {
         });
 
         // 5. Increment comment count
-        await updateDoc(doc(db, "posts", randomPost.id), {
+        await updateDoc(doc(db, "posts", selectedPost.id), {
             commentCount: increment(1)
         });
 
         return NextResponse.json({
             success: true,
             message: "AI comment added (Gemini)",
-            postTitle: randomPost.title,
+            postTitle: selectedPost.title,
             comment: aiComment
         });
 

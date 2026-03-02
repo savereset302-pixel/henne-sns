@@ -77,6 +77,22 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>📊</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("feat_poll_title") || "投票機能"}</h2>
+                            <p>{t("feat_poll_desc") || "匿名でみんなの意見を集められるアンケート機能。思索を深める一助に。"}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>👤</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("feat_profile_title") || "プロフィール"}</h2>
+                            <p>{t("feat_profile_desc") || "「自分を一言で表す」フィールドを追加。匿名の繋がりを少しだけ豊かに。"}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
                         <div className={styles.featureImage}>🧞</div>
                         <div className={styles.featureText}>
                             <h2>{t("feat_ai_title")}</h2>

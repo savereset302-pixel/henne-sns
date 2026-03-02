@@ -11,6 +11,17 @@ export default function UpdatesPage() {
     // Using keys for localized content where available, otherwise fallback
     const updates = [
         {
+            date: "2026-03-02",
+            title: "v2.6: つながりと対話の強化（投票・プロフィール・共有）",
+            items: [
+                "投票（アンケート）機能の実装。みんなの意見を匿名で収集可能に",
+                "プロフィールに「ひとこと（Bio）」設定を追加。自分を緩やかに表現できます",
+                "記事共有ボタンを追加。URLをワンタップでクリップボードにコピー",
+                "モバイル表示の最適化。詳しく読むボタンの文字崩れを修正",
+                "AIコメントの重複防止ロジックの導入と、モデルの最新化"
+            ]
+        },
+        {
             date: "2026-03-01",
             title: "v2.3: 感情の整理と彩りの追加",
             items: [

@@ -10,6 +10,7 @@ import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 
 interface Post {
   id: string;
@@ -22,9 +23,16 @@ interface Post {
   likeCount?: number;
   expiresAt?: any;
   sentiment?: string;
+  poll?: {
+    question: string;
+    options: { text: string; votes: number }[];
+    totalVotes: number;
+    voters: string[];
+  };
 }
 
 export default function Home() {
+  const { user } = useAuth();
   const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string }>>({});
@@ -32,6 +40,48 @@ export default function Home() {
   const [sentimentFilter, setSentimentFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showShareToast, setShowShareToast] = useState(false);
+
+  const handleVote = async (postId: string, optionIndex: number) => {
+    if (!user) {
+      alert(t("loginRequired"));
+      return;
+    }
+
+    try {
+      const { doc, updateDoc, arrayUnion, getDoc } = await import("firebase/firestore");
+      const postRef = doc(db, "posts", postId);
+      const postSnap = await getDoc(postRef);
+
+      if (!postSnap.exists()) return;
+      const postData = postSnap.data() as Post;
+
+      if (postData.poll?.voters?.includes(user.uid)) {
+        alert(t("pollVoted") || "Voted already");
+        return;
+      }
+
+      const newOptions = [...(postData.poll?.options || [])];
+      if (newOptions[optionIndex]) {
+        newOptions[optionIndex].votes += 1;
+      }
+
+      await updateDoc(postRef, {
+        "poll.options": newOptions,
+        "poll.totalVotes": (postData.poll?.totalVotes || 0) + 1,
+        "poll.voters": arrayUnion(user.uid)
+      });
+    } catch (error) {
+      console.error("Error voting:", error);
+    }
+  };
+
+  const handleShare = (postId: string) => {
+    const url = `${window.location.origin}/post/${postId}`;
+    navigator.clipboard.writeText(url);
+    setShowShareToast(true);
+    setTimeout(() => setShowShareToast(false), 3000);
+  };
 
   const categoryMap: any = {
     "all": t("all"),
@@ -197,15 +247,100 @@ export default function Home() {
                     {translated && <div className={styles.translatedBadge} style={{ fontSize: '0.7rem', marginBottom: '4px' }}>{t("translated")}</div>}
                     <h3 className={styles.postTitle}>{displayTitle}</h3>
                     <p className={styles.postSnippet}>{displayContent}</p>
+
+                    {post.poll && (
+                      <div className={styles.pollContainer} style={{
+                        marginTop: '1.5rem',
+                        padding: '1rem',
+                        background: 'rgba(255,255,255,0.03)',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-color)'
+                      }}>
+                        <h4 style={{ fontSize: '0.95rem', marginBottom: '1rem' }}>📊 {post.poll.question}</h4>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                          {post.poll.options.map((opt, idx) => {
+                            const hasVoted = post.poll?.voters?.includes(user?.uid || "");
+                            const percentage = post.poll?.totalVotes ? Math.round((opt.votes / post.poll.totalVotes) * 100) : 0;
+
+                            return (
+                              <div key={idx} style={{ position: 'relative' }}>
+                                <button
+                                  onClick={() => handleVote(post.id, idx)}
+                                  disabled={hasVoted}
+                                  style={{
+                                    width: '100%',
+                                    textAlign: 'left',
+                                    padding: '0.6rem 1rem',
+                                    background: 'transparent',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '6px',
+                                    cursor: hasVoted ? 'default' : 'pointer',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    zIndex: 1
+                                  }}
+                                >
+                                  {hasVoted && (
+                                    <div style={{
+                                      position: 'absolute',
+                                      top: 0,
+                                      left: 0,
+                                      bottom: 0,
+                                      width: `${percentage}%`,
+                                      background: 'rgba(79, 70, 229, 0.2)',
+                                      zIndex: -1,
+                                      transition: 'width 0.5s ease'
+                                    }} />
+                                  )}
+                                  <span style={{ fontSize: '0.9rem' }}>{opt.text}</span>
+                                  {hasVoted && (
+                                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
+                                      {percentage}% ({opt.votes})
+                                    </span>
+                                  )}
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div style={{ marginTop: '0.8rem', fontSize: '0.75rem', opacity: 0.6, textAlign: 'right' }}>
+                          {post.poll.totalVotes} {t("pollVote") || "Votes"}
+                        </div>
+                      </div>
+                    )}
+
                     <div className={styles.postFooter}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                         <span>by {post.authorName}</span>
                         <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
                           💬 {post.commentCount || 0}
                         </span>
                         <LikeButton postId={post.id} initialCount={post.likeCount || 0} />
+                        <button
+                          onClick={() => handleShare(post.id)}
+                          style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '0.8rem',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            transition: 'background 0.2s'
+                          }}
+                          onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                          onMouseOut={(e) => (e.currentTarget.style.background = 'transparent')}
+                          title={t("share")}
+                        >
+                          <span>🔗</span> {t("share")}
+                        </button>
                       </div>
-                      <Link href={`/posts/${post.id}`}>
+                      <Link href={`/post/${post.id}`}>
                         <button className={styles.readMore}>{t("readMore")}</button>
                       </Link>
                     </div>
@@ -229,6 +364,23 @@ export default function Home() {
         </div>
         <p>{t("copyright")}</p>
       </footer>
+      {showShareToast && (
+        <div className="glass-panel fade-in" style={{
+          position: 'fixed',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          padding: '1rem 2rem',
+          zIndex: 1000,
+          background: 'rgba(79, 70, 229, 0.9)',
+          color: 'white',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          borderRadius: '12px',
+          border: 'none'
+        }}>
+          {t("copySuccess")}
+        </div>
+      )}
     </main>
   );
 }

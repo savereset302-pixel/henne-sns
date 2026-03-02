@@ -185,6 +185,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .readMore:hover {

@@ -23,6 +23,9 @@ export default function NewPostPage() {
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [showPoll, setShowPoll] = useState(false);
+    const [pollQuestion, setPollQuestion] = useState("");
+    const [pollOptions, setPollOptions] = useState(["", ""]);
     const router = useRouter();
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +90,15 @@ export default function NewPostPage() {
                 imageUrl,
                 createdAt: serverTimestamp(),
             };
+
+            if (!isDraft && showPoll && pollQuestion.trim() && pollOptions.filter(o => o.trim()).length >= 2) {
+                data.poll = {
+                    question: pollQuestion,
+                    options: pollOptions.filter(o => o.trim()).map(text => ({ text, votes: 0 })),
+                    totalVotes: 0,
+                    voters: [] // Store UIDs of people who voted
+                };
+            }
 
             if (!isDraft) {
                 data.expiresAt = isEphemeral ? new Date(Date.now() + 24 * 60 * 60 * 1000) : null;
@@ -207,6 +219,67 @@ export default function NewPostPage() {
                                 />
                                 <span style={{ color: '#ffbd59' }}>⏳ {t("ephemeral")}</span>
                             </label>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label className={styles.checkboxGroup} style={{ marginBottom: '1rem', cursor: 'pointer' }}>
+                                <input
+                                    type="checkbox"
+                                    checked={showPoll}
+                                    onChange={(e) => setShowPoll(e.target.checked)}
+                                />
+                                <span style={{ fontWeight: 'bold', color: 'var(--accent-color)' }}>📊 {t("createPoll")}</span>
+                            </label>
+
+                            {showPoll && (
+                                <div className={styles.pollSection} style={{ padding: '1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                                    <div className={styles.inputSubGroup} style={{ marginBottom: '1rem' }}>
+                                        <label style={{ fontSize: '0.85rem', opacity: 0.8 }}>{t("pollQuestion")}</label>
+                                        <input
+                                            type="text"
+                                            value={pollQuestion}
+                                            onChange={(e) => setPollQuestion(e.target.value)}
+                                            placeholder={t("pollQuestion")}
+                                            style={{ marginTop: '0.5rem' }}
+                                        />
+                                    </div>
+                                    <div className={styles.inputSubGroup}>
+                                        <label style={{ fontSize: '0.85rem', opacity: 0.8 }}>{t("pollOption")}</label>
+                                        {pollOptions.map((opt, idx) => (
+                                            <div key={idx} style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                                                <input
+                                                    type="text"
+                                                    value={opt}
+                                                    onChange={(e) => {
+                                                        const newOpts = [...pollOptions];
+                                                        newOpts[idx] = e.target.value;
+                                                        setPollOptions(newOpts);
+                                                    }}
+                                                    placeholder={`${t("pollOption")} ${idx + 1}`}
+                                                />
+                                                {pollOptions.length > 2 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== idx))}
+                                                        style={{ background: 'transparent', border: 'none', color: '#ff5252', fontSize: '1.2rem', cursor: 'pointer' }}
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        {pollOptions.length < 5 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setPollOptions([...pollOptions, ""])}
+                                                style={{ marginTop: '1rem', fontSize: '0.8rem', background: 'rgba(255,255,255,0.05)', border: '1px dashed var(--border-color)', width: '100%', padding: '0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                                            >
+                                                + {t("pollOption")}を追加
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className={styles.inputGroup}>

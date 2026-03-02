@@ -8,6 +8,7 @@ export type AuthUser = User & {
     isAdmin?: boolean;
     theme?: string;
     font?: string;
+    bio?: string;
     language?: string;
 };
 
@@ -28,6 +29,7 @@ export function useAuth() {
                 let isAdmin = false;
                 let theme = "dark";
                 let font = "default";
+                let bio = "";
                 let language = "ja";
 
                 if (userSnap.exists()) {
@@ -35,6 +37,7 @@ export function useAuth() {
                     isAdmin = data.isAdmin || false;
                     theme = data.theme || "dark";
                     font = data.font || "default";
+                    bio = data.bio || "";
                     language = data.language || "ja";
                 } else {
                     // Create user document if it doesn't exist
@@ -46,11 +49,12 @@ export function useAuth() {
                         isAdmin: false,
                         theme: "dark",
                         font: "default",
+                        bio: "",
                         language: "ja"
                     });
                 }
 
-                setUser({ ...firebaseUser, isAdmin, theme, font, language });
+                setUser({ ...firebaseUser, isAdmin, theme, font, bio, language });
             } else {
                 setUser(null);
             }
