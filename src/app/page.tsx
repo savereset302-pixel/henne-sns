@@ -80,7 +80,7 @@ export default function Home() {
   };
 
   const handleShare = (postId: string) => {
-    const url = `${window.location.origin}/post/${postId}`;
+    const url = `${window.location.origin}/posts/${postId}`;
     navigator.clipboard.writeText(url);
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 3000);

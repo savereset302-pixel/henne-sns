@@ -181,6 +181,10 @@ h3 {
 }
 
 /* Buttons */
+button {
+  white-space: nowrap;
+}
+
 .btn-primary {
   background: var(--accent-color);
   color: white;
@@ -191,6 +195,10 @@ h3 {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--accent-glow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .btn-primary:hover {
