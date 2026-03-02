@@ -93,6 +93,22 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>🔍</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("feat_search_title")}</h2>
+                            <p>{t("feat_search_desc")}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>👥</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("feat_profile_view_title")}</h2>
+                            <p>{t("feat_profile_view_desc")}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
                         <div className={styles.featureImage}>🧞</div>
                         <div className={styles.featureText}>
                             <h2>{t("feat_ai_title")}</h2>

@@ -14,7 +14,8 @@ interface Comment {
     authorName: string;
     authorId: string;
     createdAt: any;
-    isAi?: boolean; // To distinguish AI comments
+    isAi?: boolean;
+    isAnonymous?: boolean;
 }
 
 export default function CommentSection({ postId, commentPolicy = 'all' }: { postId: string, commentPolicy?: string }) {
@@ -139,7 +140,17 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                         <div className={styles.commentHeader}>
                             <span className={comment.isAi ? styles.aiAuthor : styles.author}>
                                 {comment.isAi && "🤖 "}
-                                {comment.authorName}
+                                {comment.isAi || comment.isAnonymous ? (
+                                    comment.authorName
+                                ) : (
+                                    <Link href={`/profile/${comment.authorId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                        <span style={{ cursor: 'pointer', borderBottom: '1px dashed transparent', transition: 'border 0.2s' }}
+                                            onMouseOver={(e) => (e.currentTarget.style.borderBottom = '1px dashed var(--accent-color)')}
+                                            onMouseOut={(e) => (e.currentTarget.style.borderBottom = '1px dashed transparent')}>
+                                            {comment.authorName}
+                                        </span>
+                                    </Link>
+                                )}
                             </span>
                             <span className={styles.date}>
                                 {comment.createdAt?.toDate?.().toLocaleString() || t("justNow")}

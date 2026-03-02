@@ -141,6 +141,7 @@ export default function SettingsPage() {
                                 <option value="soft">{t("font_soft")}</option>
                                 <option value="handwriting">{t("font_handwriting")}</option>
                                 <option value="rounded">{t("font_rounded")}</option>
+                                <option value="playful">{t("font_playful")}</option>
                             </select>
                         </div>
 

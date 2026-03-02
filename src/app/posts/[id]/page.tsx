@@ -26,6 +26,8 @@ interface Post {
     expiresAt?: any;
     sentiment?: string;
     imageUrl?: string | null;
+    authorId?: string;
+    isAnonymous?: boolean;
 }
 
 export default function PostPage() {
@@ -163,7 +165,17 @@ export default function PostPage() {
                             </div>
 
                             <div className={styles.meta}>
-                                <span>by {post.authorName}</span>
+                                {post.isAnonymous ? (
+                                    <span>by {post.authorName}</span>
+                                ) : (
+                                    <Link href={`/profile/${post.authorId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                                        <span style={{ cursor: 'pointer', borderBottom: '1px dashed transparent', transition: 'border 0.2s' }}
+                                            onMouseOver={(e) => (e.currentTarget.style.borderBottom = '1px dashed var(--accent-color)')}
+                                            onMouseOut={(e) => (e.currentTarget.style.borderBottom = '1px dashed transparent')}>
+                                            by {post.authorName}
+                                        </span>
+                                    </Link>
+                                )}
                                 <span>{post.createdAt?.toDate?.().toLocaleDateString() || "Unknown Date"}</span>
                                 <span>💬 {post.commentCount || 0}</span>
                                 <div style={{ marginLeft: '1rem', display: 'flex', gap: '1rem' }}>

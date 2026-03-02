@@ -29,6 +29,8 @@ interface Post {
     totalVotes: number;
     voters: string[];
   };
+  authorId?: string;
+  isAnonymous?: boolean;
 }
 
 export default function Home() {
@@ -41,6 +43,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isTranslating, setIsTranslating] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleVote = async (postId: string, optionIndex: number) => {
     if (!user) {
@@ -168,6 +171,15 @@ export default function Home() {
     }
   }, [posts, language]);
 
+  const filteredPosts = posts.filter(post => {
+    if (!searchQuery) return true;
+    const lowerQuery = searchQuery.toLowerCase();
+    const translated = translatedPosts[post.id];
+    const title = (translated?.title || post.title).toLowerCase();
+    const content = (translated?.content || post.content).toLowerCase();
+    return title.includes(lowerQuery) || content.includes(lowerQuery);
+  });
+
   return (
     <main className="container fade-in">
       <header className={styles.header}>
@@ -219,6 +231,33 @@ export default function Home() {
                 ))}
               </div>
             </div>
+
+            <div className={styles.filterSection} style={{ flex: 1, minWidth: '250px' }}>
+              <div className={styles.searchBar} style={{
+                display: 'flex',
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '50px',
+                padding: '0.5rem 1.5rem',
+                border: '1px solid var(--border-color)',
+                width: '100%'
+              }}>
+                <span style={{ marginRight: '10px', opacity: 0.5 }}>🔍</span>
+                <input
+                  type="text"
+                  placeholder={t("ph_search") || "言葉を探す..."}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'var(--text-primary)',
+                    width: '100%',
+                    outline: 'none',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -226,8 +265,8 @@ export default function Home() {
           <div className={styles.loading}>{t("loadingPosts")}</div>
         ) : (
           <div className={styles.grid}>
-            {posts.length > 0 ? (
-              posts.map((post) => {
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => {
                 const sentimentStyle = post.sentiment === "sadness" ? { background: "rgba(26, 35, 126, 0.25)", border: "1px solid rgba(26, 35, 126, 0.3)" } :
                   post.sentiment === "anger" ? { background: "rgba(74, 20, 20, 0.25)", border: "1px solid rgba(74, 20, 20, 0.3)" } :
                     post.sentiment === "fatigue" ? { background: "rgba(51, 51, 51, 0.3)", border: "1px solid rgba(100, 100, 100, 0.2)" } :
@@ -313,7 +352,17 @@ export default function Home() {
 
                     <div className={styles.postFooter}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                        <span>by {post.authorName}</span>
+                        {post.isAnonymous ? (
+                          <span>by {post.authorName}</span>
+                        ) : (
+                          <Link href={`/profile/${post.authorId}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                            <span style={{ cursor: 'pointer', borderBottom: '1px dashed transparent', transition: 'border 0.2s' }}
+                              onMouseOver={(e) => (e.currentTarget.style.borderBottom = '1px dashed var(--accent-color)')}
+                              onMouseOut={(e) => (e.currentTarget.style.borderBottom = '1px dashed transparent')}>
+                              by {post.authorName}
+                            </span>
+                          </Link>
+                        )}
                         <span style={{ fontSize: '0.8rem', color: '#aaa' }}>
                           💬 {post.commentCount || 0}
                         </span>
@@ -340,7 +389,7 @@ export default function Home() {
                           <span>🔗</span> {t("share")}
                         </button>
                       </div>
-                      <Link href={`/post/${post.id}`}>
+                      <Link href={`/posts/${post.id}`}>
                         <button className={styles.readMore}>{t("readMore")}</button>
                       </Link>
                     </div>
