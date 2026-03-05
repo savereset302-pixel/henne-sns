@@ -115,6 +115,30 @@ export default function FeaturesPage() {
                             <p>{t("feat_ai_desc")}</p>
                         </div>
                     </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>🌤️</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("weather_title")}</h2>
+                            <p>{t("ai_report_desc") /* Reusing description key for simplicity or direct localized text */}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>📜</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("ai_report_title")}</h2>
+                            <p>{t("ai_report_desc")}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>💬</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("dialogue_list")}</h2>
+                            <p>{t("dialogue_start")}</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div className={styles.backToTop}>

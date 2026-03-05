@@ -23,6 +23,7 @@ export default function UserNav() {
                         <Link href="/bookmarks" className={styles.link}>{t("bookmarks")}</Link>
                         <Link href="/drafts" className={styles.link}>{t("drafts")}</Link>
                         <Link href="/communities" className={styles.link}>{t("communities")}</Link>
+                        <Link href="/dialogues" className={styles.link}>💬 {t("dialogue_list")}</Link>
                         <Link href="/settings" className={styles.link}>{t("settings")}</Link>
                     </>
                 )}

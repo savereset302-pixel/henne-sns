@@ -11,6 +11,17 @@ export default function UpdatesPage() {
     // Using keys for localized content where available, otherwise fallback
     const updates = [
         {
+            date: "2026-03-05",
+            title: "v3.0: 心の深淵を映す（AI思索レポート・感情天気・対話）",
+            items: [
+                "「AI思索レポート」実装。過去7日間の投稿をAIが哲学的に分析（プロフィールから）",
+                "「今の心の天気」機能をホームに統合。サイト全体の感情傾向をリアルタイム反映",
+                "「一期一会の対話 (Dialogue)」機能を追加。1対1の匿名チャットで深い交流を",
+                "多言語翻訳の拡充（スペイン語・中国語の完全対応）",
+                "Gemini AI モデルを最新（2.5 Flash）に統一し、分析精度を向上"
+            ]
+        },
+        {
             date: "2026-03-02",
             title: "v2.8: 安定性の向上とUIの最適化（共有機能修正・ボタン表示改善）",
             items: [

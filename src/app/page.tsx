@@ -44,6 +44,7 @@ export default function Home() {
   const [isTranslating, setIsTranslating] = useState(false);
   const [showShareToast, setShowShareToast] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [emotionWeather, setEmotionWeather] = useState<{ icon: string; label: string; color: string }>({ icon: "☀️", label: "穏やか", color: "#ffd700" });
 
   const handleVote = async (postId: string, optionIndex: number) => {
     if (!user) {
@@ -171,6 +172,30 @@ export default function Home() {
     }
   }, [posts, language]);
 
+  useEffect(() => {
+    if (posts.length === 0) return;
+
+    const sentiments = posts.map(p => p.sentiment).filter(Boolean);
+    if (sentiments.length === 0) return;
+
+    const counts: Record<string, number> = {};
+    sentiments.forEach(s => {
+      counts[s!] = (counts[s!] || 0) + 1;
+    });
+
+    const dominant = Object.entries(counts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
+
+    const weatherMap: Record<string, { icon: string; label: string; color: string }> = {
+      joy: { icon: "☀️", label: t("weather_joy") || "快晴", color: "#ffb300" },
+      sadness: { icon: "🌧️", label: t("weather_sadness") || "雨", color: "#3949ab" },
+      anger: { icon: "⚡", label: t("weather_anger") || "雷雨", color: "#b71c1c" },
+      fatigue: { icon: "☁️", label: t("weather_fatigue") || "曇り", color: "#757575" },
+      default: { icon: "🌫️", label: t("weather_default") || "霧", color: "#a0a0a0" }
+    };
+
+    setEmotionWeather(weatherMap[dominant] || weatherMap.default);
+  }, [posts, t]);
+
   const filteredPosts = posts.filter(post => {
     if (!searchQuery) return true;
     const lowerQuery = searchQuery.toLowerCase();
@@ -188,6 +213,20 @@ export default function Home() {
       </header>
 
       <section className={styles.hero}>
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '12px',
+          background: 'rgba(255,255,255,0.05)',
+          padding: '8px 20px',
+          borderRadius: '50px',
+          marginBottom: '2rem',
+          border: `1px solid ${emotionWeather.color}44`,
+          boxShadow: `0 0 15px ${emotionWeather.color}22`
+        }}>
+          <span style={{ fontSize: '1.5rem' }}>{emotionWeather.icon}</span>
+          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t("weather_title")}: {emotionWeather.label}</span>
+        </div>
         <h1 className={styles.heroTitle}>
           {t("heroTitle")}<br />
           <span>{t("heroSubTitle")}</span>

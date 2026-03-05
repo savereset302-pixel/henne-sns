@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
 import { useLanguage } from "@/context/LanguageContext";
+import { useAuth } from "@/hooks/useAuth";
 import styles from "./profile.module.css";
 import LikeButton from "@/components/LikeButton";
 
@@ -29,11 +30,67 @@ interface UserProfile {
 }
 
 export default function ProfilePage() {
+    const router = useRouter();
     const { id } = useParams();
-    const { t } = useLanguage();
+    const { user } = useAuth();
+    const { language, t } = useLanguage();
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+    const [report, setReport] = useState<any>(null);
+
+    const startDialogue = async () => {
+        if (!user || user.uid === id) return;
+
+        try {
+            const dialoguesRef = collection(db, "dialogues");
+            const q = query(
+                dialoguesRef,
+                where("participants", "array-contains", user.uid)
+            );
+            const snap = await getDocs(q);
+            const existing = snap.docs.find(doc => doc.data().participants.includes(id));
+
+            if (existing) {
+                router.push(`/dialogues/${existing.id}`);
+            } else {
+                const { addDoc, serverTimestamp } = await import("firebase/firestore");
+                const newDialogue = await addDoc(dialoguesRef, {
+                    participants: [user.uid, id],
+                    lastMessageAt: serverTimestamp(),
+                    status: "active",
+                    createdAt: serverTimestamp()
+                });
+                router.push(`/dialogues/${newDialogue.id}`);
+            }
+        } catch (error) {
+            console.error("Error starting dialogue:", error);
+        }
+    };
+
+    const generateReport = async () => {
+        if (!user) return;
+        setIsGeneratingReport(true);
+        try {
+            const res = await fetch("/api/ai-report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: user.uid, language })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setReport(data.report);
+            } else {
+                alert(data.error || "Report generation failed");
+            }
+        } catch (error) {
+            console.error("Report generation error:", error);
+            alert("An error occurred while generating the report");
+        } finally {
+            setIsGeneratingReport(false);
+        }
+    };
 
     useEffect(() => {
         async function fetchProfile() {
@@ -83,8 +140,63 @@ export default function ProfilePage() {
             <div className={styles.profileHeader}>
                 <div className={styles.avatarPlaceholder}>{profile.displayName.substring(0, 1)}</div>
                 <h1 className={styles.displayName}>{profile.displayName}</h1>
+                {user && user.uid !== id && (
+                    <button
+                        onClick={startDialogue}
+                        className="btn-primary"
+                        style={{ marginTop: '1rem', padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}
+                    >
+                        💬 {t("dialogue_start")}
+                    </button>
+                )}
                 {profile.bio && <p className={styles.bio}>{profile.bio}</p>}
             </div>
+
+            {user?.uid === id && (
+                <section className={styles.aiReportSection} style={{ marginBottom: '3rem' }}>
+                    <div className="glass-panel" style={{ padding: '2rem', border: '1px solid var(--accent-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                            <div>
+                                <h2 style={{ fontSize: '1.5rem', marginBottom: '0.2rem' }}>✨ {t("ai_report_title")}</h2>
+                                <p style={{ opacity: 0.7, fontSize: '0.9rem' }}>{t("ai_report_desc")}</p>
+                            </div>
+                            <button
+                                onClick={generateReport}
+                                disabled={isGeneratingReport || posts.length === 0}
+                                className="btn-primary"
+                                style={{ padding: '0.8rem 1.5rem', fontSize: '1rem' }}
+                            >
+                                {isGeneratingReport ? t("ai_report_loading") : t("ai_report_generate")}
+                            </button>
+                        </div>
+
+                        {report && (
+                            <div className="fade-in" style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '12px' }}>
+                                <div style={{ marginBottom: '1.5rem', fontStyle: 'italic', fontSize: '1.1rem', color: 'var(--accent-color)' }}>
+                                    "{report.summary}"
+                                </div>
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <h4 style={{ fontSize: '0.9rem', opacity: 0.5, textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t("ai_report_themes")}</h4>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                        {report.themes?.map((theme: string, i: number) => (
+                                            <span key={i} style={{ background: 'var(--accent-color)', color: 'white', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>
+                                                {theme}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div style={{ marginBottom: '1.5rem' }}>
+                                    <h4 style={{ fontSize: '0.9rem', opacity: 0.5, textTransform: 'uppercase', marginBottom: '0.5rem' }}>{t("ai_report_insight")}</h4>
+                                    <p style={{ lineHeight: '1.8', opacity: 0.9 }}>{report.insight}</p>
+                                </div>
+                                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1rem' }}>
+                                    <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>💡 {report.advice}</p>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+            )}
 
             <section className={styles.feed}>
                 <h2 className={styles.sectionTitle}>{t("userPosts") || "Recent Posts"}</h2>
