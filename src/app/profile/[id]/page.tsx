@@ -100,8 +100,15 @@ export default function ProfilePage() {
                 // Fetch user info
                 const userRef = doc(db, "users", id as string);
                 const userSnap = await getDoc(userRef);
+
                 if (userSnap.exists()) {
                     setProfile(userSnap.data() as UserProfile);
+                } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
+                    // Manual matching for AI bots if they don't have user docs
+                    setProfile({
+                        displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
+                        bio: t("ai_report_desc") || "Philosophical AI Advisor"
+                    });
                 }
 
                 // Fetch user's non-anonymous posts
@@ -112,12 +119,19 @@ export default function ProfilePage() {
                     where("isAnonymous", "==", false),
                     orderBy("createdAt", "desc")
                 );
-                const postsSnap = await getDocs(q);
-                const fetchedPosts = postsSnap.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })) as Post[];
-                setPosts(fetchedPosts);
+
+                try {
+                    const postsSnap = await getDocs(q);
+                    const fetchedPosts = postsSnap.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    })) as Post[];
+                    setPosts(fetchedPosts);
+                } catch (qErr: any) {
+                    console.error("Firestore query error:", qErr);
+                    // If it's an index error, it will show up in console. 
+                    // We don't want to crash the whole profile view if posts fail.
+                }
             } catch (error) {
                 console.error("Error fetching profile:", error);
             } finally {
@@ -125,7 +139,7 @@ export default function ProfilePage() {
             }
         }
         fetchProfile();
-    }, [id]);
+    }, [id, t]);
 
     if (loading) return <div className="container">{t("loadingPosts")}</div>;
     if (!profile) return <div className="container" style={{ textAlign: 'center', padding: '100px 0' }}>{t("userNotFound") || "User Not Found"}</div>;

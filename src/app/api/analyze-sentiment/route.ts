@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
       以下の文章の「感情」を分析し、指定された4つのカテゴリーの中から最も近いものを1つだけ選んで返してください。

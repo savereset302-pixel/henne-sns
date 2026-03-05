@@ -35,26 +35,34 @@ export default function DialoguesPage() {
         );
 
         const unsubscribe = onSnapshot(q, async (snap) => {
-            const fetchedDialogues = await Promise.all(snap.docs.map(async (d) => {
-                const data = d.data();
-                const otherId = data.participants.find((p: string) => p !== user.uid);
+            try {
+                const fetchedDialogues = await Promise.all(snap.docs.map(async (d) => {
+                    const data = d.data();
+                    const otherId = data.participants.find((p: string) => p !== user.uid);
 
-                // Fetch other user's info
-                let otherName = "Unknown";
-                if (otherId) {
-                    const userSnap = await getDoc(doc(db, "users", otherId));
-                    if (userSnap.exists()) {
-                        otherName = userSnap.data().displayName;
+                    // Fetch other user's info
+                    let otherName = "Unknown";
+                    if (otherId) {
+                        const userSnap = await getDoc(doc(db, "users", otherId));
+                        if (userSnap.exists()) {
+                            otherName = userSnap.data().displayName;
+                        }
                     }
-                }
 
-                return {
-                    id: d.id,
-                    ...data,
-                    otherUser: { displayName: otherName }
-                } as Dialogue;
-            }));
-            setDialogues(fetchedDialogues);
+                    return {
+                        id: d.id,
+                        ...data,
+                        otherUser: { displayName: otherName }
+                    } as Dialogue;
+                }));
+                setDialogues(fetchedDialogues);
+                setLoading(false);
+            } catch (err) {
+                console.error("Error processing dialogues snapshot:", err);
+                setLoading(false);
+            }
+        }, (error) => {
+            console.error("Firestore onSnapshot error (Dialogues):", error);
             setLoading(false);
         });
 

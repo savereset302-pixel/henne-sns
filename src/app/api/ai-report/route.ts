@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, orderBy, Timestamp } from "firebase/firestore";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export async function POST(req: NextRequest) {
     try {
@@ -26,7 +26,19 @@ export async function POST(req: NextRequest) {
             orderBy("createdAt", "desc")
         );
 
-        const querySnapshot = await getDocs(q);
+        let querySnapshot;
+        try {
+            querySnapshot = await getDocs(q);
+        } catch (qErr: any) {
+            console.error("AI Report Query failed:", qErr);
+            if (qErr.message?.includes("index")) {
+                return NextResponse.json({
+                    success: false,
+                    error: "Database index is being created. Please try again in 5-10 minutes. " + qErr.message
+                });
+            }
+            throw qErr;
+        }
         const posts = querySnapshot.docs.map(doc => ({
             title: doc.data().title,
             content: doc.data().content,
