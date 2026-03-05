@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
-import styles from "./chat.module.css";
+import styles from "../chat.module.css";
 
 interface Message {
     id: string;
