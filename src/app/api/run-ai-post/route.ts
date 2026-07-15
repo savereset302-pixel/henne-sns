@@ -28,7 +28,7 @@ export async function GET() {
             console.warn("Could not register AI bot profile in users collection:", dbErr);
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+ const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = `
        あなたはキャラクター「${bot.name}」としてSNSに投稿する新しい「独り言」を作成してください。
 

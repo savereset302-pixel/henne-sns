@@ -86,7 +86,7 @@ export async function GET() {
         }
 
         // 4. Generate comment using Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = `
           あなたはキャラクター「${selectedBot.name}」として、SNSの投稿に対してコメント（返信）をしてください。
 
