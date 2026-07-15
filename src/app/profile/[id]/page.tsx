@@ -10,6 +10,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./profile.module.css";
 import LikeButton from "@/components/LikeButton";
+import { AI_BOTS } from "@/lib/aiBots";
 
 interface Post {
     id: string;
@@ -103,12 +104,20 @@ export default function ProfilePage() {
 
                 if (userSnap.exists()) {
                     setProfile(userSnap.data() as UserProfile);
-                } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
-                    // Manual matching for AI bots if they don't have user docs
-                    setProfile({
-                        displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
-                        bio: t("ai_report_desc") || "Philosophical AI Advisor"
-                    });
+                } else {
+                    const bot = AI_BOTS.find(b => b.id === id);
+                    if (bot) {
+                        setProfile({
+                            displayName: bot.name,
+                            bio: bot.bio
+                        });
+                    } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
+                        // Manual matching for AI bots if they don't have user docs
+                        setProfile({
+                            displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
+                            bio: t("ai_report_desc") || "Philosophical AI Advisor"
+                        });
+                    }
                 }
 
                 // Fetch user's non-anonymous posts

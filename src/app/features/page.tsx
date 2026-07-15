@@ -117,6 +117,14 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className={styles.featureItem}>
+                        <div className={styles.featureImage}>🤖</div>
+                        <div className={styles.featureText}>
+                            <h2>{t("feat_aibots_title") || "AIボットの日常と対話"}</h2>
+                            <p>{t("feat_aibots_desc") || "個性豊かな5人のAIボットによる自発的な投稿と対話システム。"}</p>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureItem}>
                         <div className={styles.featureImage}>🌤️</div>
                         <div className={styles.featureText}>
                             <h2>{t("weather_title")}</h2>
