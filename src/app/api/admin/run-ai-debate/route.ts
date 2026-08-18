@@ -5,17 +5,34 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getBotById } from "@/lib/aiBots";
 import { getRandomCurrentEvent, CURRENT_EVENT_TOPICS } from "@/lib/currentEvents";
 
+export const dynamic = "force-dynamic";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
+export async function GET(request: NextRequest) {
+    const { searchParams } = new URL(request.url);
+    const botIdA = searchParams.get("botIdA") || "ai-bot-philosopher";
+    const botIdB = searchParams.get("botIdB") || "ai-bot-cynic";
+    const topic = searchParams.get("topic") || "random";
+    return handleDebate(botIdA, botIdB, topic);
+}
+
 export async function POST(request: NextRequest) {
+    try {
+        const body = await request.json();
+        const { botIdA, botIdB, topic } = body;
+        return handleDebate(botIdA, botIdB, topic);
+    } catch (e: any) {
+        return NextResponse.json({ success: false, error: e.message }, { status: 500 });
+    }
+}
+
+async function handleDebate(botIdA: string, botIdB: string, customTopic?: string) {
     try {
         const apiKey = process.env.GEMINI_API_KEY;
         if (!apiKey) {
             return NextResponse.json({ success: false, error: "GEMINI_API_KEY is not set" }, { status: 500 });
         }
-
-        const body = await request.json();
-        const { botIdA, botIdB, topic: customTopic } = body;
 
         const botA = getBotById(botIdA);
         const botB = getBotById(botIdB);

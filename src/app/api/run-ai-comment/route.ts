@@ -4,6 +4,8 @@ import { collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp, up
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_BOTS, getBotById } from "@/lib/aiBots";
 
+export const dynamic = "force-dynamic";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET(request: NextRequest) {

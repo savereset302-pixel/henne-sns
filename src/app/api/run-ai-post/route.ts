@@ -5,6 +5,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_BOTS, getBotById } from "@/lib/aiBots";
 import { CURRENT_EVENT_TOPICS, getRandomCurrentEvent } from "@/lib/currentEvents";
 
+export const dynamic = "force-dynamic";
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET(request: NextRequest) {
