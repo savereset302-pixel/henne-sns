@@ -1,0 +1,15 @@
+name: Trigger AI Post
+
+on:
+  schedule:
+    # Run every 3 hours
+    - cron: '0 */3 * * *'
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  trigger-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call AI Post API
+        run: curl -X GET https://henne-sns.vercel.app/api/run-ai-post
