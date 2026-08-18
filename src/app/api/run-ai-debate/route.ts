@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp, updateDoc, doc, setDoc } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, setDoc } from "firebase/firestore";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getBotById } from "@/lib/aiBots";
-import { getRandomCurrentEvent, CURRENT_EVENT_TOPICS } from "@/lib/currentEvents";
+import { getRandomCurrentEvent } from "@/lib/currentEvents";
 
 export const dynamic = "force-dynamic";
 
@@ -61,7 +61,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
         // --- Step 1: Bot A writes initial Post ---
         const postPrompt = `
-       あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}）` : ""}として、「${selectedTopic}」についてSNS「Honne.」にオピニオン投稿を作成してください。
+       あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}、母国語: ${botA.nativeLanguage}）` : ""}として、「${selectedTopic}」についてSNS「Honne.」にオピニオン投稿を作成してください。
 
        【あなたの性格/世界観】
        ${botA.personality}
@@ -97,7 +97,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
         // --- Step 2: Bot B counters Bot A (Comment 1) ---
         const comment1Prompt = `
-          あなたは「${botB.name}」${botB.country ? `（出身: ${botB.country}）` : ""}です。
+          あなたは「${botB.name}」${botB.country ? `（出身: ${botB.country}、母国語: ${botB.nativeLanguage}）` : ""}です。
           「${botA.name}」が「${parsedPost.title}」というタイトルで以下の投稿をしました。
 
           【Bot Aの投稿内容】
@@ -111,6 +111,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           【レスバ/反論の指示】
           ・Bot Aの主張に対して、あなたの価値観から真っ向から反論・ツッコミ・批判を入れてください。
           ・論理の甘さや浅さを鋭く指摘し、白熱した議論を展開してください。
+          ・外国語を使う場合は日本語の対訳を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c1Res = await model.generateContent(comment1Prompt);
@@ -126,7 +127,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
         // --- Step 3: Bot A defends and rebuts Bot B (Comment 2) ---
         const comment2Prompt = `
-          あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}）` : ""}です。
+          あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}、母国語: ${botA.nativeLanguage}）` : ""}です。
           あなたの投稿に対して、「${botB.name}」から以下の反論コメントが届きました。
 
           【Bot Bの反論】
@@ -140,6 +141,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           【再反論の指示】
           ・Bot Bの批判に屈せず、自分の論拠を補強して反論（言い返し）をしてください。
           ・あなたのキャラクターらしさを全開にして、知的かつ熱く返信してください。
+          ・外国語を使う場合は日本語の対訳を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c2Res = await model.generateContent(comment2Prompt);
@@ -155,7 +157,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
         // --- Step 4: Bot B closes the debate with a punchy conclusion (Comment 3) ---
         const comment3Prompt = `
-          あなたは「${botB.name}」${botB.country ? `（出身: ${botB.country}）` : ""}です。
+          あなたは「${botB.name}」${botB.country ? `（出身: ${botB.country}、母国語: ${botB.nativeLanguage}）` : ""}です。
           「${botA.name}」から以下の再反論が届きました。
 
           【Bot Aの再反論】
@@ -168,6 +170,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【議論の締めくくりの指示】
           ・Bot Aの意見を受け止めつつも、最後にあなたの信念や皮肉・結論をピシッと決めて議論を締めてください。
+          ・外国語を使う場合は日本語の対訳を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c3Res = await model.generateContent(comment3Prompt);

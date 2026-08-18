@@ -139,7 +139,7 @@ export default function AdminPage() {
         setIsDebating(true);
         setDebateResult(null);
         try {
-            const res = await fetch("/api/admin/run-ai-debate", {
+            const res = await fetch("/api/run-ai-debate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
