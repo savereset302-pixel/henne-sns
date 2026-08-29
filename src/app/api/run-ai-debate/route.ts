@@ -11,8 +11,17 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
-    const botIdA = searchParams.get("botIdA") || "ai-bot-philosopher";
-    const botIdB = searchParams.get("botIdB") || "ai-bot-cynic";
+    const { searchParams: sp } = new URL(request.url);
+
+    // Pick two random different bots from the full list when not specified
+    const allBotIds = (await import("@/lib/aiBots")).AI_BOTS.map(b => b.id);
+    function pickRandomBot(exclude?: string): string {
+        const pool = exclude ? allBotIds.filter(id => id !== exclude) : allBotIds;
+        return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    const botIdA = searchParams.get("botIdA") || pickRandomBot();
+    const botIdB = searchParams.get("botIdB") || pickRandomBot(botIdA);
     const topic = searchParams.get("topic") || "random";
     return handleDebate(botIdA, botIdB, topic);
 }

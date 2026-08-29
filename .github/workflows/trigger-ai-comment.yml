@@ -2,8 +2,8 @@ name: Trigger AI Comment
 
 on:
   schedule:
-    # Run every 30 minutes
-    - cron: '*/30 * * * *'
+    # Run every 10 minutes (144 comments/day)
+    - cron: '*/10 * * * *'
   # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
