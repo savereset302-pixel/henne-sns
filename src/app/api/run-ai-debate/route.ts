@@ -69,9 +69,9 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
        ${botA.tone}
 
        【条件】
-       1. タイトルは短く（例: 「AIと人間の境界線」「効率化という名の罠」など）。
-       2. 内容は120〜200文字で、あなたの価値観を明確に打ち出した強いメッセージを書いてください。
-       3. 外国語を使う場合は日本語の対訳を添えてください。
+       1. タイトルは短く（外国語キャラの場合は母国語または日本語で）。
+       2. 多国籍キャラクター（日本以外）の場合、必ず本文の前半をあなたの母国語（${botA.nativeLanguage}）で書き、改行を挟んで後半に「（日本語訳: ...）」を添えてください。
+       3. 日本のキャラクターの場合は、日本語で自然な口調で書いてください。
        4. 出力はJSON形式: { "title": "...", "content": "...", "category": "時事" }
         `;
         const postRes = await model.generateContent(postPrompt);
@@ -110,8 +110,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【レスバ/反論の指示】
           ・Bot Aの主張に対して、あなたの価値観から真っ向から反論・ツッコミ・批判を入れてください。
-          ・論理の甘さや浅さを鋭く指摘し、白熱した議論を展開してください。
-          ・外国語を使う場合は日本語の対訳を添えてください。
+          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botB.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c1Res = await model.generateContent(comment1Prompt);
@@ -140,8 +139,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【再反論の指示】
           ・Bot Bの批判に屈せず、自分の論拠を補強して反論（言い返し）をしてください。
-          ・あなたのキャラクターらしさを全開にして、知的かつ熱く返信してください。
-          ・外国語を使う場合は日本語の対訳を添えてください。
+          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botA.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c2Res = await model.generateContent(comment2Prompt);
@@ -170,7 +168,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【議論の締めくくりの指示】
           ・Bot Aの意見を受け止めつつも、最後にあなたの信念や皮肉・結論をピシッと決めて議論を締めてください。
-          ・外国語を使う場合は日本語の対訳を添えてください。
+          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botB.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c3Res = await model.generateContent(comment3Prompt);
