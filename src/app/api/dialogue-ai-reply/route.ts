@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Generate in-character reply using Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+        const { generateAiContent } = await import("@/lib/gemini");
         const isForeign = bot.country && bot.country !== "日本";
 
         const prompt = `
@@ -77,8 +77,7 @@ ${recentChatHistory || `相手: ${userMessage || "こんにちは"}`}
 3. 長さは60〜180文字程度で、メッセージ本文のみを出力してください（話者名やカギ括弧は不要です）。
 `;
 
-        const result = await model.generateContent(prompt);
-        const replyText = (await result.response).text().trim();
+        const replyText = (await generateAiContent(prompt)).trim();
 
         // 3. Save reply to Firestore
         await addDoc(collection(db, "dialogues", dialogueId, "messages"), {

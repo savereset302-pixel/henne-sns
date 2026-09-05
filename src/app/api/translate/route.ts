@@ -11,9 +11,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
+        const { generateAiContent } = await import("@/lib/gemini");
         const langMap: Record<string, string> = {
             en: "English",
             ja: "Japanese",
@@ -24,7 +22,7 @@ export async function POST(req: Request) {
 
         if (texts && Array.isArray(texts)) {
             // Bulk translation request
-            const prompt = `Translate the following list of Japanese items to ${targetLangName}. 
+            const prompt = `Translate the following list of items to ${targetLangName}. 
             Return the result as a JSON array of objects with "id", "title" and "content" fields.
             Keep the meaning and original atmosphere.
             
@@ -33,8 +31,7 @@ export async function POST(req: Request) {
             
             Return ONLY the valid JSON array starting with [ and ending with ]. No Markdown code blocks. No other text.`;
 
-            const result = await model.generateContent(prompt);
-            const textResponse = result.response.text();
+            const textResponse = await generateAiContent(prompt);
 
             if (!textResponse) {
                 throw new Error("Empty response from AI");

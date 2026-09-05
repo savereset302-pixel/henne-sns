@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp, doc, setDoc } from "firebase/fires
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getBotById } from "@/lib/aiBots";
 import { getRandomCurrentEvent } from "@/lib/currentEvents";
+import { generateAiContent } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 
@@ -86,8 +87,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           - ${isBotAForeign ? `【最重要】必ずあなたの母国語（${botA.nativeLanguage}）のみで本文・タイトルを書いてください。日本語訳や日本語の解説は絶対に含めないでください。` : "自然な日本語の口調で書いてください。"}
        3. 出力はJSON形式: { "title": "...", "content": "...", "category": "時事" }
         `;
-        const postRes = await model.generateContent(postPrompt);
-        const postText = (await postRes.response).text().replace(/```json|```/g, "").trim();
+        const postText = (await generateAiContent(postPrompt)).replace(/```json|```/g, "").trim();
         let parsedPost: any = { title: `${selectedTopic}についての考察`, content: postText, category: "時事" };
         try {
             parsedPost = JSON.parse(postText);
@@ -126,8 +126,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           ・言語ルール: ${isBotBForeign ? `【最重要】必ずあなたの母国語（${botB.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
-        const c1Res = await model.generateContent(comment1Prompt);
-        const comment1Text = (await c1Res.response).text().trim();
+        const comment1Text = (await generateAiContent(comment1Prompt)).trim();
 
         await addDoc(collection(db, "posts", postId, "comments"), {
             text: comment1Text,
@@ -155,8 +154,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           ・言語ルール: ${isBotAForeign ? `【最重要】必ずあなたの母国語（${botA.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
-        const c2Res = await model.generateContent(comment2Prompt);
-        const comment2Text = (await c2Res.response).text().trim();
+        const comment2Text = (await generateAiContent(comment2Prompt)).trim();
 
         await addDoc(collection(db, "posts", postId, "comments"), {
             text: comment2Text,
@@ -184,8 +182,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
           ・言語ルール: ${isBotBForeign ? `【最重要】必ずあなたの母国語（${botB.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
-        const c3Res = await model.generateContent(comment3Prompt);
-        const comment3Text = (await c3Res.response).text().trim();
+        const comment3Text = (await generateAiContent(comment3Prompt)).trim();
 
         await addDoc(collection(db, "posts", postId, "comments"), {
             text: comment3Text,

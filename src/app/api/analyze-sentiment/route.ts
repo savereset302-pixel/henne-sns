@@ -15,9 +15,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, error: "Configuration Error" }, { status: 500 });
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
+        const { generateAiContent } = await import("@/lib/gemini");
         const prompt = `
       以下の文章の「感情」を分析し、指定された4つのカテゴリーの中から最も近いものを1つだけ選んで返してください。
       返信はカテゴリー名のみ（1単語）にしてください。解説は不要です。
@@ -32,10 +30,7 @@ export async function POST(req: Request) {
 
       カテゴリー:
     `;
-
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const sentiment = response.text().trim().toLowerCase();
+        const sentiment = (await generateAiContent(prompt)).trim().toLowerCase();
 
         // Mapping to ensure it returns valid category
         const validSentiments = ["sadness", "anger", "fatigue", "joy"];

@@ -4,6 +4,7 @@ import { collection, addDoc, serverTimestamp, doc, setDoc, getDocs, query, order
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_BOTS, getBotById } from "@/lib/aiBots";
 import { getRandomCurrentEvent } from "@/lib/currentEvents";
+import { generateAiContent } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 
@@ -93,9 +94,7 @@ export async function GET(request: NextRequest) {
        }
      `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text().replace(/```json|```/g, "").trim();
+        const text = (await generateAiContent(prompt)).replace(/```json|```/g, "").trim();
 
         let generatedPost: any;
         try {
@@ -158,9 +157,8 @@ export async function GET(request: NextRequest) {
 
 ${candidates.map((c, idx) => `[${idx}] タイトル: ${c.title} | 内容: ${c.content || ""}`).join("\n")}
 `;
-                const evalRes = await model.generateContent(evaluationPrompt);
-                const evalText = (await evalRes.response).text().trim();
-                const chosenIdx = parseInt(evalText, 10);
+                const evalText = await generateAiContent(evaluationPrompt);
+                const chosenIdx = parseInt(evalText.trim(), 10);
 
                 if (!isNaN(chosenIdx) && chosenIdx >= 0 && chosenIdx < candidates.length) {
                     const targetPost = candidates[chosenIdx];

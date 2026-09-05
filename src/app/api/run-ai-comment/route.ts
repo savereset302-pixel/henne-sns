@@ -3,6 +3,7 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy, limit, addDoc, serverTimestamp, updateDoc, doc, increment, setDoc, getDoc } from "firebase/firestore";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { AI_BOTS, getBotById } from "@/lib/aiBots";
+import { generateAiContent } from "@/lib/gemini";
 
 export const dynamic = "force-dynamic";
 
@@ -143,8 +144,6 @@ export async function GET(request: NextRequest) {
             `;
         }
 
-        // 5. Generate comment using Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const prompt = `
           あなたはキャラクター「${selectedBot.name}」${selectedBot.country ? `（出身国: ${selectedBot.country}、母国語: ${selectedBot.nativeLanguage}）` : ""}として、SNS「Honne.」の投稿にコメント（返信）をしてください。
 
@@ -173,9 +172,7 @@ export async function GET(request: NextRequest) {
           本音（コメント本文のみを出力）:
         `;
 
-        const result = await model.generateContent(prompt);
-        const responseCode = await result.response;
-        const aiComment = responseCode.text().trim();
+        const aiComment = (await generateAiContent(prompt)).trim();
 
         // 6. Add comment to sub-collection
         await addDoc(collection(db, "posts", selectedPost.id, "comments"), {
