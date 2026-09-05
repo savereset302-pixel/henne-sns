@@ -102,44 +102,50 @@ export default function ProfilePage() {
                 const userRef = doc(db, "users", id as string);
                 const userSnap = await getDoc(userRef);
 
-                if (userSnap.exists()) {
+                const bot = AI_BOTS.find(b => b.id === id);
+                if (bot) {
+                    setProfile({
+                        displayName: bot.name,
+                        bio: bot.bio
+                    });
+                } else if (userSnap.exists()) {
                     setProfile(userSnap.data() as UserProfile);
-                } else {
-                    const bot = AI_BOTS.find(b => b.id === id);
-                    if (bot) {
-                        setProfile({
-                            displayName: bot.name,
-                            bio: bot.bio
-                        });
-                    } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
-                        // Manual matching for AI bots if they don't have user docs
-                        setProfile({
-                            displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
-                            bio: t("ai_report_desc") || "Philosophical AI Advisor"
-                        });
-                    }
+                } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
+                    setProfile({
+                        displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
+                        bio: t("ai_report_desc") || "Philosophical AI Advisor"
+                    });
                 }
 
-                // Fetch user's non-anonymous posts
+                // Fetch user's posts without requiring composite Firestore indexes
                 const postsRef = collection(db, "posts");
-                const q = query(
-                    postsRef,
-                    where("authorId", "==", id),
-                    where("isAnonymous", "==", false),
-                    orderBy("createdAt", "desc")
-                );
+                const q = query(postsRef, where("authorId", "==", id));
 
                 try {
                     const postsSnap = await getDocs(q);
-                    const fetchedPosts = postsSnap.docs.map(doc => ({
+                    let fetchedPosts = postsSnap.docs.map(doc => ({
                         id: doc.id,
                         ...doc.data()
                     })) as Post[];
+
+                    // Show posts: AI bot posts are always visible; for users, hide anonymous posts if viewed by others
+                    const isBot = (id as string).startsWith("ai-bot-") || !!bot;
+                    fetchedPosts = fetchedPosts.filter(p => {
+                        if (isBot) return true;
+                        if (user && user.uid === id) return true;
+                        return !p.isAnonymous;
+                    });
+
+                    // Sort descending in memory
+                    fetchedPosts.sort((a, b) => {
+                        const tA = a.createdAt?.toMillis ? a.createdAt.toMillis() : (a.createdAt?.seconds ? a.createdAt.seconds * 1000 : 0);
+                        const tB = b.createdAt?.toMillis ? b.createdAt.toMillis() : (b.createdAt?.seconds ? b.createdAt.seconds * 1000 : 0);
+                        return tB - tA;
+                    });
+
                     setPosts(fetchedPosts);
                 } catch (qErr: any) {
                     console.error("Firestore query error:", qErr);
-                    // If it's an index error, it will show up in console. 
-                    // We don't want to crash the whole profile view if posts fail.
                 }
             } catch (error) {
                 console.error("Error fetching profile:", error);

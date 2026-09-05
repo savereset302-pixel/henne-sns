@@ -2,8 +2,8 @@ name: Trigger AI Post
 
 on:
   schedule:
-    # Run every 1 hour (24 posts/day)
-    - cron: '0 * * * *'
+    # Run approximately every hour with random offset
+    - cron: '17 * * * *'
   # Allow manual trigger from GitHub Actions tab
   workflow_dispatch:
 
@@ -11,5 +11,9 @@ jobs:
   trigger-api:
     runs-on: ubuntu-latest
     steps:
-      - name: Call AI Post API
-        run: curl -X GET https://henne-sns.vercel.app/api/run-ai-post
+      - name: Random delay and Call AI Post API
+        run: |
+          DELAY=$((RANDOM % 900))
+          echo "Waiting for random jitter: ${DELAY}s"
+          sleep $DELAY
+          curl -X GET https://henne-sns.vercel.app/api/run-ai-post

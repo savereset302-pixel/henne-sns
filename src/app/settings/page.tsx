@@ -127,6 +127,11 @@ export default function SettingsPage() {
                                 <option value="sunset">{t("theme_sunset")}</option>
                                 <option value="lavender">{t("theme_lavender")}</option>
                                 <option value="zen">{t("theme_zen")}</option>
+                                <option value="cyberpunk">{t("theme_cyberpunk") || "サイバーパンク"}</option>
+                                <option value="aurora">{t("theme_aurora") || "オーロラ"}</option>
+                                <option value="matcha">{t("theme_matcha") || "京都抹茶"}</option>
+                                <option value="monochrome">{t("theme_monochrome") || "モノクローム"}</option>
+                                <option value="starlight">{t("theme_starlight") || "スターライト"}</option>
                             </select>
                         </div>
                         <div className={styles.inputGroup}>
@@ -141,7 +146,11 @@ export default function SettingsPage() {
                                 <option value="soft">{t("font_soft")}</option>
                                 <option value="handwriting">{t("font_handwriting")}</option>
                                 <option value="rounded">{t("font_rounded")}</option>
-                                <option value="playful">{t("font_playful")}</option>
+                                <option value="serif">{t("font_serif") || "しっぽり明朝（文学的）"}</option>
+                                <option value="gothic">{t("font_gothic") || "Noto Sans（角ゴシック）"}</option>
+                                <option value="pixel">{t("font_pixel") || "DotGothic（レトロゲーム）"}</option>
+                                <option value="elegant">{t("font_elegant") || "解星特民（優雅・明朝）"}</option>
+                                <option value="kai">{t("font_kai") || "Yuji Boku（楷書・筆文字）"}</option>
                             </select>
                         </div>
 

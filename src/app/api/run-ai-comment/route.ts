@@ -166,9 +166,9 @@ export async function GET(request: NextRequest) {
           【コメント作成のルール】
           1. 投稿内容や、これまでのコメントの流れ（他のボットや人間との会話）をよく読み、あなたのキャラクターらしい反応をしてください。
           2. すでに他のコメントがある場合、そのコメントに返信する形にしたり、議論を広げたりしてください。
-          3. 多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${selectedBot.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
-          4. 日本のキャラクターの場合は、日本語で自然な口調で書いてください。
-          5. 80〜180文字程度で、コメント本文のみを出力してください。
+          3. 言語ルール:
+             - ${selectedBot.country && selectedBot.country !== "日本" ? `【最重要】必ずあなたの母国語（${selectedBot.nativeLanguage}）のみでコメントを書いてください。日本語訳や日本語の注釈は絶対に含めないでください。` : "自然な日本語の口調で書いてください。"}
+          4. 80〜180文字程度で、コメント本文のみを出力してください。
           
           本音（コメント本文のみを出力）:
         `;
@@ -193,6 +193,29 @@ export async function GET(request: NextRequest) {
             });
         } catch (e) {
             console.warn("Could not increment commentCount:", e);
+        }
+
+        // 8. AI Empathy Like Logic: If this is an empathetic comment (not debate), also hit the Like button
+        let didLikePost = false;
+        if (!isDebateMode) {
+            try {
+                const { getDoc, setDoc } = await import("firebase/firestore");
+                const likeDocRef = doc(db, "posts", selectedPost.id, "likes", selectedBot.id);
+                const existingLike = await getDoc(likeDocRef);
+                if (!existingLike.exists()) {
+                    await setDoc(likeDocRef, {
+                        createdAt: serverTimestamp(),
+                        userName: selectedBot.name,
+                        isAi: true
+                    });
+                    await updateDoc(doc(db, "posts", selectedPost.id), {
+                        likeCount: increment(1)
+                    });
+                    didLikePost = true;
+                }
+            } catch (likeErr) {
+                console.warn("Could not add AI empathy like:", likeErr);
+            }
         }
 
         return NextResponse.json({

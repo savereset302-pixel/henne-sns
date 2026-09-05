@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Zen+Maru+Gothic:wght@400;700&family=Yomogi&family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Zen+Maru+Gothic:wght@400;700&family=Yomogi&family=M+PLUS+Rounded+1c:wght@400;700&family=Shippori+Mincho:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=DotGothic16&family=Kaisei+Tokumin:wght@400;700&family=Yuji+Boku&display=swap');
 
 :root {
   --bg-color: #050505;
@@ -22,6 +22,26 @@
 
 [data-font='rounded'] {
   --font-main: 'M PLUS Rounded 1c', sans-serif;
+}
+
+[data-font='serif'] {
+  --font-main: 'Shippori Mincho', serif;
+}
+
+[data-font='gothic'] {
+  --font-main: 'Noto Sans JP', sans-serif;
+}
+
+[data-font='pixel'] {
+  --font-main: 'DotGothic16', sans-serif;
+}
+
+[data-font='elegant'] {
+  --font-main: 'Kaisei Tokumin', serif;
+}
+
+[data-font='kai'] {
+  --font-main: 'Yuji Boku', serif;
 }
 
 * {
@@ -129,6 +149,66 @@
   --accent-color: #ffffff;
   --text-primary: #cccccc;
   --text-secondary: #888888;
+}
+
+[data-theme='cyberpunk'] {
+  --bg-color: #0b001a;
+  --bg-gradient: linear-gradient(135deg, #0b001a 0%, #1a0033 50%, #001f3f 100%);
+  --panel-bg: rgba(20, 5, 35, 0.75);
+  --border-color: rgba(0, 255, 234, 0.2);
+  --accent-color: #00ffea;
+  --accent-glow: 0 0 20px rgba(0, 255, 234, 0.4);
+  --text-primary: #f5f0ff;
+  --text-secondary: #b39ddb;
+  --logo-color: #ff007f;
+}
+
+[data-theme='aurora'] {
+  --bg-color: #021b1a;
+  --bg-gradient: linear-gradient(135deg, #021b1a 0%, #063835 50%, #16113a 100%);
+  --panel-bg: rgba(4, 30, 28, 0.7);
+  --border-color: rgba(52, 211, 153, 0.2);
+  --accent-color: #34d399;
+  --accent-glow: 0 0 20px rgba(52, 211, 153, 0.35);
+  --text-primary: #e6fffa;
+  --text-secondary: #81e6d9;
+  --logo-color: #34d399;
+}
+
+[data-theme='matcha'] {
+  --bg-color: #f7f6f0;
+  --bg-gradient: linear-gradient(135deg, #f7f6f0 0%, #eef0e5 100%);
+  --panel-bg: rgba(255, 255, 255, 0.75);
+  --border-color: rgba(85, 107, 47, 0.15);
+  --accent-color: #4b6f44;
+  --accent-glow: 0 0 12px rgba(75, 111, 68, 0.2);
+  --text-primary: #2d382c;
+  --text-secondary: #5c6b5b;
+  --logo-color: #4b6f44;
+}
+
+[data-theme='monochrome'] {
+  --bg-color: #000000;
+  --bg-gradient: none;
+  --panel-bg: #111111;
+  --border-color: #333333;
+  --accent-color: #ffffff;
+  --accent-glow: 0 0 15px rgba(255, 255, 255, 0.3);
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --logo-color: #ffffff;
+}
+
+[data-theme='starlight'] {
+  --bg-color: #070b19;
+  --bg-gradient: linear-gradient(135deg, #070b19 0%, #111c3a 50%, #1b1233 100%);
+  --panel-bg: rgba(15, 23, 42, 0.75);
+  --border-color: rgba(147, 197, 253, 0.15);
+  --accent-color: #60a5fa;
+  --accent-glow: 0 0 20px rgba(96, 165, 250, 0.4);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --logo-color: #93c5fd;
 }
 
 * {

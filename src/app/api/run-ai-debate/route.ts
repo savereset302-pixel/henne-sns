@@ -69,6 +69,9 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // --- Step 1: Bot A writes initial Post ---
+        const isBotAForeign = botA.country && botA.country !== "日本";
+        const isBotBForeign = botB.country && botB.country !== "日本";
+
         const postPrompt = `
        あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}、母国語: ${botA.nativeLanguage}）` : ""}として、「${selectedTopic}」についてSNS「Honne.」にオピニオン投稿を作成してください。
 
@@ -78,10 +81,10 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
        ${botA.tone}
 
        【条件】
-       1. タイトルは短く（外国語キャラの場合は母国語または日本語で）。
-       2. 多国籍キャラクター（日本以外）の場合、必ず本文の前半をあなたの母国語（${botA.nativeLanguage}）で書き、改行を挟んで後半に「（日本語訳: ...）」を添えてください。
-       3. 日本のキャラクターの場合は、日本語で自然な口調で書いてください。
-       4. 出力はJSON形式: { "title": "...", "content": "...", "category": "時事" }
+       1. タイトルは短く書いてください。
+       2. 言語ルール:
+          - ${isBotAForeign ? `【最重要】必ずあなたの母国語（${botA.nativeLanguage}）のみで本文・タイトルを書いてください。日本語訳や日本語の解説は絶対に含めないでください。` : "自然な日本語の口調で書いてください。"}
+       3. 出力はJSON形式: { "title": "...", "content": "...", "category": "時事" }
         `;
         const postRes = await model.generateContent(postPrompt);
         const postText = (await postRes.response).text().replace(/```json|```/g, "").trim();
@@ -100,6 +103,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
             authorId: botA.id,
             createdAt: serverTimestamp(),
             isAi: true,
+            isAnonymous: false,
             commentCount: 3
         });
         const postId = postDocRef.id;
@@ -119,7 +123,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【レスバ/反論の指示】
           ・Bot Aの主張に対して、あなたの価値観から真っ向から反論・ツッコミ・批判を入れてください。
-          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botB.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
+          ・言語ルール: ${isBotBForeign ? `【最重要】必ずあなたの母国語（${botB.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c1Res = await model.generateContent(comment1Prompt);
@@ -148,7 +152,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【再反論の指示】
           ・Bot Bの批判に屈せず、自分の論拠を補強して反論（言い返し）をしてください。
-          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botA.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
+          ・言語ルール: ${isBotAForeign ? `【最重要】必ずあなたの母国語（${botA.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c2Res = await model.generateContent(comment2Prompt);
@@ -177,7 +181,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
 
           【議論の締めくくりの指示】
           ・Bot Aの意見を受け止めつつも、最後にあなたの信念や皮肉・結論をピシッと決めて議論を締めてください。
-          ・多国籍キャラクター（日本以外）の場合、コメント前半をあなたの母国語（${botB.nativeLanguage}）で書き、後半に「（日本語訳: ...）」を添えてください。
+          ・言語ルール: ${isBotBForeign ? `【最重要】必ずあなたの母国語（${botB.nativeLanguage}）のみで書いてください。日本語訳は絶対に含めないでください。` : "日本語で書いてください。"}
           ・80〜150文字程度で、コメント本文のみを出力してください。
         `;
         const c3Res = await model.generateContent(comment3Prompt);

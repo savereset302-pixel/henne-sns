@@ -9,6 +9,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
 import styles from "../chat.module.css";
+import { getBotById } from "@/lib/aiBots";
 
 interface Message {
     id: string;
@@ -25,7 +26,9 @@ export default function DialogueChatPage() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMsg, setNewMsg] = useState("");
     const [otherUser, setOtherUser] = useState<any>(null);
+    const [otherUserId, setOtherUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
+    const [isAiTyping, setIsAiTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -38,10 +41,29 @@ export default function DialogueChatPage() {
                 const data = chatSnap.data();
                 const otherId = data.participants.find((p: string) => p !== user.uid);
                 if (otherId) {
+                    setOtherUserId(otherId);
                     const userSnap = await getDoc(doc(db, "users", otherId));
                     if (userSnap.exists()) {
                         setOtherUser(userSnap.data());
+                    } else {
+                        const bot = getBotById(otherId);
+                        if (bot) {
+                            setOtherUser({
+                                displayName: bot.name,
+                                bio: bot.bio,
+                                isAi: true
+                            });
+                        }
                     }
+                }
+
+                // Mark conversation as read by this user
+                try {
+                    await updateDoc(chatRef, {
+                        [`readBy.${user.uid}`]: serverTimestamp()
+                    });
+                } catch (readErr) {
+                    console.warn("Could not mark readBy:", readErr);
                 }
             } else {
                 router.push("/dialogues");
@@ -62,13 +84,13 @@ export default function DialogueChatPage() {
         });
 
         return () => unsubscribe();
-    }, [id, user]);
+    }, [id, user, router]);
 
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, isAiTyping]);
 
     const sendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -86,8 +108,29 @@ export default function DialogueChatPage() {
 
             await updateDoc(doc(db, "dialogues", id as string), {
                 lastMessage: text,
-                lastMessageAt: serverTimestamp()
+                lastSenderId: user.uid,
+                lastMessageAt: serverTimestamp(),
+                [`readBy.${user.uid}`]: serverTimestamp()
             });
+
+            // If other user is an AI bot, trigger AI auto-reply
+            const isBot = otherUserId?.startsWith("ai-bot-") || otherUser?.isAi;
+            if (isBot && otherUserId) {
+                setIsAiTyping(true);
+                fetch("/api/dialogue-ai-reply", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        dialogueId: id,
+                        botId: otherUserId,
+                        userMessage: text
+                    })
+                }).catch(err => {
+                    console.error("AI reply error:", err);
+                }).finally(() => {
+                    setIsAiTyping(false);
+                });
+            }
         } catch (error) {
             console.error("Error sending message:", error);
         }
@@ -99,7 +142,10 @@ export default function DialogueChatPage() {
         <main className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
                 <Link href="/dialogues" style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>← {t("dialogue_list")}</Link>
-                <div style={{ fontWeight: 700 }}>{otherUser?.displayName}</div>
+                <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {otherUser?.isAi && <span style={{ fontSize: '0.75rem', background: 'var(--accent-color)', color: '#fff', padding: '2px 8px', borderRadius: '12px' }}>AI</span>}
+                    {otherUser?.displayName || "対話"}
+                </div>
                 <UserNav />
             </header>
 
@@ -118,6 +164,13 @@ export default function DialogueChatPage() {
                             </div>
                         </div>
                     ))}
+                    {isAiTyping && (
+                        <div className={styles.otherMessage} style={{ opacity: 0.8 }}>
+                            <div className={styles.bubble} style={{ fontStyle: 'italic', background: 'rgba(255,255,255,0.06)' }}>
+                                💭 {otherUser?.displayName || "AI"} が思索中...
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <form className={styles.inputArea} onSubmit={sendMessage}>
