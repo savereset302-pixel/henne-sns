@@ -148,7 +148,8 @@ export default function PostPage() {
                                 ) : (
                                     <>
                                         <div className={styles.text}>{post.content}</div>
-                                        {language !== "ja" && (
+                                        {/* 日本語設定でも平仮名を含まない外国語投稿の場合、または他言語設定時に翻訳ボタンを表示 */}
+                                        {(language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || ""))) && (
                                             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                                                 <button
                                                     onClick={handleTranslate}
@@ -156,7 +157,7 @@ export default function PostPage() {
                                                     disabled={isTranslating}
                                                     style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem', opacity: isTranslating ? 0.7 : 1 }}
                                                 >
-                                                    {isTranslating ? t("loadingPosts") : t("translatePost")}
+                                                    {isTranslating ? t("loadingPosts") : (language === "ja" ? "日本語に翻訳して読む" : t("translatePost"))}
                                                 </button>
                                             </div>
                                         )}

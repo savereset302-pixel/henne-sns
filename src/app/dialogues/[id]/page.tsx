@@ -46,14 +46,26 @@ export default function DialogueChatPage() {
                     if (userSnap.exists()) {
                         setOtherUser(userSnap.data());
                     } else {
-                        const bot = getBotById(otherId);
-                        if (bot) {
-                            setOtherUser({
-                                displayName: bot.name,
-                                bio: bot.bio,
-                                isAi: true
-                            });
+                        let botName = "AIパートナー";
+                        let botBio = "";
+                        if (otherId === "ai-bot-gemini") {
+                            botName = "Gemini AI";
+                            botBio = "Googleの対話AI";
+                        } else if (otherId === "ai-bot-honne") {
+                            botName = "Honne.";
+                            botBio = "本音対話AI";
+                        } else {
+                            const bot = getBotById(otherId);
+                            if (bot) {
+                                botName = bot.name;
+                                botBio = bot.bio;
+                            }
                         }
+                        setOtherUser({
+                            displayName: botName,
+                            bio: botBio,
+                            isAi: true
+                        });
                     }
                 }
 
@@ -66,7 +78,7 @@ export default function DialogueChatPage() {
                     console.warn("Could not mark readBy:", readErr);
                 }
             } else {
-                router.push("/dialogues");
+                router.push("/inbox");
             }
         };
 
@@ -117,19 +129,37 @@ export default function DialogueChatPage() {
             const isBot = otherUserId?.startsWith("ai-bot-") || otherUser?.isAi;
             if (isBot && otherUserId) {
                 setIsAiTyping(true);
-                fetch("/api/dialogue-ai-reply", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        dialogueId: id,
-                        botId: otherUserId,
-                        userMessage: text
-                    })
-                }).catch(err => {
-                    console.error("AI reply error:", err);
-                }).finally(() => {
+                try {
+                    const res = await fetch("/api/dialogue-ai-reply", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            dialogueId: id,
+                            botId: otherUserId,
+                            userMessage: text
+                        })
+                    });
+                    const data = await res.json();
+                    if (data.success && data.reply) {
+                        // Persist reply in Firestore from authenticated client to ensure permission compliance
+                        await addDoc(collection(db, "dialogues", id as string, "messages"), {
+                            senderId: otherUserId,
+                            text: data.reply,
+                            createdAt: serverTimestamp()
+                        });
+
+                        await updateDoc(doc(db, "dialogues", id as string), {
+                            lastMessage: data.reply,
+                            lastSenderId: otherUserId,
+                            lastMessageAt: serverTimestamp(),
+                            [`readBy.${user.uid}`]: serverTimestamp()
+                        });
+                    }
+                } catch (replyErr) {
+                    console.error("AI reply fetch error:", replyErr);
+                } finally {
                     setIsAiTyping(false);
-                });
+                }
             }
         } catch (error) {
             console.error("Error sending message:", error);
@@ -141,7 +171,7 @@ export default function DialogueChatPage() {
     return (
         <main className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
-                <Link href="/dialogues" style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>← {t("dialogue_list")}</Link>
+                <Link href="/inbox" style={{ textDecoration: 'none', color: 'var(--text-secondary)' }}>← 📬 {t("dialogue_list")}</Link>
                 <div style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {otherUser?.isAi && <span style={{ fontSize: '0.75rem', background: 'var(--accent-color)', color: '#fff', padding: '2px 8px', borderRadius: '12px' }}>AI</span>}
                     {otherUser?.displayName || "対話"}

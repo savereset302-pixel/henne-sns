@@ -21,15 +21,25 @@ export async function POST(req: Request) {
         const targetLangName = langMap[targetLang] || "English";
 
         if (texts && Array.isArray(texts)) {
-            // Bulk translation request
-            const prompt = `Translate the following list of items to ${targetLangName}. 
-            Return the result as a JSON array of objects with "id", "title" and "content" fields.
-            Keep the meaning and original atmosphere.
-            
-            Items:
-            ${JSON.stringify(texts)}
-            
-            Return ONLY the valid JSON array starting with [ and ending with ]. No Markdown code blocks. No other text.`;
+            const prompt = `You are a professional literary translator specializing in social media and personal essays.
+Your task is to translate the following list of posts into ${targetLangName}.
+
+STRICT TRANSLATION RULES:
+1. SPEAKER PERSPECTIVE & FIRST-PERSON PRONOUN:
+   - Always translate strictly from the point of view of the original author.
+   - NEVER refer to yourself as an AI (NEVER insert "私（AI）は", "AIとして", or explanatory commentary).
+   - Use natural first-person pronouns that fit the tone of the text (in Japanese: 「私」「僕」「俺」etc. according to context and personality).
+2. NATURAL TONE & NUANCE:
+   - Produce fluent, atmospheric, and emotive text that reads like a genuine human post rather than mechanical translation.
+   - Preserve cynicism, warmth, melancholy, or philosophical contemplation faithfully.
+3. OUTPUT FORMAT:
+   - Return ONLY a valid JSON array of objects with keys "id", "title", and "content".
+   - Do NOT wrap in markdown \`\`\`json. Start strictly with [ and end with ].
+   - Every input item MUST be present with its original "id".
+
+Items to translate:
+${JSON.stringify(texts)}
+`;
 
             const textResponse = await generateAiContent(prompt);
 
