@@ -8,7 +8,7 @@ import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, where } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, where, limit } from "firebase/firestore";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -208,28 +208,63 @@ export default function Home() {
   }, [posts, language]);
 
   useEffect(() => {
-    if (posts.length === 0) return;
-
-    const sentiments = posts.map(p => p.sentiment).filter(Boolean);
-    if (sentiments.length === 0) return;
-
-    const counts: Record<string, number> = {};
-    sentiments.forEach(s => {
-      counts[s!] = (counts[s!] || 0) + 1;
-    });
-
-    const dominant = Object.entries(counts).reduce((a, b) => a[1] > b[1] ? a : b)[0];
-
     const weatherMap: Record<string, { icon: string; label: string; color: string }> = {
       joy: { icon: "☀️", label: t("weather_joy") || "快晴", color: "#ffb300" },
       sadness: { icon: "🌧️", label: t("weather_sadness") || "雨", color: "#3949ab" },
       anger: { icon: "⚡", label: t("weather_anger") || "雷雨", color: "#b71c1c" },
       fatigue: { icon: "☁️", label: t("weather_fatigue") || "曇り", color: "#757575" },
-      default: { icon: "🌫️", label: t("weather_default") || "霧", color: "#a0a0a0" }
+      default: { icon: "☀️", label: t("weather_joy") || "快晴", color: "#ffb300" }
     };
 
-    setEmotionWeather(weatherMap[dominant] || weatherMap.default);
-  }, [posts, t]);
+    // Calculate community-wide weather across the latest 50 posts (including AI and user posts)
+    const qWeather = query(collection(db, "posts"), orderBy("createdAt", "desc"), limit(50));
+    const unsubWeather = onSnapshot(qWeather, (snapshot) => {
+      if (snapshot.empty) {
+        setEmotionWeather(weatherMap.joy);
+        return;
+      }
+
+      const recentPosts = snapshot.docs.map(doc => doc.data() as Post);
+      const counts: Record<string, number> = { joy: 0, sadness: 0, anger: 0, fatigue: 0 };
+      let validCount = 0;
+
+      recentPosts.forEach(p => {
+        let sent = p.sentiment;
+        // If untagged or 'none', infer sentiment from post text
+        if (!sent || sent === "none" || !counts.hasOwnProperty(sent)) {
+          const txt = ((p.title || "") + " " + (p.content || "")).toLowerCase();
+          if (/(嬉し|楽し|最高|幸せ|ありがと|感謝|前向き|希望|好き|笑|happy|joy)/.test(txt)) {
+            sent = "joy";
+          } else if (/(悲し|辛い|つらい|泣|寂し|孤独|涙|不安|憂鬱|鬱|sad)/.test(txt)) {
+            sent = "sadness";
+          } else if (/(怒り|不満|イライラ|ムカつ|許せ|憤|理不尽|腹立|angry|hate)/.test(txt)) {
+            sent = "anger";
+          } else if (/(疲れ|しんど|だる|眠い|限界|虚無|脱力|ため息|休みたい|tired)/.test(txt)) {
+            sent = "fatigue";
+          } else {
+            sent = undefined;
+          }
+        }
+
+        if (sent && counts.hasOwnProperty(sent)) {
+          counts[sent]++;
+          validCount++;
+        }
+      });
+
+      if (validCount === 0) {
+        setEmotionWeather(weatherMap.joy);
+        return;
+      }
+
+      const dominant = Object.entries(counts).reduce((a, b) => a[1] >= b[1] ? a : b)[0];
+      setEmotionWeather(weatherMap[dominant] || weatherMap.joy);
+    }, (err) => {
+      console.warn("Weather listener warning:", err);
+    });
+
+    return () => unsubWeather();
+  }, [t]);
 
   const filteredPosts = posts.filter(post => {
     if (!searchQuery) return true;
@@ -252,16 +287,40 @@ export default function Home() {
           display: 'inline-flex',
           alignItems: 'center',
           gap: '12px',
-          background: 'rgba(255,255,255,0.05)',
-          padding: '8px 20px',
+          background: 'rgba(255,255,255,0.06)',
+          backdropFilter: 'blur(10px)',
+          padding: '8px 22px',
           borderRadius: '50px',
-          marginBottom: '2rem',
-          border: `1px solid ${emotionWeather.color}44`,
-          boxShadow: `0 0 15px ${emotionWeather.color}22`
+          marginBottom: '1rem',
+          border: `1px solid ${emotionWeather.color}55`,
+          boxShadow: `0 0 16px ${emotionWeather.color}25`
         }}>
-          <span style={{ fontSize: '1.5rem' }}>{emotionWeather.icon}</span>
-          <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{t("weather_title")}: {emotionWeather.label}</span>
+          <span style={{ fontSize: '1.6rem' }}>{emotionWeather.icon}</span>
+          <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--text-primary)' }}>
+            {t("weather_title")}: <span style={{ color: emotionWeather.color, fontWeight: 700 }}>{emotionWeather.label}</span>
+          </span>
         </div>
+
+        <div style={{ marginBottom: '1.5rem' }}>
+          <Link href="/updates" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(99, 102, 241, 0.12)',
+            border: '1px solid rgba(129, 140, 248, 0.35)',
+            padding: '6px 18px',
+            borderRadius: '20px',
+            fontSize: '0.85rem',
+            color: 'var(--text-primary)',
+            textDecoration: 'none',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+          }}>
+            <span style={{ color: '#818cf8', fontWeight: 700 }}>✨ NEW</span>
+            <span>最新アップデート (v3.7) の詳細を見る →</span>
+          </Link>
+        </div>
+
         <h1 className={styles.heroTitle}>
           {t("heroTitle")}<br />
           <span>{t("heroSubTitle")}</span>
@@ -415,15 +474,17 @@ export default function Home() {
                                   style={{
                                     width: '100%',
                                     textAlign: 'left',
-                                    padding: '0.6rem 1rem',
-                                    background: 'transparent',
+                                    padding: '0.65rem 1rem',
+                                    background: hasVoted ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
                                     border: '1px solid var(--border-color)',
-                                    borderRadius: '6px',
+                                    borderRadius: '8px',
                                     cursor: hasVoted ? 'default' : 'pointer',
                                     position: 'relative',
                                     overflow: 'hidden',
                                     display: 'flex',
                                     justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    color: 'var(--text-primary)',
                                     zIndex: 1
                                   }}
                                 >
@@ -434,15 +495,15 @@ export default function Home() {
                                       left: 0,
                                       bottom: 0,
                                       width: `${percentage}%`,
-                                      background: 'rgba(79, 70, 229, 0.2)',
+                                      background: 'rgba(99, 102, 241, 0.25)',
                                       zIndex: -1,
                                       transition: 'width 0.5s ease'
                                     }} />
                                   )}
-                                  <span style={{ fontSize: '0.9rem' }}>{opt.text}</span>
+                                  <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>{opt.text}</span>
                                   {hasVoted && (
-                                    <span style={{ fontSize: '0.8rem', opacity: 0.8 }}>
-                                      {percentage}% ({opt.votes})
+                                    <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                                      {percentage}% <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>({opt.votes})</span>
                                     </span>
                                   )}
                                 </button>
@@ -450,7 +511,7 @@ export default function Home() {
                             );
                           })}
                         </div>
-                        <div style={{ marginTop: '0.8rem', fontSize: '0.75rem', opacity: 0.6, textAlign: 'right' }}>
+                        <div style={{ marginTop: '0.8rem', fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right', fontWeight: 500 }}>
                           {post.poll.totalVotes} {t("pollVote") || "Votes"}
                         </div>
                       </div>

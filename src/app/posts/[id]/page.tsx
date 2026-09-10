@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./post.module.css";
 import UserNav from "@/components/UserNav";
 import { useLanguage } from "@/context/LanguageContext";
@@ -28,6 +28,12 @@ interface Post {
     imageUrl?: string | null;
     authorId?: string;
     isAnonymous?: boolean;
+    poll?: {
+        question: string;
+        options: { text: string; votes: number }[];
+        totalVotes: number;
+        voters: string[];
+    };
 }
 
 export default function PostPage() {
@@ -39,6 +45,7 @@ export default function PostPage() {
     const [loading, setLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
     const { language, t } = useLanguage();
+    const { user } = useAuth();
 
     const categoryMap: any = {
         "all": t("all"),
@@ -95,6 +102,41 @@ export default function PostPage() {
             console.error("Translation failed:", error);
         } finally {
             setIsTranslating(false);
+        }
+    };
+
+    const handleVote = async (optionIndex: number) => {
+        if (!user) {
+            alert(t("loginRequired") || "投票するにはログインが必要です。");
+            return;
+        }
+        if (!post || !post.poll || !id) return;
+        if (post.poll.voters?.includes(user.uid)) return;
+
+        try {
+            const updatedOptions = [...post.poll.options];
+            updatedOptions[optionIndex].votes = (updatedOptions[optionIndex].votes || 0) + 1;
+            const updatedTotal = (post.poll.totalVotes || 0) + 1;
+            const updatedVoters = [...(post.poll.voters || []), user.uid];
+
+            const postRef = doc(db, "posts", id as string);
+            await updateDoc(postRef, {
+                "poll.options": updatedOptions,
+                "poll.totalVotes": updatedTotal,
+                "poll.voters": updatedVoters
+            });
+
+            setPost({
+                ...post,
+                poll: {
+                    ...post.poll,
+                    options: updatedOptions,
+                    totalVotes: updatedTotal,
+                    voters: updatedVoters
+                }
+            });
+        } catch (err) {
+            console.error("Error voting in detail page:", err);
         }
     };
 
@@ -164,6 +206,70 @@ export default function PostPage() {
                                     </>
                                 )}
                             </div>
+
+                            {post.poll && (
+                                <div style={{
+                                    margin: '1.5rem 0',
+                                    padding: '1.2rem',
+                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--border-color)'
+                                }}>
+                                    <h4 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>📊 {post.poll.question}</h4>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                        {post.poll.options.map((opt, idx) => {
+                                            const hasVoted = post.poll?.voters?.includes(user?.uid || "");
+                                            const percentage = post.poll?.totalVotes ? Math.round((opt.votes / post.poll.totalVotes) * 100) : 0;
+                                            return (
+                                                <div key={idx} style={{ position: 'relative' }}>
+                                                    <button
+                                                        onClick={() => handleVote(idx)}
+                                                        disabled={hasVoted}
+                                                        style={{
+                                                            width: '100%',
+                                                            textAlign: 'left',
+                                                            padding: '0.7rem 1.2rem',
+                                                            background: hasVoted ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                                                            border: '1px solid var(--border-color)',
+                                                            borderRadius: '8px',
+                                                            cursor: hasVoted ? 'default' : 'pointer',
+                                                            position: 'relative',
+                                                            overflow: 'hidden',
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            color: 'var(--text-primary)',
+                                                            zIndex: 1
+                                                        }}
+                                                    >
+                                                        {hasVoted && (
+                                                            <div style={{
+                                                                position: 'absolute',
+                                                                top: 0,
+                                                                left: 0,
+                                                                bottom: 0,
+                                                                width: `${percentage}%`,
+                                                                background: 'rgba(99, 102, 241, 0.25)',
+                                                                zIndex: -1,
+                                                                transition: 'width 0.5s ease'
+                                                            }} />
+                                                        )}
+                                                        <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500 }}>{opt.text}</span>
+                                                        {hasVoted && (
+                                                            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                                                                {percentage}% <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>({opt.votes})</span>
+                                                            </span>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <div style={{ marginTop: '0.8rem', fontSize: '0.8rem', color: 'var(--text-secondary)', textAlign: 'right', fontWeight: 500 }}>
+                                        {post.poll.totalVotes} {t("pollVote") || "Votes"}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className={styles.meta}>
                                 {post.isAnonymous ? (

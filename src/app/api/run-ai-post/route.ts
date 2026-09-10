@@ -69,13 +69,12 @@ export async function GET(request: NextRequest) {
        1. タイトルは短く印象的に書いてください。
        2. 言語ルール:
           - ${isForeign ? `【最重要】必ずあなたの母国語（${bot.nativeLanguage}）のみで書いてください。日本語の翻訳や解説は絶対に含めないでください。` : "自然な日本語の口調で書いてください。"}
-       3. 偉そうなお説教ではなく、生々しい本音やリアルな感情として書いてください。
        4. 感情カラー（sentiment）を選択してください:
           - "sadness"（悲しみ/憂鬱/寂しさ）
           - "anger"（怒り/不満/憤り）
           - "fatigue"（虚無/疲れ/脱力）
           - "joy"（喜び/希望/感謝/情熱）
-          - "none"（中立/思索）
+          ※必ず上記4つ（sadness, anger, fatigue, joy）のいずれかから、あなたのこの投稿の感情に最も合致するものを1つ選んでください（noneは禁止です）。
        5. 投票機能（アンケート）の作成:
           - あなたが読者に問いかけたいテーマであれば、約30%〜40%の確率で投票を作成してください。
           - 投票を作る場合は、"poll": { "question": "質問内容", "options": ["選択肢1", "選択肢2"] } （選択肢は2〜4個）を含めてください。不要な場合は null にしてください。
@@ -105,13 +104,30 @@ export async function GET(request: NextRequest) {
                 title: "無題の思考",
                 content: text,
                 category: defaultCategory,
-                sentiment: "none",
+                sentiment: "joy",
                 poll: null
             };
         }
 
-        const validSentiments = ["sadness", "anger", "fatigue", "joy", "none"];
-        const chosenSentiment = validSentiments.includes(generatedPost.sentiment) ? generatedPost.sentiment : "none";
+        const validSentiments = ["sadness", "anger", "fatigue", "joy"];
+        let chosenSentiment = validSentiments.includes(generatedPost.sentiment) ? generatedPost.sentiment : null;
+        if (!chosenSentiment) {
+            const fallbackMap: Record<string, string> = {
+                "bot-philosophy": "joy",
+                "bot-cynic": "anger",
+                "bot-empathy": "joy",
+                "bot-tech": "joy",
+                "bot-poet": "sadness",
+                "bot-coach": "joy",
+                "bot-elder": "joy",
+                "bot-catherine": "anger",
+                "bot-kou": "fatigue",
+                "bot-dieter": "anger",
+                "bot-elena": "sadness",
+                "bot-chao": "joy"
+            };
+            chosenSentiment = fallbackMap[bot.id] || validSentiments[Math.floor(Math.random() * validSentiments.length)];
+        }
 
         let pollData = null;
         if (generatedPost.poll && generatedPost.poll.question && Array.isArray(generatedPost.poll.options) && generatedPost.poll.options.length >= 2) {

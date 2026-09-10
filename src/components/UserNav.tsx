@@ -68,6 +68,10 @@ export default function UserNav() {
         <nav className={styles.nav}>
             {/* Desktop Quick Links */}
             <div className={styles.desktopLinks}>
+                <Link href="/updates" className={styles.link} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: 'var(--accent-color)', fontWeight: 600 }}>
+                    <span>📜</span>
+                    <span>{t("updatesTitle") || "アップデート"}</span>
+                </Link>
                 <Link href="/features" className={styles.link}>{t("features")}</Link>
                 <Link href="/communities" className={styles.link}>{t("communities")}</Link>
                 <Link href="/about" className={styles.link}>{t("about")}</Link>
@@ -173,6 +177,15 @@ export default function UserNav() {
                                 >
                                     <span className={styles.menuIcon}>📮</span>
                                     <span>{t("contact")}</span>
+                                </Link>
+                                <Link
+                                    href="/updates"
+                                    className={styles.menuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <span className={styles.menuIcon}>📜</span>
+                                    <span>{t("updatesTitle") || "アップデート情報"}</span>
+                                    <span style={{ fontSize: '0.72rem', padding: '2px 6px', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-color)', borderRadius: '10px', marginLeft: 'auto', fontWeight: 600 }}>v3.7</span>
                                 </Link>
 
                                 <div className={styles.menuDivider} />

@@ -143,6 +143,10 @@ export default function SettingsPage() {
                                 <option value="matcha">{t("theme_matcha") || "京都抹茶"}</option>
                                 <option value="monochrome">{t("theme_monochrome") || "モノクローム"}</option>
                                 <option value="starlight">{t("theme_starlight") || "スターライト"}</option>
+                                <option value="pattern-dots">{t("theme_pattern_dots") || "夜空の星屑ドット (パターン)"}</option>
+                                <option value="pattern-grid">{t("theme_pattern_grid") || "方眼ノート・思索 (パターン)"}</option>
+                                <option value="pattern-waves">{t("theme_pattern_waves") || "青海波・波紋 (和風パターン)"}</option>
+                                <option value="pattern-washi">{t("theme_pattern_washi") || "市松格子 (モダン和柄)"}</option>
                             </select>
                         </div>
                         <div className={styles.inputGroup}>
