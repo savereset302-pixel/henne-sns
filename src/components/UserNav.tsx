@@ -64,7 +64,7 @@ export default function UserNav() {
             </div>
             {user ? (
                 <>
-                    <Link href="/dialogues" className={styles.inboxButton} title={t("dialogue_list")}>
+                    <Link href="/inbox" className={styles.inboxButton} title={t("dialogue_list")}>
                         <span>✉️ 受信箱</span>
                         {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}
                     </Link>
