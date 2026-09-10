@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, setDoc, deleteDoc, updateDoc, increment, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc, updateDoc, increment, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import styles from "./LikeButton.module.css";
 
@@ -61,6 +61,28 @@ export default function LikeButton({ postId, initialCount = 0 }: { postId: strin
                 });
                 setLiked(true);
                 setCount(prev => prev + 1);
+
+                // Send notification to author if author is not self
+                try {
+                    const postSnap = await getDoc(postRef);
+                    if (postSnap.exists()) {
+                        const postData = postSnap.data();
+                        if (postData.authorId && postData.authorId !== user.uid && !postData.authorId.startsWith("ai-bot-")) {
+                            const notifRef = collection(db, "users", postData.authorId, "notifications");
+                            await addDoc(notifRef, {
+                                type: "like",
+                                postId,
+                                postTitle: postData.title || "無題の本音",
+                                senderName: user.displayName || "誰か",
+                                senderId: user.uid,
+                                createdAt: serverTimestamp(),
+                                read: false
+                            });
+                        }
+                    }
+                } catch (notifErr) {
+                    console.warn("Could not create like notification:", notifErr);
+                }
             }
         } catch (error) {
             console.error("Error toggling like:", error);

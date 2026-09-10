@@ -7,6 +7,7 @@ import { collection, query, where, onSnapshot } from "firebase/firestore";
 import Link from "next/link";
 import styles from "./UserNav.module.css";
 import { useLanguage } from "@/context/LanguageContext";
+import NotificationBell from "./NotificationBell";
 
 export default function UserNav() {
     const { user, loading } = useAuth();
@@ -64,6 +65,7 @@ export default function UserNav() {
             </div>
             {user ? (
                 <>
+                    <NotificationBell />
                     <Link href="/inbox" className={styles.inboxButton} title={t("dialogue_list")}>
                         <span>✉️ 受信箱</span>
                         {unreadCount > 0 && <span className={styles.badge}>{unreadCount}</span>}

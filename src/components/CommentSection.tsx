@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { db, auth } from "@/lib/firebase";
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, increment } from "firebase/firestore";
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, increment, getDoc } from "firebase/firestore";
 import { onAuthStateChanged, User } from "firebase/auth";
 import styles from "./CommentSection.module.css";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
+import { AI_BOTS } from "@/lib/aiBots";
 
 interface Comment {
     id: string;
@@ -25,6 +26,7 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
     const [isAnonymous, setIsAnonymous] = useState(false);
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
+    const [isAiReplying, setIsAiReplying] = useState(false);
 
     // Monitor Auth State
     useEffect(() => {
@@ -58,11 +60,15 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
         e.preventDefault();
         if (!newComment.trim() || !user) return;
 
+        const commentText = newComment.trim();
+        const userName = isAnonymous ? t("anonUser") : (user.displayName || t("ph_display_name"));
+        const mentionedBot = AI_BOTS.find(b => commentText.includes(`@${b.name}`) || commentText.includes(`@${b.id}`));
+
         setLoading(true);
         try {
             await addDoc(collection(db, "posts", postId, "comments"), {
-                text: newComment,
-                authorName: isAnonymous ? t("anonUser") : (user.displayName || t("ph_display_name")),
+                text: commentText,
+                authorName: userName,
                 authorId: user.uid,
                 isAnonymous,
                 createdAt: serverTimestamp(),
@@ -74,7 +80,50 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                 commentCount: increment(1)
             });
 
+            // Send notification to post author if not self
+            try {
+                const postSnap = await getDoc(doc(db, "posts", postId));
+                if (postSnap.exists()) {
+                    const postData = postSnap.data();
+                    if (postData.authorId && postData.authorId !== user.uid && !postData.authorId.startsWith("ai-bot-")) {
+                        await addDoc(collection(db, "users", postData.authorId, "notifications"), {
+                            type: "comment",
+                            postId,
+                            postTitle: postData.title || "無題の本音",
+                            senderName: userName,
+                            senderId: user.uid,
+                            text: commentText.slice(0, 50),
+                            createdAt: serverTimestamp(),
+                            read: false
+                        });
+                    }
+                }
+            } catch (notifErr) {
+                console.warn("Could not create comment notification:", notifErr);
+            }
+
             setNewComment("");
+
+            // If a bot was mentioned, summon the AI bot for a direct response
+            if (mentionedBot) {
+                setIsAiReplying(true);
+                fetch("/api/mention-ai-comment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        postId,
+                        botId: mentionedBot.id,
+                        botName: mentionedBot.name,
+                        userCommentText: commentText,
+                        userName,
+                        userId: user.uid
+                    })
+                }).catch(err => {
+                    console.error("Mention AI reply failed:", err);
+                }).finally(() => {
+                    setIsAiReplying(false);
+                });
+            }
         } catch (error) {
             console.error("Error adding comment:", error);
             alert(t("errorOccurred"));
@@ -97,6 +146,33 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
                 </div>
             ) : user ? (
                 <form onSubmit={handleSubmit} className={styles.form}>
+                    {/* Quick AI mention pills */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '0.75rem', opacity: 0.7 }}>🤖 AIを呼ぶ:</span>
+                        {AI_BOTS.slice(0, 7).map(b => (
+                            <button
+                                key={b.id}
+                                type="button"
+                                onClick={() => {
+                                    setNewComment(prev => prev ? `${prev} @${b.name} ` : `@${b.name} `);
+                                }}
+                                style={{
+                                    background: 'rgba(255, 255, 255, 0.05)',
+                                    border: '1px solid var(--border-color)',
+                                    borderRadius: '12px',
+                                    padding: '2px 8px',
+                                    fontSize: '0.72rem',
+                                    color: 'var(--text-secondary)',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.15s'
+                                }}
+                                title={`${b.name}（${b.bio}）`}
+                            >
+                                @{b.name}
+                            </button>
+                        ))}
+                    </div>
+
                     <textarea
                         className={styles.textarea}
                         value={newComment}
@@ -135,6 +211,16 @@ export default function CommentSection({ postId, commentPolicy = 'all' }: { post
             )}
 
             <div className={styles.commentList}>
+                {isAiReplying && (
+                    <div className={styles.comment} style={{ opacity: 0.85, background: 'rgba(255, 255, 255, 0.04)', border: '1px dashed var(--border-color)', borderRadius: '8px' }}>
+                        <div className={styles.commentHeader}>
+                            <span className={styles.aiAuthor}>🤖 メンションされたAIが返信を思索中...</span>
+                        </div>
+                        <div className={styles.body} style={{ fontStyle: 'italic', fontSize: '0.85rem', opacity: 0.7 }}>
+                            言葉を紡いでいます。少々お待ちください💭
+                        </div>
+                    </div>
+                )}
                 {comments.map((comment) => (
                     <div key={comment.id} className={styles.comment}>
                         <div className={styles.commentHeader}>
