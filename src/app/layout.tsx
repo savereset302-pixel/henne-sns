@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { SoundProvider } from "@/context/SoundContext";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 
@@ -40,6 +41,12 @@ export const metadata: Metadata = {
   verification: {
     google: 'z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c',
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Honne."
+  },
 };
 
 // ThemeProvider is already imported above
@@ -53,14 +60,30 @@ export default function RootLayout({
     <html lang="ja">
       <head>
         <meta name="google-site-verification" content="z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <meta name="theme-color" content="#0a0a14" />
       </head>
       <body className={`${outfit.variable}`}>
         <ThemeProvider>
           <LanguageProvider>
-            <JsonLd />
-            {children}
+            <SoundProvider>
+              <JsonLd />
+              {children}
+            </SoundProvider>
           </LanguageProvider>
         </ThemeProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').catch(function() {});
+                });
+              }
+            `
+          }}
+        />
       </body>
     </html>
   );

@@ -10,12 +10,22 @@ import styles from "./settings.module.css";
 
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSound } from "@/context/SoundContext";
 import { Language } from "@/lib/translations";
 
 export default function SettingsPage() {
     const { user, loading: authLoading } = useAuth();
     const { theme: currentTheme, setTheme, font: currentFont, setFont } = useTheme();
     const { language: currentLang, setLanguage, t } = useLanguage();
+    const {
+        keyClickEnabled,
+        ambientType,
+        volume: soundVolume,
+        setKeyClickEnabled,
+        setAmbientType,
+        setVolume: setSoundVolume,
+        triggerKeyClick,
+    } = useSound();
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
     const [font, setFontOption] = useState("default");
@@ -167,6 +177,81 @@ export default function SettingsPage() {
                                 <option value="es">Español (Spanish)</option>
                                 <option value="zh">中文 (Chinese)</option>
                             </select>
+                        </div>
+
+                        {/* サウンド・演出設定 */}
+                        <div style={{
+                            marginTop: '1.5rem',
+                            marginBottom: '1.5rem',
+                            padding: '1.2rem',
+                            borderRadius: '8px',
+                            background: 'rgba(255, 255, 255, 0.03)',
+                            border: '1px solid var(--border-color)'
+                        }}>
+                            <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                🎧 音響・サウンド演出 <span style={{ fontSize: '0.75rem', opacity: 0.6, fontWeight: 'normal' }}>（Web Audio超軽量合成）</span>
+                            </h3>
+
+                            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <input
+                                    type="checkbox"
+                                    id="keyClick"
+                                    checked={keyClickEnabled}
+                                    onChange={(e) => setKeyClickEnabled(e.target.checked)}
+                                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                                />
+                                <label htmlFor="keyClick" style={{ cursor: 'pointer', fontSize: '0.9rem' }}>
+                                    ⌨️ タイピング打鍵音（文字入力時の心地よいクリック音）
+                                </label>
+                                <button
+                                    type="button"
+                                    onClick={triggerKeyClick}
+                                    style={{
+                                        marginLeft: 'auto',
+                                        background: 'rgba(255,255,255,0.08)',
+                                        border: '1px solid var(--border-color)',
+                                        borderRadius: '4px',
+                                        padding: '2px 8px',
+                                        fontSize: '0.75rem',
+                                        cursor: 'pointer',
+                                        color: 'inherit'
+                                    }}
+                                >
+                                    試聴
+                                </button>
+                            </div>
+
+                            <div style={{ marginBottom: '1rem' }}>
+                                <label htmlFor="ambientSelect" style={{ display: 'block', fontSize: '0.9rem', marginBottom: '0.4rem' }}>
+                                    🌌 心を落ち着かせる環境BGM（外部音声の通信量ゼロ・完全無音から選択可）
+                                </label>
+                                <select
+                                    id="ambientSelect"
+                                    value={ambientType}
+                                    onChange={(e) => setAmbientType(e.target.value as any)}
+                                    className={styles.select}
+                                >
+                                    <option value="silence">オフ（完全無音・推奨）</option>
+                                    <option value="rain">🌧️ 静かな雨音（雨の日の本音）</option>
+                                    <option value="meditation">🧘 宇宙・静寂（メディテーション・深い思索）</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: '0.3rem' }}>
+                                    <span>🔊 音量調整</span>
+                                    <span>{Math.round(soundVolume * 100)}%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0.05"
+                                    max="1"
+                                    step="0.05"
+                                    value={soundVolume}
+                                    onChange={(e) => setSoundVolume(parseFloat(e.target.value))}
+                                    style={{ width: '100%', cursor: 'pointer' }}
+                                />
+                            </div>
                         </div>
 
                         <button type="submit" className={`btn-primary ${styles.saveBtn}`} disabled={isSaving}>
