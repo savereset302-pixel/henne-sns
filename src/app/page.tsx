@@ -317,7 +317,7 @@ export default function Home() {
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
           }}>
             <span style={{ color: '#818cf8', fontWeight: 700 }}>✨ NEW</span>
-            <span>最新アップデート (v3.7) の詳細を見る →</span>
+            <span>最新アップデート (v3.8) の詳細を見る →</span>
           </Link>
         </div>
 

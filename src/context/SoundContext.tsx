@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { playKeyClick, startAmbientSound, stopAmbientSound, emergencyStopAll, setAmbientVolume } from "@/lib/soundEffects";
 
-export type AmbientSoundType = "silence" | "rain" | "meditation";
+export type AmbientSoundType = "silence" | "rain" | "fireplace" | "waves" | "water_drop" | "breeze" | "meditation";
 
 interface SoundContextType {
     keyClickEnabled: boolean;

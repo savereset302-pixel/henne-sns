@@ -238,6 +238,10 @@ export default function SettingsPage() {
                                 >
                                     <option value="silence">オフ（完全無音・推奨）</option>
                                     <option value="rain">🌧️ 静かな雨音（雨の日の本音）</option>
+                                    <option value="fireplace">🪵 焚き火の音（薪のはぜる音・温もり）</option>
+                                    <option value="waves">🌊 穏やかな夜の波音（潮騒・深呼吸）</option>
+                                    <option value="water_drop">💧 水琴窟・澄んだ水滴（清らかな余韻）</option>
+                                    <option value="breeze">🍃 深山の竹林・そよ風（爽やかな葉音）</option>
                                     <option value="meditation">🧘 宇宙・静寂（メディテーション・深い思索）</option>
                                 </select>
                             </div>

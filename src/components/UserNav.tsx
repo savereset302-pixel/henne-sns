@@ -128,6 +128,14 @@ export default function UserNav() {
                                     <span>{t("bookmarks")}</span>
                                 </Link>
                                 <Link
+                                    href="/journal"
+                                    className={styles.menuItem}
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <span className={styles.menuIcon}>🌱</span>
+                                    <span>{t("journal") || "本音の振り返り"}</span>
+                                </Link>
+                                <Link
                                     href="/drafts"
                                     className={styles.menuItem}
                                     onClick={() => setIsMenuOpen(false)}
@@ -185,7 +193,7 @@ export default function UserNav() {
                                 >
                                     <span className={styles.menuIcon}>📜</span>
                                     <span>{t("updatesTitle") || "アップデート情報"}</span>
-                                    <span style={{ fontSize: '0.72rem', padding: '2px 6px', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-color)', borderRadius: '10px', marginLeft: 'auto', fontWeight: 600 }}>v3.7</span>
+                                    <span style={{ fontSize: '0.72rem', padding: '2px 6px', background: 'rgba(99, 102, 241, 0.2)', color: 'var(--accent-color)', borderRadius: '10px', marginLeft: 'auto', fontWeight: 600 }}>v3.8</span>
                                 </Link>
 
                                 <div className={styles.menuDivider} />

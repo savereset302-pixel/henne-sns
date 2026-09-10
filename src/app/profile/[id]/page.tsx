@@ -182,6 +182,31 @@ export default function ProfilePage() {
             </div>
 
             {user?.uid === id && (
+                <div style={{ marginBottom: '2rem', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    <Link
+                        href="/journal"
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            background: 'rgba(99, 102, 241, 0.15)',
+                            border: '1px solid var(--accent-color)',
+                            color: 'var(--text-primary)',
+                            padding: '10px 20px',
+                            borderRadius: '12px',
+                            textDecoration: 'none',
+                            fontWeight: 600,
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        <span>🌱</span>
+                        <span>本音の振り返り（カレンダー & 感情バランス）を開く →</span>
+                    </Link>
+                </div>
+            )}
+
+            {user?.uid === id && (
                 <section className={styles.aiReportSection} style={{ marginBottom: '3rem' }}>
                     <div className="glass-panel" style={{ padding: '2rem', border: '1px solid var(--accent-color)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
