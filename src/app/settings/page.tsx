@@ -25,6 +25,7 @@ export default function SettingsPage() {
         setAmbientType,
         setVolume: setSoundVolume,
         triggerKeyClick,
+        hardStopAll,
     } = useSound();
     const [displayName, setDisplayName] = useState("");
     const [theme, setThemeOption] = useState("dark");
@@ -252,6 +253,29 @@ export default function SettingsPage() {
                                     style={{ width: '100%', cursor: 'pointer' }}
                                 />
                             </div>
+
+                            {ambientType !== "silence" && (
+                                <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+                                    <button
+                                        type="button"
+                                        onClick={hardStopAll}
+                                        style={{
+                                            background: 'rgba(239, 68, 68, 0.15)',
+                                            border: '1px solid #ef4444',
+                                            color: '#f87171',
+                                            borderRadius: '6px',
+                                            padding: '4px 12px',
+                                            fontSize: '0.8rem',
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '5px'
+                                        }}
+                                    >
+                                        🛑 音声を即時完全停止（ミュート）
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         <button type="submit" className={`btn-primary ${styles.saveBtn}`} disabled={isSaving}>
