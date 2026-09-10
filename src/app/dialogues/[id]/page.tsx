@@ -22,14 +22,45 @@ export default function DialogueChatPage() {
     const { id } = useParams();
     const router = useRouter();
     const { user } = useAuth();
-    const { t } = useLanguage();
+    const { language, t } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMsg, setNewMsg] = useState("");
     const [otherUser, setOtherUser] = useState<any>(null);
     const [otherUserId, setOtherUserId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAiTyping, setIsAiTyping] = useState(false);
+    const [translatedMsgs, setTranslatedMsgs] = useState<Record<string, string>>({});
+    const [msgTranslating, setMsgTranslating] = useState<Record<string, boolean>>({});
+    const [showOriginalMsgs, setShowOriginalMsgs] = useState<Record<string, boolean>>({});
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const handleTranslateMessage = async (msg: Message) => {
+        if (translatedMsgs[msg.id]) {
+            setShowOriginalMsgs(prev => ({ ...prev, [msg.id]: !prev[msg.id] }));
+            return;
+        }
+
+        setMsgTranslating(prev => ({ ...prev, [msg.id]: true }));
+        try {
+            const res = await fetch("/api/translate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    texts: [{ id: msg.id, title: "", content: msg.text }],
+                    targetLang: language
+                })
+            });
+            const data = await res.json();
+            if (data.success && data.translatedItems && data.translatedItems[0]) {
+                setTranslatedMsgs(prev => ({ ...prev, [msg.id]: data.translatedItems[0].content }));
+                setShowOriginalMsgs(prev => ({ ...prev, [msg.id]: false }));
+            }
+        } catch (e) {
+            console.error("Message translation failed:", e);
+        } finally {
+            setMsgTranslating(prev => ({ ...prev, [msg.id]: false }));
+        }
+    };
 
     useEffect(() => {
         if (!id || !user) return;
@@ -181,19 +212,64 @@ export default function DialogueChatPage() {
 
             <div className={styles.chatContainer}>
                 <div className={styles.messageList} ref={scrollRef}>
-                    {messages.map((msg) => (
-                        <div
-                            key={msg.id}
-                            className={msg.senderId === user?.uid ? styles.myMessage : styles.otherMessage}
-                        >
-                            <div className={styles.bubble}>
-                                {msg.text}
+                    {messages.map((msg) => {
+                        const isMine = msg.senderId === user?.uid;
+                        const translated = translatedMsgs[msg.id];
+                        const isShowingOriginal = showOriginalMsgs[msg.id];
+                        const isShowingTranslation = translated && !isShowingOriginal;
+                        const isForeign = !isMine && (language !== "ja" || !/[\u3040-\u309F]/.test(msg.text));
+
+                        return (
+                            <div
+                                key={msg.id}
+                                className={isMine ? styles.myMessage : styles.otherMessage}
+                            >
+                                <div className={styles.bubble}>
+                                    {isShowingTranslation ? (
+                                        <>
+                                            <div>{translated}</div>
+                                            <div style={{ fontSize: '0.78rem', opacity: 0.6, marginTop: '5px', paddingTop: '4px', borderTop: '1px dashed rgba(255,255,255,0.15)' }}>
+                                                {msg.text}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        msg.text
+                                    )}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+                                    <span className={styles.time}>
+                                        {msg.createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    </span>
+                                    {isForeign && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleTranslateMessage(msg)}
+                                            disabled={msgTranslating[msg.id]}
+                                            style={{
+                                                background: 'transparent',
+                                                border: 'none',
+                                                color: 'var(--accent-color)',
+                                                fontSize: '0.72rem',
+                                                cursor: 'pointer',
+                                                padding: '1px 4px',
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                gap: '3px',
+                                                opacity: msgTranslating[msg.id] ? 0.6 : 0.9
+                                            }}
+                                        >
+                                            <span>🌐</span>
+                                            {msgTranslating[msg.id]
+                                                ? "翻訳中..."
+                                                : isShowingTranslation
+                                                    ? "原文のみ"
+                                                    : (language === "ja" ? "日本語訳" : t("translatePost"))}
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                            <div className={styles.time}>
-                                {msg.createdAt?.toDate()?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {isAiTyping && (
                         <div className={styles.otherMessage} style={{ opacity: 0.8 }}>
                             <div className={styles.bubble} style={{ fontStyle: 'italic', background: 'rgba(255,255,255,0.06)' }}>

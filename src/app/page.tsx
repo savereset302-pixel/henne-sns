@@ -38,6 +38,8 @@ export default function Home() {
   const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
   const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string }>>({});
+  const [cardTranslating, setCardTranslating] = useState<Record<string, boolean>>({});
+  const [cardShowOriginal, setCardShowOriginal] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState("all");
   const [sentimentFilter, setSentimentFilter] = useState("all");
   const [loading, setLoading] = useState(true);
@@ -45,6 +47,39 @@ export default function Home() {
   const [showShareToast, setShowShareToast] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [emotionWeather, setEmotionWeather] = useState<{ icon: string; label: string; color: string }>({ icon: "☀️", label: "穏やか", color: "#ffd700" });
+
+  const handleToggleCardTranslation = async (targetPost: Post) => {
+    if (translatedPosts[targetPost.id]) {
+      setCardShowOriginal(prev => ({ ...prev, [targetPost.id]: !prev[targetPost.id] }));
+      return;
+    }
+
+    setCardTranslating(prev => ({ ...prev, [targetPost.id]: true }));
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        body: JSON.stringify({
+          texts: [{ id: targetPost.id, title: targetPost.title, content: targetPost.content }],
+          targetLang: language
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.translatedItems && data.translatedItems[0]) {
+        setTranslatedPosts(prev => ({
+          ...prev,
+          [targetPost.id]: {
+            title: data.translatedItems[0].title,
+            content: data.translatedItems[0].content
+          }
+        }));
+        setCardShowOriginal(prev => ({ ...prev, [targetPost.id]: false }));
+      }
+    } catch (err) {
+      console.error("Card translation failed:", err);
+    } finally {
+      setCardTranslating(prev => ({ ...prev, [targetPost.id]: false }));
+    }
+  };
 
   const handleVote = async (postId: string, optionIndex: number) => {
     if (!user) {
@@ -313,8 +348,11 @@ export default function Home() {
                         {};
 
                 const translated = translatedPosts[post.id];
-                const displayTitle = translated ? translated.title : post.title;
-                const displayContent = translated ? translated.content : post.content;
+                const isShowingOriginal = cardShowOriginal[post.id];
+                const isShowingTranslation = translated && !isShowingOriginal;
+                const displayTitle = isShowingTranslation ? translated.title : post.title;
+                const displayContent = isShowingTranslation ? translated.content : post.content;
+                const isForeign = language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || ""));
 
                 return (
                   <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s', ...sentimentStyle }}>
@@ -322,9 +360,38 @@ export default function Home() {
                       <span className={styles.category}>{categoryMap[post.category] || post.category}</span>
                       {post.expiresAt && <span style={{ fontSize: '0.8rem', color: '#ffbd59' }}>⏳ 24h</span>}
                     </div>
-                    {translated && <div className={styles.translatedBadge} style={{ fontSize: '0.7rem', marginBottom: '4px' }}>{t("translated")}</div>}
+                    {isShowingTranslation && <div className={styles.translatedBadge} style={{ fontSize: '0.7rem', marginBottom: '4px' }}>{t("translated")}</div>}
                     <h3 className={styles.postTitle}>{displayTitle}</h3>
                     <p className={styles.postSnippet}>{displayContent}</p>
+
+                    {isForeign && (
+                      <div style={{ marginTop: '0.6rem', marginBottom: '0.4rem' }}>
+                        <button
+                          onClick={() => handleToggleCardTranslation(post)}
+                          disabled={cardTranslating[post.id]}
+                          style={{
+                            background: 'rgba(255,255,255,0.06)',
+                            border: '1px solid var(--border-color)',
+                            borderRadius: '16px',
+                            padding: '3px 10px',
+                            fontSize: '0.75rem',
+                            color: 'var(--text-secondary)',
+                            cursor: 'pointer',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          <span>🌐</span>
+                          {cardTranslating[post.id]
+                            ? (t("loadingPosts") || "翻訳中...")
+                            : isShowingTranslation
+                              ? "原文に戻す"
+                              : (language === "ja" ? "日本語に翻訳して読む" : t("translatePost"))}
+                        </button>
+                      </div>
+                    )}
 
                     {post.poll && (
                       <div className={styles.pollContainer} style={{
