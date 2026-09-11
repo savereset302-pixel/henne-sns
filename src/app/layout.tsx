@@ -42,6 +42,15 @@ export const metadata: Metadata = {
     google: 'z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c',
   },
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -62,7 +71,7 @@ export default function RootLayout({
         <meta name="google-site-verification" content="z3DdMX1Kb8M6J_YgRkIiAt3TMdZhr-XHo6HceDmtI7c" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-        <meta name="theme-color" content="#0a0a14" />
+        <meta name="theme-color" content="#061325" />
       </head>
       <body className={`${outfit.variable}`}>
         <ThemeProvider>

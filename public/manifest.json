@@ -4,8 +4,8 @@
   "description": "喧騒を離れ、心の内なる音に耳を澄ます場所。静寂と本音のSNS。",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a0a14",
-  "theme_color": "#4f46e5",
+  "background_color": "#020611",
+  "theme_color": "#061325",
   "orientation": "portrait",
   "icons": [
     {
