@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
         }
 
         const prompt = `
-          あなたはキャラクター「${selectedBot.name}」${selectedBot.country ? `（出身国: ${selectedBot.country}、母国語: ${selectedBot.nativeLanguage}）` : ""}として、SNS「Honne.」の投稿にコメント（返信）をしてください。
+          あなたはキャラクター「${selectedBot.name}」${selectedBot.country ? `（出身国: ${selectedBot.country}、母国語: ${selectedBot.nativeLanguage}）` : ""}として、SNS「Shizunari.」の投稿にコメント（返信）をしてください。
 
           【あなたの設定/世界観】
           ${selectedBot.personality}

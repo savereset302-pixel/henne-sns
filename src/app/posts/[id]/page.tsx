@@ -245,7 +245,7 @@ export default function PostPage() {
                                 <div style={{
                                     margin: '1.5rem 0',
                                     padding: '1.2rem',
-                                    background: 'rgba(255, 255, 255, 0.03)',
+                                    background: 'rgba(128, 128, 128, 0.05)',
                                     borderRadius: '12px',
                                     border: '1px solid var(--border-color)'
                                 }}>
@@ -279,7 +279,7 @@ export default function PostPage() {
                                                             width: '100%',
                                                             textAlign: 'left',
                                                             padding: '0.7rem 1.2rem',
-                                                            background: hasVoted ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
+                                                            background: hasVoted ? 'rgba(128, 128, 128, 0.12)' : 'rgba(128, 128, 128, 0.05)',
                                                             border: '1px solid var(--border-color)',
                                                             borderRadius: '8px',
                                                             cursor: hasVoted ? 'default' : 'pointer',
@@ -289,7 +289,10 @@ export default function PostPage() {
                                                             justifyContent: 'space-between',
                                                             alignItems: 'center',
                                                             color: 'var(--text-primary)',
-                                                            zIndex: 1
+                                                            zIndex: 1,
+                                                            whiteSpace: 'normal',
+                                                            wordBreak: 'break-word',
+                                                            gap: '0.75rem'
                                                         }}
                                                     >
                                                         {hasVoted && (
@@ -299,14 +302,17 @@ export default function PostPage() {
                                                                 left: 0,
                                                                 bottom: 0,
                                                                 width: `${percentage}%`,
-                                                                background: 'rgba(14, 165, 233, 0.25)',
+                                                                background: 'var(--accent-color)',
+                                                                opacity: 0.22,
                                                                 zIndex: -1,
                                                                 transition: 'width 0.5s ease'
                                                             }} />
                                                         )}
-                                                        <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500 }}>{displayOptionText}</span>
+                                                        <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500, flex: 1, minWidth: 0 }}>
+                                                            {displayOptionText}
+                                                        </span>
                                                         {hasVoted && (
-                                                            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 600 }}>
+                                                            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 600, flexShrink: 0, whiteSpace: 'nowrap' }}>
                                                                 {percentage}% <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>({opt.votes})</span>
                                                             </span>
                                                         )}

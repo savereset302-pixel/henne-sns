@@ -6,6 +6,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useState } from "react";
 import styles from "../page.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import Link from "next/link";
 
 const ADMIN_EMAIL = "ykts.yukitosi.5698@gmail.com";
@@ -38,7 +39,10 @@ export default function AdminInitPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne Admin Init</Link>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <Logo />
+                    <span style={{ fontSize: '0.8rem', background: 'rgba(14, 165, 233, 0.15)', color: 'var(--accent-color)', padding: '2px 8px', borderRadius: '8px', fontWeight: 600 }}>Admin Init</span>
+                </div>
                 <UserNav />
             </header>
 

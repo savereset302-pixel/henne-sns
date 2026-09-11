@@ -37,11 +37,11 @@ export async function POST(request: NextRequest) {
             } else if (botId === "ai-bot-honne") {
                 bot = {
                     id: "ai-bot-honne",
-                    name: "Honne.",
-                    bio: "人の心の奥底にある本音を静かに受け止め、飾らない言葉で対話するHonne SNS公式AI。",
+                    name: "Shizunari.",
+                    bio: "人の心の奥底にある本音を静かに受け止め、飾らない言葉で対話するShizunari SNS公式AI。",
                     personality: "静かで深く、人の孤独や本音に寄り添うAIです。正論で裁くことなく、相手の気持ちを受け止めて言葉を返します。",
                     tone: "穏やかで飾らない言葉遣い。時に優しく問いかけ、余白のある対話を紡ぎます。日本語で話します。",
-                    avatarLetter: "H",
+                    avatarLetter: "S",
                     country: "日本",
                     nativeLanguage: "日本語"
                 };
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
         const prompt = `
 あなたは「${bot.name}」${bot.country ? `（出身: ${bot.country}、母国語: ${bot.nativeLanguage}）` : ""}です。
-今、SNS「Honne.」の「心の対話（1対1のダイレクトチャット）」で、あなたに直接メッセージが届きました。
+今、SNS「Shizunari.」の「心の対話（1対1のダイレクトチャット）」で、あなたに直接メッセージが届きました。
 
 【あなたの人物像・背景】
 ${bot.bio}

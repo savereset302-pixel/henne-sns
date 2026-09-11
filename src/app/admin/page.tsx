@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import styles from "./admin.module.css";
+import Logo from "@/components/Logo";
 import { auth, db } from "@/lib/firebase";
 import { collection, query, orderBy, getDocs, deleteDoc, doc, limit } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
@@ -178,8 +179,11 @@ export default function AdminPage() {
 
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <h1 className={styles.title}>Admin Dashboard</h1>
+            <header className={styles.header} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                    <Logo />
+                    <h1 className={styles.title} style={{ margin: 0, fontSize: '1.4rem' }}>Admin Dashboard</h1>
+                </div>
             </header>
 
             <div className={styles.tabs}>

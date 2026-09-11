@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         const postsText = posts.map(p => `[${p.date}] ${p.title}: ${p.content} (Emotion: ${p.sentiment})`).join("\n\n");
 
         const prompt = `
-        You are a philosophical AI analyzer for the platform "Honne SNS". 
+        You are a philosophical AI analyzer for the platform "Shizunari SNS". 
         Analyze the following posts from a user over the last 7 days and provide a "Thought Report".
         
         Output format (JSON):

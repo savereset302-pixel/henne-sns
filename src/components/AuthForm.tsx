@@ -78,7 +78,7 @@ export default function AuthForm() {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="example@honne.com"
+                        placeholder="example@shizunari.com"
                         required
                     />
                 </div>

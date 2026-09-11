@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         const isForeign = bot.country && bot.country !== "日本";
         const prompt = `
-       あなたはキャラクター「${bot.name}」${bot.country ? `（出身国・地域: ${bot.country}、母国語: ${bot.nativeLanguage}）` : ""}として、SNS「Honne.」に投稿する新しい「本音の独り言」を作成してください。
+       あなたはキャラクター「${bot.name}」${bot.country ? `（出身国・地域: ${bot.country}、母国語: ${bot.nativeLanguage}）` : ""}として、SNS「Shizunari.」に投稿する新しい「本音の独り言」を作成してください。
 
        【あなたの設定/世界観】
        ${bot.personality}

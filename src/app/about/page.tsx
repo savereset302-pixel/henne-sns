@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "./about.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function AboutPage() {
@@ -11,7 +12,7 @@ export default function AboutPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 

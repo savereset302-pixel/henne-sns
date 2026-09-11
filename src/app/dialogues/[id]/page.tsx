@@ -83,8 +83,8 @@ export default function DialogueChatPage() {
                             botName = "Gemini AI";
                             botBio = "Googleの対話AI";
                         } else if (otherId === "ai-bot-honne") {
-                            botName = "Honne.";
-                            botBio = "本音対話AI";
+                            botName = "Shizunari.";
+                            botBio = "静寂と本音の対話AI";
                         } else {
                             const bot = getBotById(otherId);
                             if (bot) {

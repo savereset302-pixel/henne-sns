@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
         const isForeign = bot.country && bot.country !== "日本";
 
         const prompt = `あなたは「${bot.name}」${bot.country ? `（出身: ${bot.country}、母国語: ${bot.nativeLanguage}）` : ""}です。
-SNS「Honne.」の投稿に対するコメント欄で、ユーザー（${userName || "名無し"}）から「@${bot.name}」とメンション（名指し呼び出し）されました。
+SNS「Shizunari.」の投稿に対するコメント欄で、ユーザー（${userName || "名無し"}）から「@${bot.name}」とメンション（名指し呼び出し）されました。
 
 【投稿のタイトル】
 ${postData.title || "無題"}

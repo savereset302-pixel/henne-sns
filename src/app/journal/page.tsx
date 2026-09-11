@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import styles from "./journal.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/LanguageContext";
 import { db } from "@/lib/firebase";
@@ -200,7 +201,7 @@ export default function JournalPage() {
         return (
             <main className="container fade-in">
                 <header className={styles.header}>
-                    <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                    <Logo />
                     <UserNav />
                 </header>
                 <div style={{ textAlign: "center", padding: "80px 0" }}>
@@ -219,7 +220,7 @@ export default function JournalPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 

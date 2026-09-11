@@ -7,6 +7,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import styles from "./settings.module.css";
+import Logo from "@/components/Logo";
 
 import { useTheme } from "@/components/ThemeProvider";
 import { useLanguage } from "@/context/LanguageContext";
@@ -87,7 +88,7 @@ export default function SettingsPage() {
     return (
         <main className="container fade-in">
             <header style={{ padding: '1.5rem 0' }}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>{t("siteName")}</Link>
+                <Logo />
             </header>
 
             <div className={styles.content}>

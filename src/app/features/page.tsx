@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "./features.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function FeaturesPage() {
@@ -11,13 +12,13 @@ export default function FeaturesPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 
             <div className={styles.content}>
                 <section className={styles.hero}>
-                    <h1>{t("featuresTitle") || "Honne. の機能"}</h1>
+                    <h1>{t("featuresTitle") || "Shizunari. の機能"}</h1>
                     <p>{t("featuresSub") || "あなたの本音を解き放ち、心を整えるための道具たち。"}</p>
                 </section>
 

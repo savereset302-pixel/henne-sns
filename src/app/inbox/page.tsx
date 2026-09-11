@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/context/LanguageContext";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import styles from "./inbox.module.css";
 
 interface Dialogue {
@@ -85,7 +86,7 @@ export default function InboxPage() {
                         } else if (otherId === "ai-bot-gemini") {
                             otherName = "Gemini AI";
                         } else if (otherId === "ai-bot-honne") {
-                            otherName = "Honne.";
+                            otherName = "Shizunari.";
                         } else {
                             // AIボット名を探す
                             const { AI_BOTS } = await import("@/lib/aiBots");
@@ -155,9 +156,7 @@ export default function InboxPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>
-                    {t("siteName")}
-                </Link>
+                <Logo />
                 <UserNav />
             </header>
 

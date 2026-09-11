@@ -6,6 +6,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, collection, query, where, orderBy, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./profile.module.css";
@@ -112,7 +113,7 @@ export default function ProfilePage() {
                     setProfile(userSnap.data() as UserProfile);
                 } else if (id === "ai-bot-honne" || id === "ai-bot-gemini") {
                     setProfile({
-                        displayName: id === "ai-bot-honne" ? "Honne." : "Gemini AI",
+                        displayName: id === "ai-bot-honne" ? "Shizunari." : "Gemini AI",
                         bio: t("ai_report_desc") || "Philosophical AI Advisor"
                     });
                 }
@@ -162,7 +163,7 @@ export default function ProfilePage() {
     return (
         <main className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 

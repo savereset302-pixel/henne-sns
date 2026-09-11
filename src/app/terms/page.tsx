@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import styles from "../privacy/legal.module.css";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function TermsPage() {
@@ -10,7 +11,7 @@ export default function TermsPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
             </header>
 
             <section className={styles.content}>

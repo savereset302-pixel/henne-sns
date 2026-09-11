@@ -7,13 +7,14 @@ import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ContactPage() {
     const { t } = useLanguage();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [category, setCategory] = useState("バグ報告");
+    const [category, setCategory] = useState("con_cat_bug");
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -33,19 +34,18 @@ export default function ContactPage() {
         setLoading(true);
 
         try {
-            await addDoc(collection(db, "inquiries"), {
+            await addDoc(collection(db, "contacts"), {
                 name,
                 email,
                 category,
                 message,
-                userId: auth.currentUser?.uid || "anonymous",
                 createdAt: serverTimestamp(),
-                status: "open"
+                userId: auth.currentUser ? auth.currentUser.uid : null
             });
             setSubmitted(true);
         } catch (error) {
-            console.error("Error submitting inquiry:", error);
-            alert("送信に失敗しました。時間をおいて再試行してください。");
+            console.error("Error submitting contact form:", error);
+            alert(t("errorOccurred") || "エラーが発生しました。");
         } finally {
             setLoading(false);
         }
@@ -55,7 +55,7 @@ export default function ContactPage() {
         return (
             <div className="container fade-in">
                 <header className={styles.header}>
-                    <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                    <Logo />
                     <UserNav />
                 </header>
                 <div className={styles.successMessage}>
@@ -72,7 +72,7 @@ export default function ContactPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 

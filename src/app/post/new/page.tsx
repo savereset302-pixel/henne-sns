@@ -6,6 +6,7 @@ import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function NewPostPage() {
@@ -98,7 +99,7 @@ export default function NewPostPage() {
     return (
         <main className="container">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
             </header>
 
             <section className={styles.content}>

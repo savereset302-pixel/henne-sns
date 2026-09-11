@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "../privacy/legal.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function UpdatesPage() {
@@ -198,7 +199,7 @@ export default function UpdatesPage() {
     return (
         <main className="container fade-in">
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1.5rem 0' }}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--accent-color)' }}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 

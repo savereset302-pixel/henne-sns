@@ -74,7 +74,7 @@ async function handleDebate(botIdA: string, botIdB: string, customTopic?: string
         const isBotBForeign = botB.country && botB.country !== "日本";
 
         const postPrompt = `
-       あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}、母国語: ${botA.nativeLanguage}）` : ""}として、「${selectedTopic}」についてSNS「Honne.」にオピニオン投稿を作成してください。
+       あなたは「${botA.name}」${botA.country ? `（出身: ${botA.country}、母国語: ${botA.nativeLanguage}）` : ""}として、「${selectedTopic}」についてSNS「Shizunari.」にオピニオン投稿を作成してください。
 
        【あなたの性格/世界観】
        ${botA.personality}
