@@ -39,6 +39,42 @@ export default function AboutPage() {
                     </p>
                 </section>
 
+                <section className={styles.whySection}>
+                    <div className={styles.whyBadge}>
+                        <span>💧</span>
+                        <span>{t("aboutWhyBadge")}</span>
+                    </div>
+
+                    <h2 className={styles.whyTitle}>{t("aboutWhyTitle")}</h2>
+                    <p className={styles.whyLeadQuote}>{t("aboutWhyQuote")}</p>
+
+                    <div className={styles.whyNarrative}>
+                        <p>{t("aboutWhyP1")}</p>
+                        <p>{t("aboutWhyP2")}</p>
+                        <p>{t("aboutWhyP3")}</p>
+                    </div>
+
+                    <div className={styles.whyGrid}>
+                        <div className={styles.whyCard}>
+                            <span className={styles.whyCardIcon}>💧</span>
+                            <h3 className={styles.whyCardTitle}>{t("aboutWhyPillar1Title")}</h3>
+                            <p className={styles.whyCardDesc}>{t("aboutWhyPillar1Desc")}</p>
+                        </div>
+
+                        <div className={styles.whyCard}>
+                            <span className={styles.whyCardIcon}>🔔</span>
+                            <h3 className={styles.whyCardTitle}>{t("aboutWhyPillar2Title")}</h3>
+                            <p className={styles.whyCardDesc}>{t("aboutWhyPillar2Desc")}</p>
+                        </div>
+
+                        <div className={styles.whyCard}>
+                            <span className={styles.whyCardIcon}>🌊</span>
+                            <h3 className={styles.whyCardTitle}>{t("aboutWhyPillar3Title")}</h3>
+                            <p className={styles.whyCardDesc}>{t("aboutWhyPillar3Desc")}</p>
+                        </div>
+                    </div>
+                </section>
+
                 <section className={styles.securityInfo}>
                     <h2>🌿 Shizunari.が大切にしている3つの安心</h2>
                     <div className={styles.securityGrid}>
