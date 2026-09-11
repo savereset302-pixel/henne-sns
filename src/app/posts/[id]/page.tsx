@@ -7,6 +7,7 @@ import { db } from "@/lib/firebase";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import styles from "./post.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/hooks/useAuth";
 import LikeButton from "@/components/LikeButton";
@@ -42,6 +43,7 @@ export default function PostPage() {
     const [post, setPost] = useState<Post | null>(null);
     const [translatedContent, setTranslatedContent] = useState<string | null>(null);
     const [translatedTitle, setTranslatedTitle] = useState<string | null>(null);
+    const [translatedPoll, setTranslatedPoll] = useState<{ question: string; options: string[] } | null>(null);
     const [loading, setLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
     const { language, t } = useLanguage();
@@ -89,7 +91,15 @@ export default function PostPage() {
             const res = await fetch("/api/translate", {
                 method: "POST",
                 body: JSON.stringify({
-                    texts: [{ id: post.id, title: post.title, content: post.content }],
+                    texts: [{
+                        id: post.id,
+                        title: post.title,
+                        content: post.content,
+                        poll: post.poll ? {
+                            question: post.poll.question,
+                            options: post.poll.options.map(o => o.text)
+                        } : undefined
+                    }],
                     targetLang: language
                 })
             });
@@ -97,6 +107,9 @@ export default function PostPage() {
             if (data.success && data.translatedItems && data.translatedItems[0]) {
                 setTranslatedContent(data.translatedItems[0].content);
                 setTranslatedTitle(data.translatedItems[0].title);
+                if (data.translatedItems[0].poll) {
+                    setTranslatedPoll(data.translatedItems[0].poll);
+                }
             }
         } catch (error) {
             console.error("Translation failed:", error);
@@ -144,7 +157,8 @@ export default function PostPage() {
         // Reset translations when navigating or changing language manually
         setTranslatedContent(null);
         setTranslatedTitle(null);
-    }, [post, language]);
+        setTranslatedPoll(null);
+    }, [id, language]);
 
     if (loading) return <div className={styles.loading}>{t("loadingPosts")}</div>;
     if (!post) return <div className={styles.notFound}>{t("noPosts")}</div>;
@@ -152,7 +166,7 @@ export default function PostPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>{t("siteName")}</Link>
+                <Logo />
                 <UserNav />
             </header>
 
@@ -186,12 +200,32 @@ export default function PostPage() {
                                             <span>{t("original")}</span>
                                         </div>
                                         <div className={`${styles.text} ${styles.originalText}`}>{post.content}</div>
+                                        <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+                                            <button
+                                                onClick={() => {
+                                                    setTranslatedContent(null);
+                                                    setTranslatedTitle(null);
+                                                    setTranslatedPoll(null);
+                                                }}
+                                                style={{
+                                                    background: 'rgba(255, 255, 255, 0.06)',
+                                                    border: '1px solid var(--border-color)',
+                                                    borderRadius: '16px',
+                                                    padding: '4px 14px',
+                                                    fontSize: '0.8rem',
+                                                    color: 'var(--text-secondary)',
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {t("showOriginal")}
+                                            </button>
+                                        </div>
                                     </>
                                 ) : (
                                     <>
                                         <div className={styles.text}>{post.content}</div>
                                         {/* 日本語設定でも平仮名を含まない外国語投稿の場合、または他言語設定時に翻訳ボタンを表示 */}
-                                        {(language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || ""))) && (
+                                        {(language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || "") + (post.poll?.question || "") + (post.poll?.options?.map(o => o.text).join("") || ""))) && (
                                             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
                                                 <button
                                                     onClick={handleTranslate}
@@ -215,11 +249,27 @@ export default function PostPage() {
                                     borderRadius: '12px',
                                     border: '1px solid var(--border-color)'
                                 }}>
-                                    <h4 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--text-primary)', fontWeight: 600 }}>📊 {post.poll.question}</h4>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: translatedPoll ? '0.4rem' : '1rem' }}>
+                                        <h4 style={{ fontSize: '1rem', margin: 0, color: 'var(--text-primary)', fontWeight: 600 }}>
+                                            📊 {translatedPoll?.question || post.poll.question}
+                                        </h4>
+                                        {translatedPoll && (
+                                            <span style={{ fontSize: '0.72rem', color: 'var(--accent-color)', background: 'rgba(14, 165, 233, 0.1)', padding: '2px 8px', borderRadius: '10px' }}>
+                                                {t("translated")}
+                                            </span>
+                                        )}
+                                    </div>
+                                    {translatedPoll && translatedPoll.question !== post.poll.question && (
+                                        <div style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', marginBottom: '0.9rem', opacity: 0.8 }}>
+                                            ({post.poll.question})
+                                        </div>
+                                    )}
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
                                         {post.poll.options.map((opt, idx) => {
                                             const hasVoted = post.poll?.voters?.includes(user?.uid || "");
                                             const percentage = post.poll?.totalVotes ? Math.round((opt.votes / post.poll.totalVotes) * 100) : 0;
+                                            const displayOptionText = (translatedPoll?.options && translatedPoll.options[idx]) ? translatedPoll.options[idx] : opt.text;
+
                                             return (
                                                 <div key={idx} style={{ position: 'relative' }}>
                                                     <button
@@ -249,12 +299,12 @@ export default function PostPage() {
                                                                 left: 0,
                                                                 bottom: 0,
                                                                 width: `${percentage}%`,
-                                                                background: 'rgba(99, 102, 241, 0.25)',
+                                                                background: 'rgba(14, 165, 233, 0.25)',
                                                                 zIndex: -1,
                                                                 transition: 'width 0.5s ease'
                                                             }} />
                                                         )}
-                                                        <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500 }}>{opt.text}</span>
+                                                        <span style={{ fontSize: '0.92rem', color: 'var(--text-primary)', fontWeight: 500 }}>{displayOptionText}</span>
                                                         {hasVoted && (
                                                             <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 600 }}>
                                                                 {percentage}% <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>({opt.votes})</span>

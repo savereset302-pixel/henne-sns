@@ -13,22 +13,22 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Honne. - 本音共有SNS | 自分の哲学を語る場所",
-  description: "世間の目を気にせず、あなたの本音や哲学を共有しよう。匿名投稿、AIコメント、感情カラーなど、他にはない機能で安心して本音を語れるSNS。",
-  keywords: ["本音", "SNS", "哲学", "匿名", "AI", "感情", "独白", "コミュニティ"],
-  authors: [{ name: "Honne Team" }],
+  title: "Shizunari. - 静寂と本音のSNS | 自分の哲学を語る場所",
+  description: "喧騒を離れ、心の内なる音に耳を澄ます場所。世間の目を気にせず、あなたの本音や哲学を共有しよう。匿名投稿、AI思索、環境音、感情カレンダーで安心して本音を語れるSNS。",
+  keywords: ["Shizunari", "シズナリ", "本音", "静寂", "SNS", "哲学", "匿名", "AI", "感情", "環境音", "ジャーナル"],
+  authors: [{ name: "Shizunari Team" }],
   openGraph: {
-    title: "Honne. - 本音共有SNS",
-    description: "世間の目を気にせず、あなたの本音や哲学を共有しよう。",
+    title: "Shizunari. - 静寂と本音のSNS",
+    description: "喧騒を離れ、心の内なる音に耳を澄ます場所。あなたの本音や哲学を静かに共有しよう。",
     url: "https://henne-sns.vercel.app",
-    siteName: "Honne.",
+    siteName: "Shizunari.",
     locale: "ja_JP",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Honne. - 本音共有SNS",
-    description: "世間の目を気にせず、あなたの本音や哲学を共有しよう。",
+    title: "Shizunari. - 静寂と本音のSNS",
+    description: "喧騒を離れ、心の内なる音に耳を澄ます場所。あなたの本音や哲学を静かに共有しよう。",
   },
   robots: {
     index: true,
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Honne."
+    title: "Shizunari."
   },
 };
 

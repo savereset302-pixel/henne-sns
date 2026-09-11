@@ -5,6 +5,7 @@ import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Logo from "@/components/Logo";
 import styles from "./newCommunity.module.css";
 
 export default function NewCommunityPage() {
@@ -42,7 +43,7 @@ export default function NewCommunityPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Logo />
             </header>
 
             <section className={styles.content}>

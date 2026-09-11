@@ -1,12 +1,12 @@
 import AuthForm from "@/components/AuthForm";
 import styles from "./login.module.css";
-import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
     return (
         <main className="container">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Logo />
             </header>
             <section className={styles.content}>
                 <AuthForm />

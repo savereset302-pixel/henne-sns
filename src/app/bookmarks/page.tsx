@@ -7,6 +7,7 @@ import { collection, getDocs, query, orderBy, doc, getDoc } from "firebase/fires
 import Link from "next/link";
 import styles from "../page.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 
@@ -61,7 +62,7 @@ export default function BookmarksPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--logo-color)' }}>Honne.</Link>
+                <Logo />
                 <UserNav />
             </header>
 

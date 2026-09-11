@@ -6,6 +6,7 @@ import { collection, query, orderBy, onSnapshot, doc, setDoc, serverTimestamp } 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import { useAuth } from "@/hooks/useAuth";
 import styles from "./communities.module.css";
 
@@ -108,7 +109,7 @@ export default function CommunitiesPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" className={styles.logo}>Honne.</Link>
+                <Logo />
                 <UserNav />
             </header>
 

@@ -7,6 +7,7 @@ import { collection, getDocs, query, orderBy, where } from "firebase/firestore";
 import Link from "next/link";
 import styles from "../page.module.css";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 
 interface Draft {
     id: string;
@@ -51,7 +52,7 @@ export default function DraftsPage() {
     return (
         <main className="container fade-in">
             <header className={styles.header}>
-                <Link href="/" style={{ fontSize: '1.8rem', fontWeight: 800, textDecoration: 'none', color: 'var(--logo-color)' }}>Honne.</Link>
+                <Logo />
                 <UserNav />
             </header>
 

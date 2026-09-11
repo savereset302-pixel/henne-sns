@@ -9,10 +9,11 @@
 .logo {
   font-size: 1.8rem;
   font-weight: 800;
-  background: linear-gradient(to right, #4f46e5, #ec4899);
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 45%, #06b6d4 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.25));
 }
 
 .hero {
@@ -27,10 +28,11 @@
 }
 
 .heroTitle span {
-  background: linear-gradient(to right, #818cf8, #c084fc);
+  background: linear-gradient(135deg, #38bdf8 0%, #67e8f9 50%, #a5f3fc 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.2));
 }
 
 .heroSub {

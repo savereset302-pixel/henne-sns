@@ -1,0 +1,99 @@
+.logoLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.logoLink:hover {
+  transform: translateY(-1px);
+}
+
+.iconContainer {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.16) 0%, rgba(6, 182, 212, 0.05) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.logoLink:hover .iconContainer {
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.35), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.svgIcon {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+}
+
+.logoLink:hover .svgIcon {
+  transform: scale(1.08);
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brandName {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f2fe 30%, #38bdf8 70%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-flex;
+  align-items: baseline;
+  transition: filter 0.3s ease;
+}
+
+.logoLink:hover .brandName {
+  filter: drop-shadow(0 0 16px rgba(56, 189, 248, 0.45));
+}
+
+.dot {
+  color: #38bdf8;
+  -webkit-text-fill-color: #38bdf8;
+  display: inline-block;
+  margin-left: 2px;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.9));
+  animation: pulseDot 3s ease-in-out infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+    filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.8));
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    filter: drop-shadow(0 0 12px rgba(34, 211, 238, 1));
+  }
+}
+
+.tagline {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: #7dd3fc;
+  opacity: 0.8;
+  margin-top: 3px;
+  text-transform: uppercase;
+}

@@ -39,7 +39,7 @@ export default function AboutPage() {
                 </section>
 
                 <section className={styles.securityInfo}>
-                    <h2>🌿 Honne.が大切にしている3つの安心</h2>
+                    <h2>🌿 Shizunari.が大切にしている3つの安心</h2>
                     <div className={styles.securityGrid}>
                         <div className={styles.securityItem}>
                             <h3>🔒 評価や数字のない世界</h3>

@@ -1,7 +1,7 @@
 {
-  "name": "Honne. - 本音共有SNS",
-  "short_name": "Honne.",
-  "description": "世間の目を気にせず、あなたの本音や哲学を共有しよう。",
+  "name": "Shizunari. - 静寂と本音のSNS",
+  "short_name": "Shizunari.",
+  "description": "喧騒を離れ、心の内なる音に耳を澄ます場所。静寂と本音のSNS。",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a14",

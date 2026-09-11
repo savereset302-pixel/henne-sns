@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 import Link from "next/link";
 import UserNav from "@/components/UserNav";
+import Logo from "@/components/Logo";
 import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
@@ -37,7 +38,7 @@ export default function Home() {
   const { user } = useAuth();
   const { language, t } = useLanguage();
   const [posts, setPosts] = useState<Post[]>([]);
-  const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string }>>({});
+  const [translatedPosts, setTranslatedPosts] = useState<Record<string, { title: string, content: string, poll?: { question: string, options: string[] } }>>({});
   const [cardTranslating, setCardTranslating] = useState<Record<string, boolean>>({});
   const [cardShowOriginal, setCardShowOriginal] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState("all");
@@ -59,7 +60,15 @@ export default function Home() {
       const res = await fetch("/api/translate", {
         method: "POST",
         body: JSON.stringify({
-          texts: [{ id: targetPost.id, title: targetPost.title, content: targetPost.content }],
+          texts: [{
+            id: targetPost.id,
+            title: targetPost.title,
+            content: targetPost.content,
+            poll: targetPost.poll ? {
+              question: targetPost.poll.question,
+              options: targetPost.poll.options.map(o => o.text)
+            } : undefined
+          }],
           targetLang: language
         })
       });
@@ -69,7 +78,8 @@ export default function Home() {
           ...prev,
           [targetPost.id]: {
             title: data.translatedItems[0].title,
-            content: data.translatedItems[0].content
+            content: data.translatedItems[0].content,
+            poll: data.translatedItems[0].poll
           }
         }));
         setCardShowOriginal(prev => ({ ...prev, [targetPost.id]: false }));
@@ -183,7 +193,15 @@ export default function Home() {
           const res = await fetch("/api/translate", {
             method: "POST",
             body: JSON.stringify({
-              texts: toTranslate.map(p => ({ id: p.id, title: p.title, content: p.content })),
+              texts: toTranslate.map(p => ({
+                id: p.id,
+                title: p.title,
+                content: p.content,
+                poll: p.poll ? {
+                  question: p.poll.question,
+                  options: p.poll.options.map(o => o.text)
+                } : undefined
+              })),
               targetLang: language
             })
           });
@@ -191,7 +209,11 @@ export default function Home() {
           if (data.success && data.translatedItems) {
             const newTranslations = { ...translatedPosts };
             data.translatedItems.forEach((item: any) => {
-              newTranslations[item.id] = { title: item.title, content: item.content };
+              newTranslations[item.id] = {
+                title: item.title,
+                content: item.content,
+                poll: item.poll
+              };
             });
             setTranslatedPosts(newTranslations);
           }
@@ -278,7 +300,7 @@ export default function Home() {
   return (
     <main className="container fade-in">
       <header className={styles.header}>
-        <div className={styles.logo}>{t("siteName")}</div>
+        <Logo />
         <UserNav />
       </header>
 
@@ -306,17 +328,17 @@ export default function Home() {
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            background: 'rgba(99, 102, 241, 0.12)',
-            border: '1px solid rgba(129, 140, 248, 0.35)',
+            background: 'rgba(14, 165, 233, 0.12)',
+            border: '1px solid rgba(56, 189, 248, 0.35)',
             padding: '6px 18px',
             borderRadius: '20px',
             fontSize: '0.85rem',
             color: 'var(--text-primary)',
             textDecoration: 'none',
             transition: 'all 0.2s ease',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            boxShadow: '0 2px 12px rgba(14, 165, 233, 0.15)'
           }}>
-            <span style={{ color: '#818cf8', fontWeight: 700 }}>✨ NEW</span>
+            <span style={{ color: '#38bdf8', fontWeight: 700 }}>✨ NEW</span>
             <span>最新アップデート (v3.8) の詳細を見る →</span>
           </Link>
         </div>
@@ -411,7 +433,10 @@ export default function Home() {
                 const isShowingTranslation = translated && !isShowingOriginal;
                 const displayTitle = isShowingTranslation ? translated.title : post.title;
                 const displayContent = isShowingTranslation ? translated.content : post.content;
-                const isForeign = language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || ""));
+                const isForeign = language !== "ja" || !/[\u3040-\u309F]/.test((post.title || "") + (post.content || "") + (post.poll?.question || "") + (post.poll?.options?.map(o => o.text).join("") || ""));
+
+                const translatedPoll = isShowingTranslation ? translated?.poll : undefined;
+                const displayPollQuestion = translatedPoll?.question || post.poll?.question;
 
                 return (
                   <div key={post.id} className="glass-panel" style={{ padding: '1.5rem', transition: 'all 0.3s', ...sentimentStyle }}>
@@ -446,7 +471,7 @@ export default function Home() {
                           {cardTranslating[post.id]
                             ? (t("loadingPosts") || "翻訳中...")
                             : isShowingTranslation
-                              ? "原文に戻す"
+                              ? (t("showOriginal") || "原文に戻す")
                               : (language === "ja" ? "日本語に翻訳して読む" : t("translatePost"))}
                         </button>
                       </div>
@@ -460,11 +485,24 @@ export default function Home() {
                         borderRadius: '8px',
                         border: '1px solid var(--border-color)'
                       }}>
-                        <h4 style={{ fontSize: '0.95rem', marginBottom: '1rem' }}>📊 {post.poll.question}</h4>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: (isShowingTranslation && translatedPoll) ? '0.35rem' : '1rem' }}>
+                          <h4 style={{ fontSize: '0.95rem', margin: 0, color: 'var(--text-primary)' }}>📊 {displayPollQuestion}</h4>
+                          {isShowingTranslation && translatedPoll && (
+                            <span style={{ fontSize: '0.7rem', color: 'var(--accent-color)', background: 'rgba(14, 165, 233, 0.1)', padding: '2px 8px', borderRadius: '10px' }}>
+                              {t("translated")}
+                            </span>
+                          )}
+                        </div>
+                        {isShowingTranslation && translatedPoll && translatedPoll.question !== post.poll.question && (
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.8rem', opacity: 0.8 }}>
+                            ({post.poll.question})
+                          </div>
+                        )}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                           {post.poll.options.map((opt, idx) => {
                             const hasVoted = post.poll?.voters?.includes(user?.uid || "");
                             const percentage = post.poll?.totalVotes ? Math.round((opt.votes / post.poll.totalVotes) * 100) : 0;
+                            const displayOptionText = (translatedPoll?.options && translatedPoll.options[idx]) ? translatedPoll.options[idx] : opt.text;
 
                             return (
                               <div key={idx} style={{ position: 'relative' }}>
@@ -495,12 +533,12 @@ export default function Home() {
                                       left: 0,
                                       bottom: 0,
                                       width: `${percentage}%`,
-                                      background: 'rgba(99, 102, 241, 0.25)',
+                                      background: 'rgba(14, 165, 233, 0.25)',
                                       zIndex: -1,
                                       transition: 'width 0.5s ease'
                                     }} />
                                   )}
-                                  <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>{opt.text}</span>
+                                  <span style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 500 }}>{displayOptionText}</span>
                                   {hasVoted && (
                                     <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>
                                       {percentage}% <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>({opt.votes})</span>

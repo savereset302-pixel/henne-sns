@@ -32,8 +32,16 @@ STRICT TRANSLATION RULES:
 2. NATURAL TONE & NUANCE:
    - Produce fluent, atmospheric, and emotive text that reads like a genuine human post rather than mechanical translation.
    - Preserve cynicism, warmth, melancholy, or philosophical contemplation faithfully.
+   - If an item contains a "poll" object (with "question" and "options"), translate both the poll question and all option strings naturally into ${targetLangName}, keeping the exact same number and order of options.
 3. OUTPUT FORMAT:
-   - Return ONLY a valid JSON array of objects with keys "id", "title", and "content".
+   - Return ONLY a valid JSON array of objects.
+   - Each object must have keys:
+     - "id": string (the input item id)
+     - "title": string (translated title)
+     - "content": string (translated content)
+     - "poll": optional object (if input had "poll") with:
+       - "question": string (translated poll question)
+       - "options": array of strings (translated option strings in the same order)
    - Do NOT wrap in markdown \`\`\`json. Start strictly with [ and end with ].
    - Every input item MUST be present with its original "id".
 
