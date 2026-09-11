@@ -31,6 +31,43 @@
     margin-bottom: 2rem;
 }
 
+.promptHintCard {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, rgba(6, 18, 38, 0.6) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 14px;
+    padding: 1.2rem 1.4rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+}
+
+.promptHintIcon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.promptHintText {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.promptHintText strong {
+    font-size: 0.85rem;
+    color: #38bdf8;
+    letter-spacing: 0.04em;
+}
+
+.promptHintText p {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.5;
+}
+
 .form {
     display: flex;
     flex-direction: column;

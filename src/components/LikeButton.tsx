@@ -4,10 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc, deleteDoc, updateDoc, increment, serverTimestamp, collection, addDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { useRipple } from "@/context/RippleContext";
 import styles from "./LikeButton.module.css";
 
 export default function LikeButton({ postId, initialCount = 0 }: { postId: string, initialCount?: number }) {
     const { user } = useAuth();
+    const { triggerRipple } = useRipple();
     const [liked, setLiked] = useState(false);
     const [count, setCount] = useState(initialCount);
     const [loading, setLoading] = useState(false);
@@ -51,6 +53,9 @@ export default function LikeButton({ postId, initialCount = 0 }: { postId: strin
                 setLiked(false);
                 setCount(prev => Math.max(0, prev - 1));
             } else {
+                // Trigger serene water ripple at click coordinates
+                triggerRipple(e.clientX, e.clientY);
+
                 // Like
                 await setDoc(likeRef, {
                     createdAt: serverTimestamp(),

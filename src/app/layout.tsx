@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { SoundProvider } from "@/context/SoundContext";
+import { RippleProvider } from "@/context/RippleContext";
 import "./globals.css";
 import JsonLd from "@/components/JsonLd";
 
@@ -77,8 +78,10 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <SoundProvider>
-              <JsonLd />
-              {children}
+              <RippleProvider>
+                <JsonLd />
+                {children}
+              </RippleProvider>
             </SoundProvider>
           </LanguageProvider>
         </ThemeProvider>

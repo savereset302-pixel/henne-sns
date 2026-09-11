@@ -33,8 +33,18 @@ export default function SettingsPage() {
     const [font, setFontOption] = useState("default");
     const [bio, setBio] = useState("");
     const [language, setLanguageOption] = useState<Language>("ja");
+    const [midnightMode, setMidnightMode] = useState<"auto" | "always" | "off">("auto");
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem("shizunari_midnight_mode");
+            if (saved === "always" || saved === "off" || saved === "auto") {
+                setMidnightMode(saved);
+            }
+        } catch {}
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -167,6 +177,39 @@ export default function SettingsPage() {
                                 <option value="pixel">{t("font_pixel") || "DotGothic（レトロゲーム）"}</option>
                                 <option value="elegant">{t("font_elegant") || "解星特民（優雅・明朝）"}</option>
                                 <option value="kai">{t("font_kai") || "Yuji Boku（楷書・筆文字）"}</option>
+                            </select>
+                        </div>
+
+                        <div className={styles.inputGroup}>
+                            <label htmlFor="midnightMode">{t("settingsMidnightMode") || "🌙 深夜の静寂モード"}</label>
+                            <select
+                                id="midnightMode"
+                                value={midnightMode}
+                                onChange={(e) => {
+                                    const val = e.target.value as any;
+                                    setMidnightMode(val);
+                                    try {
+                                        localStorage.setItem("shizunari_midnight_mode", val);
+                                        sessionStorage.removeItem("shizunari_midnight_dismissed");
+                                        if (val === "always") {
+                                            document.body.classList.add("midnight-mode");
+                                        } else if (val === "off") {
+                                            document.body.classList.remove("midnight-mode");
+                                        } else {
+                                            const hour = new Date().getHours();
+                                            if (hour >= 22 || hour < 5) {
+                                                document.body.classList.add("midnight-mode");
+                                            } else {
+                                                document.body.classList.remove("midnight-mode");
+                                            }
+                                        }
+                                    } catch {}
+                                }}
+                                className={styles.select}
+                            >
+                                <option value="auto">{t("midnight_auto") || "自動（夜21時〜翌朝5時に有効）"}</option>
+                                <option value="always">{t("midnight_always") || "常に有効（静夜のトーンを常時適用）"}</option>
+                                <option value="off">{t("midnight_off") || "無効（通常のテーマのままにする）"}</option>
                             </select>
                         </div>
 

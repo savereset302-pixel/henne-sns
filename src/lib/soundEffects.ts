@@ -75,6 +75,38 @@ export function playKeyClick(volume: number = 0.1) {
 }
 
 /**
+ * Play a single crystal-clear water droplet sound (Suikinkutsu pentatonic bell tone)
+ */
+export function playWaterDropSound(volume: number = 0.3) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    try {
+        const now = ctx.currentTime;
+        const dropFrequencies = [1175, 1318, 1568, 1760, 2093, 2349];
+        const freq = dropFrequencies[Math.floor(Math.random() * dropFrequencies.length)];
+
+        const osc = ctx.createOscillator();
+        osc.type = "sine";
+        // Subtle pitch bend down to simulate water surface collision
+        osc.frequency.setValueAtTime(freq * 1.08, now);
+        osc.frequency.exponentialRampToValueAtTime(freq, now + 0.035);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(volume * 0.35, now + 0.012);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 1.25);
+    } catch {}
+}
+
+
+/**
  * Stop all ambient audio nodes IMMEDIATELY (no timeouts, no zombie nodes, no leaks)
  */
 export function stopAmbientSound() {

@@ -8,6 +8,8 @@ import Logo from "@/components/Logo";
 import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
+import DailyPrompt from "@/components/DailyPrompt";
+import MidnightBanner from "@/components/MidnightBanner";
 import { db } from "@/lib/firebase";
 import { collection, query, orderBy, onSnapshot, where, limit } from "firebase/firestore";
 import { useLanguage } from "@/context/LanguageContext";
@@ -354,7 +356,11 @@ export default function Home() {
 
       <EmailVerificationBanner />
 
+      <MidnightBanner />
+
       <section className={styles.feed}>
+        <DailyPrompt />
+
         <div className={styles.feedHeader}>
           <div className={styles.filtersContainer}>
             <div className={styles.filterSection}>

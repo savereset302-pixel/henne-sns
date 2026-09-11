@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import styles from "./newPost.module.css";
 import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Logo from "@/components/Logo";
 import { useLanguage } from "@/context/LanguageContext";
+import { useRipple } from "@/context/RippleContext";
 
-export default function NewPostPage() {
+function NewPostForm() {
     const { t } = useLanguage();
-    const [title, setTitle] = useState("");
+    const { triggerRipple } = useRipple();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const promptParam = searchParams.get("prompt");
+    const titleParam = searchParams.get("title");
+
+    const [title, setTitle] = useState(titleParam || "");
     const [content, setContent] = useState("");
     const [category, setCategory] = useState("哲学");
     const [commentPolicy, setCommentPolicy] = useState("all");
@@ -23,7 +30,12 @@ export default function NewPostPage() {
     const [showPoll, setShowPoll] = useState(false);
     const [pollQuestion, setPollQuestion] = useState("");
     const [pollOptions, setPollOptions] = useState(["", ""]);
-    const router = useRouter();
+
+    useEffect(() => {
+        if (titleParam) {
+            setTitle(prev => prev || titleParam);
+        }
+    }, [titleParam]);
 
     const handleSubmit = async (e: React.FormEvent, isDraft = false) => {
         if (e) e.preventDefault();
@@ -82,6 +94,9 @@ export default function NewPostPage() {
 
             await addDoc(collection(db, collectionName), data);
 
+            // Trigger serene water ripple on successful creation
+            triggerRipple();
+
             if (isDraft) {
                 alert("下書きを保存しました");
                 router.push("/drafts");
@@ -105,6 +120,17 @@ export default function NewPostPage() {
             <section className={styles.content}>
                 <div className={`glass-panel ${styles.formWrapper}`}>
                     <h1 className={styles.pageTitle}>{t("newPost")}</h1>
+
+                    {promptParam && (
+                        <div className={styles.promptHintCard}>
+                            <span className={styles.promptHintIcon}>🪷</span>
+                            <div className={styles.promptHintText}>
+                                <strong>{t("dailyPromptBadge") || "今日の問いへの思索"}</strong>
+                                <p>「{promptParam}」</p>
+                            </div>
+                        </div>
+                    )}
+
                     <form onSubmit={(e) => handleSubmit(e, false)} className={styles.form}>
                         <div className={styles.inputGroup}>
                             <label>{t("title")}</label>
@@ -279,5 +305,13 @@ export default function NewPostPage() {
                 </div>
             </section>
         </main>
+    );
+}
+
+export default function NewPostPage() {
+    return (
+        <Suspense fallback={<div className="container" style={{ padding: "3rem", textAlign: "center", color: "var(--text-secondary)" }}>読み込み中...</div>}>
+            <NewPostForm />
+        </Suspense>
     );
 }

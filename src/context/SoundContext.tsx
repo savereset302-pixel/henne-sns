@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
-import { playKeyClick, startAmbientSound, stopAmbientSound, emergencyStopAll, setAmbientVolume } from "@/lib/soundEffects";
+import { playKeyClick, playWaterDropSound, startAmbientSound, stopAmbientSound, emergencyStopAll, setAmbientVolume } from "@/lib/soundEffects";
 
 export type AmbientSoundType = "silence" | "rain" | "fireplace" | "waves" | "water_drop" | "breeze" | "meditation";
 
@@ -13,6 +13,7 @@ interface SoundContextType {
     setAmbientType: (type: AmbientSoundType) => void;
     setVolume: (volume: number) => void;
     triggerKeyClick: () => void;
+    triggerWaterDrop: () => void;
     hardStopAll: () => void;
 }
 
@@ -24,6 +25,7 @@ const SoundContext = createContext<SoundContextType>({
     setAmbientType: () => {},
     setVolume: () => {},
     triggerKeyClick: () => {},
+    triggerWaterDrop: () => {},
     hardStopAll: () => {},
 });
 
@@ -81,6 +83,10 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     }, [keyClickEnabled, volume]);
 
+    const triggerWaterDrop = useCallback(() => {
+        playWaterDropSound(volume);
+    }, [volume]);
+
     const hardStopAll = useCallback(() => {
         setAmbientTypeState("silence");
         saveSettings(keyClickEnabled, "silence", volume);
@@ -121,6 +127,7 @@ export const SoundProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 setAmbientType,
                 setVolume,
                 triggerKeyClick,
+                triggerWaterDrop,
                 hardStopAll,
             }}
         >
