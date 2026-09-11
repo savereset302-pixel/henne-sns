@@ -3,11 +3,11 @@ export default function JsonLd() {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "Shizunari.",
-        "url": "https://henne-sns.vercel.app",
+        "url": "https://shizunari-sns.vercel.app",
         "description": "喧騒を離れ、心の内なる音に耳を澄ます場所。静寂と本音のSNS",
         "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://henne-sns.vercel.app/?q={search_term_string}",
+            "target": "https://shizunari-sns.vercel.app/?q={search_term_string}",
             "query-input": "required name=search_term_string"
         }
     };

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/admin/', '/admin-init/'],
         },
-        sitemap: 'https://henne-sns.vercel.app/sitemap.xml',
+        sitemap: 'https://shizunari-sns.vercel.app/sitemap.xml',
     }
 }

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Shizunari. - 静寂と本音のSNS",
     description: "喧騒を離れ、心の内なる音に耳を澄ます場所。あなたの本音や哲学を静かに共有しよう。",
-    url: "https://henne-sns.vercel.app",
+    url: "https://shizunari-sns.vercel.app",
     siteName: "Shizunari.",
     locale: "ja_JP",
     type: "website",

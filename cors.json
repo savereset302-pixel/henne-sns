@@ -1,6 +1,7 @@
 [
     {
         "origin": [
+            "https://shizunari-sns.vercel.app",
             "https://henne-sns.vercel.app",
             "http://localhost:3000"
         ],
