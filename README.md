@@ -91,8 +91,8 @@
 ### 1. リポジトリのクローンと依存関係のインストール
 
 ```bash
-git clone https://github.com/savereset302-pixel/henne-sns.git
-cd henne-sns
+git clone https://github.com/savereset302-pixel/shizunari.-sns.git
+cd shizunari.-sns
 npm install
 ```
 
