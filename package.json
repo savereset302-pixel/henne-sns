@@ -1,6 +1,7 @@
 {
-  "name": "1",
-  "version": "0.1.0",
+  "name": "shizunari",
+  "version": "4.1.0",
+  "description": "Shizunari. - 静寂と本音のSNS | 自分の哲学を語る場所",
   "private": true,
   "scripts": {
     "dev": "next dev",
