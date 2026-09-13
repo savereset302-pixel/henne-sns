@@ -1,51 +1,66 @@
-# Shizunari - 静寂と本音のSNS
+# Shizunari.
 
-現代のSNSに見られる「いいね数やフォロワー数の過剰な可視化」や「即時的な反応へのプレッシャー」から離れ、自分の本音や考えを静かに書き残すためのWebアプリケーションです。
+ゼミの研究・個人開発で制作している、静けさと本音をテーマにした思索型SNSです。
 
-日本庭園の「水琴窟（すいきんくつ）」のように、落ち着いた静かな空間の中で自己の感情と向き合える場を目指して制作しました。
+## プロジェクトの概要
 
-## 主な機能
+現代のSNSは、いいね数やフォロワー数などの数字による評価や、刺激的なコンテンツによる過熱が起こりやすい傾向にあります。Shizunari. ではそうした数字への執着から離れ、自分の考えや本音を静かに書き留めておける場所を目指して開発しています。
 
-- **投稿と共感（波紋エフェクト）**
-  数字を競い合わせないよう、投稿や共感のアクション時に画面へ波紋が広がり、澄んだ水滴音が鳴る設計にしています。
-- **環境音の合成・再生**
-  外部の音声ファイルをダウンロードせず、ブラウザのWeb Audio API（オシレーター・ノイズ処理）を用いて、水琴窟・夜の波・竹林の風・焚き火の4種類の環境音をリアルタイムにプロシージャル合成します。
-- **感情の可視化と振り返り（マイジャーナル）**
-  投稿テキストの感情分析結果をもとにコミュニティ全体の傾向を「心の天気」として表示するほか、過去の自分の投稿や感情の推移をカレンダーで振り返ることができます。
-- **思索プロンプトとAI連携**
-  日替わりで思索のきっかけとなる問いかけ（今日の問い）を表示するほか、Gemini APIを利用したAI哲学者との対話や、投稿・アンケートの多言語翻訳に対応しています。
-- **深夜の静寂モード**
-  夜間（21:00〜翌5:00）のアクセス時に画面の刺激を抑え、静かな思索を促すバナーと水音の再生ショートカットを表示します。
+日本庭園の「水琴窟」のように、静かな環境だからこそ小さな水滴の音が澄んで響くという着想から、刺激を抑えた水色と深いネイビーを基調としたUIにしています。
+
+## 実装した主な機能
+
+- **共感リアクションと音響演出**
+  いいねボタンを押した際や投稿完了時に、水面に広がる波紋アニメーションを表示します。また、Web Audio APIを使って水琴窟のような水滴音をブラウザ側で合成・再生します。
+- **環境音の再生機能**
+  水琴窟、波、竹林の風、焚き火の4種類の環境音を、外部の音声ファイルを使わずにWeb Audio APIの波形合成だけで再生できるようにしています（通信量・読み込み遅延ゼロ）。
+- **心の天気**
+  投稿されたテキストを分析し、コミュニティ全体の感情の傾向を天気（晴れ・雨・曇り・嵐）として可視化します。
+- **マイジャーナル**
+  自分の過去の投稿と感情の変化をカレンダーやグラフで振り返ることができます。
+- **深夜モード**
+  夜間（21:00〜翌5:00）にアクセスした際、画面の眩しさを抑え、静かな思索を促すバナーを表示します。
+- **AIによる思索サポート**
+  日替わりで考えを深める問いを提示する機能や、Gemini APIを利用した感情分析・思索レポート、多言語翻訳を組み込んでいます。
+- **多言語対応**
+  日本語、英語、スペイン語、中国語の切り替えに対応しています。
 
 ## 使用技術
 
-- **フロントエンド**: Next.js 16 (App Router), React 19, TypeScript, CSS Modules
-- **バックエンド / データベース**: Firebase Authentication, Cloud Firestore, Next.js API Routes
-- **音響処理**: Web Audio API
-- **AI連携**: Google Gemini API (gemini-2.5-flash)
-- **インフラ**: Vercel
+- フロントエンド: Next.js (App Router), React, TypeScript
+- スタイリング: CSS Modules
+- バックエンド / データベース: Firebase (Authentication, Cloud Firestore)
+- AI / API: Google Gemini API
+- 音声処理: Web Audio API
+- デプロイ: Vercel
 
 ## 起動方法
 
-### 1. パッケージのインストール
+### 1. 準備
+
 ```bash
+git clone https://github.com/savereset302-pixel/shizunari.-sns.git
+cd shizunari.-sns
 npm install
 ```
 
 ### 2. 環境変数の設定
-ルートディレクトリに `.env.local` を作成し、必要な環境変数を設定します。
+
+`.env.local` を作成し、FirebaseおよびGeminiのAPIキーを設定します。
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
 ### 3. 開発サーバーの起動
+
 ```bash
 npm run dev
 ```
